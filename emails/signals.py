@@ -1,6 +1,8 @@
 import logging
 
 from django.core.cache import cache
+
+logger = logging.getLogger(__name__)
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 

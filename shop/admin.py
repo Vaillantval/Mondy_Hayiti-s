@@ -312,14 +312,6 @@ class SettingAdmin(admin.ModelAdmin):
     )
     actions = ["refresh_exchange_rates"]
 
-    def has_add_permission(self, request):
-        """Autorise la création uniquement s'il n'existe pas encore de Setting."""
-        return not Setting.objects.exists()
-
-    def has_delete_permission(self, request, obj=None):
-        """Interdit la suppression du Setting — le site ne peut pas fonctionner sans."""
-        return False
-
     def display_logo(self, obj):
         if obj.logo:
             return format_html(
