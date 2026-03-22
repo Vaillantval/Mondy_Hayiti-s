@@ -17,6 +17,9 @@ def _migrate_cart_session(request):
 
 def cart_context(request):
     """Injecte le panier et la wishlist dans tous les templates."""
+    if request.path.startswith('/admin/'):
+        return {}
+
     from shop.services.cart_service import CartService
     from shop.templatetags.price_filters import _get_setting, _get_rate, _format
 
@@ -95,11 +98,19 @@ def cart_context(request):
 
 
 def site_settings(request):
-    settings_obj = Setting.objects.first()
-    head_pages = Page.objects.filter(is_head=True)
-    foot_pages = Page.objects.filter(is_foot=True)
-    mega_categories = Category.objects.filter(is_mega=True)
-    mega_collections = Collection.objects.all()[:3]
+    # Court-circuit sur les pages admin — ces variables ne sont pas utilisées
+    # par les templates Django admin et les requêtes inutiles peuvent causer des 500.
+    if request.path.startswith('/admin/'):
+        return {}
+
+    try:
+        settings_obj = Setting.objects.first()
+        head_pages = Page.objects.filter(is_head=True)
+        foot_pages = Page.objects.filter(is_foot=True)
+        mega_categories = Category.objects.filter(is_mega=True)
+        mega_collections = Collection.objects.all()[:3]
+    except Exception:
+        return {}
 
     my_head_pages = []
     my_foot_pages = []

@@ -14,12 +14,21 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-default-change-me")
 # --- GESTION DES HÔTES  ---
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "healthcheck.railway.app"]
 
-# Récupération automatique du domaine Railway
+# Domaine Railway auto-injecté (ex: xxx.up.railway.app)
 _railway_domain = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
 if _railway_domain:
     ALLOWED_HOSTS.append(_railway_domain)
 
-# Ajout des domaines personnalisés depuis les variables d'environnement
+# Domaine extrait de SITE_URL — source de vérité unique pour le domaine de production
+# Ex: SITE_URL=https://matstorehaiti.online → ajoute "matstorehaiti.online"
+_site_url = os.environ.get("SITE_URL", "")
+if _site_url:
+    from urllib.parse import urlparse as _urlparse
+    _site_host = _urlparse(_site_url).hostname
+    if _site_host and _site_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_site_host)
+
+# Domaines supplémentaires via variable Railway ALLOWED_HOSTS (ex: "matstorehaiti.online,www.matstorehaiti.online")
 _extra_hosts = os.environ.get("ALLOWED_HOSTS", "")
 if _extra_hosts:
     ALLOWED_HOSTS += [h.strip() for h in _extra_hosts.split(",") if h.strip()]
@@ -140,6 +149,12 @@ if not DEBUG:
 CSRF_TRUSTED_ORIGINS = ["http://localhost", "http://127.0.0.1"]
 if _railway_domain:
     CSRF_TRUSTED_ORIGINS.append(f"https://{_railway_domain}")
+
+# Ajout automatique depuis SITE_URL (même source de vérité que ALLOWED_HOSTS)
+if _site_url and _site_url not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(_site_url)
+
+# Origines supplémentaires via variable Railway CSRF_TRUSTED_ORIGINS (ex: "https://matstorehaiti.online")
 _extra_origins = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
 if _extra_origins:
     CSRF_TRUSTED_ORIGINS += [o.strip() for o in _extra_origins.split(",") if o.strip()]
