@@ -317,6 +317,10 @@ class StripeWebhookView(APIView):
             intent = event["data"]["object"]
             order_id = intent.get("metadata", {}).get("order_id")
             if order_id:
-                Order.objects.filter(id=order_id).update(is_paid=True, status="processing")
+                order = Order.objects.filter(id=order_id).first()
+                if order and not order.is_paid:
+                    order.is_paid = True
+                    order.status = "processing"
+                    order.save(update_fields=["is_paid", "status"])
 
         return Response({"status": "ok"})
