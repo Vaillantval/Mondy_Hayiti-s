@@ -27,7 +27,9 @@ au marché haïtien.
 
 ## Aperçu du projet
 
-MatStore Haiti est une boutique en ligne spécialisée dans la vente de matériaux de construction.
+MatStore Haiti est une boutique en ligne spécialisée dans la vente de matériaux de construction, de produits
+alimenraires
+et de vetements.
 Elle s'adresse à la clientèle haïtienne avec des méthodes de paiement locales (MonCash, virement,
 dépôt) et internationales (Stripe / carte bancaire).
 
@@ -45,16 +47,16 @@ dépôt) et internationales (Stripe / carte bancaire).
 
 ## Architecture technique
 
-| Couche | Technologie |
-| --- | --- |
-| Backend | Python 3.13 · Django 6.0 · Django REST Framework |
-| Base de données | PostgreSQL (Railway) |
-| Stockage médias | Volume persistant Railway (`/app/media`) |
-| Paiement en ligne | Stripe PaymentIntents · MonCash REST API |
-| Notifications | Mailjet (SMTP/API) · Firebase Cloud Messaging (mobile) |
-| Documentation API | drf-spectacular (OpenAPI 3.0 / Swagger UI) |
-| Application mobile | Flutter 3.x · Dart · Riverpod · Dio · Freezed |
-| Déploiement | Railway (PaaS) · Gunicorn · WhiteNoise |
+| Couche             | Technologie                                            |
+|--------------------|--------------------------------------------------------|
+| Backend            | Python 3.13 · Django 6.0 · Django REST Framework       |
+| Base de données    | PostgreSQL (Railway)                                   |
+| Stockage médias    | Volume persistant Railway (`/app/media`)               |
+| Paiement en ligne  | Stripe PaymentIntents · MonCash REST API               |
+| Notifications      | Mailjet (SMTP/API) · Firebase Cloud Messaging (mobile) |
+| Documentation API  | drf-spectacular (OpenAPI 3.0 / Swagger UI)             |
+| Application mobile | Flutter 3.x · Dart · Riverpod · Dio · Freezed          |
+| Déploiement        | Railway (PaaS) · Gunicorn · WhiteNoise                 |
 
 ---
 
@@ -150,32 +152,32 @@ Créer un fichier `.env` à la racine du projet (ne jamais versionner ce fichier
 
 ```ini
 # -- Django --
-SECRET_KEY=votre_cle_secrete_django
-DEBUG=False
-ALLOWED_HOSTS=votre-domaine.railway.app,localhost
+SECRET_KEY = votre_cle_secrete_django
+DEBUG = False
+ALLOWED_HOSTS = votre-domaine.railway.app,localhost
 
 # -- Base de données --
-DATABASE_URL=postgresql://user:password@host:5432/matstore_db
+DATABASE_URL = postgresql://user:password@host:5432/matstore_db
 
 # -- Email (Mailjet) --
-MAILJET_API_KEY=votre_api_key
-MAILJET_SECRET_KEY=votre_secret_key
-DEFAULT_FROM_EMAIL=MatStore Haiti <info@matstorehaiti.online>
-ADMINS_NOTIFY=info@matstorehaiti.online
-SITE_URL=https://matstorehaiti.online
+MAILJET_API_KEY = votre_api_key
+MAILJET_SECRET_KEY = votre_secret_key
+DEFAULT_FROM_EMAIL = MatStore Haiti <info@matstorehaiti.online>
+ADMINS_NOTIFY = info@matstorehaiti.online
+SITE_URL = https://matstorehaiti.online
 
 # -- Stripe --
-STRIPE_PUBLIC_KEY=pk_live_...
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PUBLIC_KEY = pk_live_...
+STRIPE_SECRET_KEY = sk_live_...
+STRIPE_WEBHOOK_SECRET = whsec_...
 
 # -- MonCash --
-MONCASH_CLIENT_ID=votre_client_id
-MONCASH_SECRET_KEY=votre_secret_key
-MONCASH_ENVIRONMENT=production   # sandbox | production
+MONCASH_CLIENT_ID = votre_client_id
+MONCASH_SECRET_KEY = votre_secret_key
+MONCASH_ENVIRONMENT = production   # sandbox | production
 
 # -- Firebase (notifications mobiles) --
-FIREBASE_SERVER_KEY=votre_cle_firebase
+FIREBASE_SERVER_KEY = votre_cle_firebase
 ```
 
 ---
@@ -270,14 +272,14 @@ L'API est construite avec Django REST Framework et documentée via **drf-spectac
 
 ### Authentification
 
-| Méthode | Endpoint | Description |
-| --- | --- | --- |
-| POST | `/api/auth/login/` | Connexion (retourne access + refresh JWT) |
-| POST | `/api/auth/register/` | Inscription |
-| POST | `/api/auth/token/refresh/` | Renouvellement du token d'accès |
-| POST | `/api/auth/logout/` | Déconnexion (blacklist du refresh token) |
-| GET/PATCH | `/api/auth/profile/` | Profil de l'utilisateur connecté |
-| POST | `/api/auth/fcm-token/` | Enregistrement du token FCM (notifications push) |
+| Méthode   | Endpoint                   | Description                                      |
+|-----------|----------------------------|--------------------------------------------------|
+| POST      | `/api/auth/login/`         | Connexion (retourne access + refresh JWT)        |
+| POST      | `/api/auth/register/`      | Inscription                                      |
+| POST      | `/api/auth/token/refresh/` | Renouvellement du token d'accès                  |
+| POST      | `/api/auth/logout/`        | Déconnexion (blacklist du refresh token)         |
+| GET/PATCH | `/api/auth/profile/`       | Profil de l'utilisateur connecté                 |
+| POST      | `/api/auth/fcm-token/`     | Enregistrement du token FCM (notifications push) |
 
 > **Note :** Le token FCM est géré séparément via `POST /api/auth/fcm-token/` après le login.
 > Ne pas inclure `fcm_token` dans le payload de `POST /api/auth/login/`.
@@ -293,44 +295,44 @@ Authorization: Bearer <access_token>
 
 ### Catalogue
 
-| Méthode | Endpoint | Description |
-| --- | --- | --- |
-| GET | `/api/products/` | Liste des produits (filtres, recherche, pagination) |
-| GET | `/api/products/{id}/` | Détail d'un produit |
-| GET | `/api/categories/` | Liste des catégories |
-| GET | `/api/categories/{id}/products/` | Produits par catégorie |
+| Méthode | Endpoint                         | Description                                         |
+|---------|----------------------------------|-----------------------------------------------------|
+| GET     | `/api/products/`                 | Liste des produits (filtres, recherche, pagination) |
+| GET     | `/api/products/{id}/`            | Détail d'un produit                                 |
+| GET     | `/api/categories/`               | Liste des catégories                                |
+| GET     | `/api/categories/{id}/products/` | Produits par catégorie                              |
 
 ### Panier et Commandes
 
-| Méthode | Endpoint | Description |
-| --- | --- | --- |
-| GET | `/api/cart/` | Contenu du panier |
-| POST | `/api/cart/add/` | Ajouter un article |
-| PATCH | `/api/cart/update/` | Modifier la quantité |
-| DELETE | `/api/cart/remove/` | Retirer un article |
-| GET | `/api/orders/` | Historique des commandes (auth requis) |
-| GET | `/api/orders/{id}/` | Détail d'une commande |
-| POST | `/api/orders/` | Créer une commande |
+| Méthode | Endpoint            | Description                            |
+|---------|---------------------|----------------------------------------|
+| GET     | `/api/cart/`        | Contenu du panier                      |
+| POST    | `/api/cart/add/`    | Ajouter un article                     |
+| PATCH   | `/api/cart/update/` | Modifier la quantité                   |
+| DELETE  | `/api/cart/remove/` | Retirer un article                     |
+| GET     | `/api/orders/`      | Historique des commandes (auth requis) |
+| GET     | `/api/orders/{id}/` | Détail d'une commande                  |
+| POST    | `/api/orders/`      | Créer une commande                     |
 
 ### Paiement
 
-| Méthode | Endpoint | Description |
-| --- | --- | --- |
-| GET | `/api/carriers/` | Liste des transporteurs avec tarifs |
-| GET | `/api/payment-methods/` | Méthodes de paiement disponibles |
-| POST | `/api/payments/initiate/` | Initier un paiement (Stripe / MonCash) |
-| POST | `/api/payments/verify/` | Vérifier le statut d'un paiement |
-| POST | `/api/payments/offline/` | Soumettre une preuve de paiement hors ligne |
+| Méthode | Endpoint                  | Description                                 |
+|---------|---------------------------|---------------------------------------------|
+| GET     | `/api/carriers/`          | Liste des transporteurs avec tarifs         |
+| GET     | `/api/payment-methods/`   | Méthodes de paiement disponibles            |
+| POST    | `/api/payments/initiate/` | Initier un paiement (Stripe / MonCash)      |
+| POST    | `/api/payments/verify/`   | Vérifier le statut d'un paiement            |
+| POST    | `/api/payments/offline/`  | Soumettre une preuve de paiement hors ligne |
 
 ### Adresses
 
-| Méthode | Endpoint | Description |
-| --- | --- | --- |
-| GET | `/api/addresses/` | Adresses de l'utilisateur |
-| POST | `/api/addresses/` | Ajouter une adresse |
-| PATCH | `/api/addresses/{id}/` | Modifier une adresse |
-| DELETE | `/api/addresses/{id}/` | Supprimer une adresse |
-| PATCH | `/api/addresses/{id}/set-default/` | Définir comme adresse par défaut |
+| Méthode | Endpoint                           | Description                      |
+|---------|------------------------------------|----------------------------------|
+| GET     | `/api/addresses/`                  | Adresses de l'utilisateur        |
+| POST    | `/api/addresses/`                  | Ajouter une adresse              |
+| PATCH   | `/api/addresses/{id}/`             | Modifier une adresse             |
+| DELETE  | `/api/addresses/{id}/`             | Supprimer une adresse            |
+| PATCH   | `/api/addresses/{id}/set-default/` | Définir comme adresse par défaut |
 
 ---
 
@@ -369,6 +371,7 @@ Pour les clients souhaitant payer par virement bancaire, dépôt ou autre.
 6. Le client suit l'état via `payment_status` : `unpaid` → `proof_submitted` → `verified` → `paid`
 
 **Règles :**
+
 - La commande doit avoir `payment_method="offline"` pour accepter la preuve
 - Formats acceptés : JPG, PNG — taille maximale : 5 MB
 - La commande reste `is_paid=False` jusqu'à validation manuelle de l'admin
@@ -415,7 +418,7 @@ class Product with _$Product {
   }) = _Product;
 
   factory Product.fromJson(Map<String, dynamic> json) =>
-          _$ProductFromJson(json);
+      _$ProductFromJson(json);
 }
 ```
 
@@ -445,7 +448,8 @@ lib/
 
 1. L'application obtient un token FCM au démarrage via `FirebaseMessaging.instance.getToken()`
 2. Après login réussi, envoyer le token via `POST /api/auth/fcm-token/`
-3. Le backend utilise ce token pour envoyer des notifications ciblées (confirmation de commande, changement de statut de livraison)
+3. Le backend utilise ce token pour envoyer des notifications ciblées (confirmation de commande, changement de statut de
+   livraison)
 
 ---
 
@@ -455,16 +459,16 @@ L'interface d'administration Django (`/admin/`) permet de gérer l'ensemble de l
 
 ### Modules disponibles
 
-| Module | Fonctionnalités |
-| --- | --- |
-| **Produits** | Création, modification, images, gestion du stock, prix promo |
-| **Catégories** | Arborescence, images de catégorie |
-| **Commandes** | Suivi des statuts, détail des articles, preuve de paiement hors ligne |
-| **Clients** | Liste, profil, historique des commandes |
-| **Transporteurs** | Nom, tarif, activation/désactivation |
-| **Méthodes de paiement** | Activation par méthode (Stripe, MonCash, Hors Ligne) |
-| **Paramètres** | Devise de base, taux de TVA, coordonnées de la boutique, APK Android |
-| **Taux de change** | Gestion des paires de devises (HTG, USD, EUR...) |
+| Module                   | Fonctionnalités                                                       |
+|--------------------------|-----------------------------------------------------------------------|
+| **Produits**             | Création, modification, images, gestion du stock, prix promo          |
+| **Catégories**           | Arborescence, images de catégorie                                     |
+| **Commandes**            | Suivi des statuts, détail des articles, preuve de paiement hors ligne |
+| **Clients**              | Liste, profil, historique des commandes                               |
+| **Transporteurs**        | Nom, tarif, activation/désactivation                                  |
+| **Méthodes de paiement** | Activation par méthode (Stripe, MonCash, Hors Ligne)                  |
+| **Paramètres**           | Devise de base, taux de TVA, coordonnées de la boutique, APK Android  |
+| **Taux de change**       | Gestion des paires de devises (HTG, USD, EUR...)                      |
 
 ### Gestion des taux de change
 
