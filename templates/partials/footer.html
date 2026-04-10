@@ -32,7 +32,7 @@
                     <a href="{% url 'home' %}" class="ft-brand-link">
                         <div class="ft-brand-logo">
                             <div class="ft-brand-icon"><i class="linearicons-cart"></i></div>
-                            <span class="ft-brand-name">{% if site_name %}{{ site_name }}{% else %}MAT-STORE{% endif %}</span>
+                            <span class="ft-brand-name">{% if site_name %}{{ site_name }}{% else %}Hayiti's{% endif %}</span>
                         </div>
                     </a>
                     <p class="ft-brand-desc">
@@ -153,7 +153,7 @@
         <div class="container">
             <div class="ft-bottom-inner">
                 <p class="ft-copyright">
-                    {% if site_copyright %}{{ site_copyright }}{% else %}&copy; {% now "Y" %} MAT-STORE. Tous droits réservés.{% endif %}
+                    {% if site_copyright %}{{ site_copyright }}{% else %}&copy; {% now "Y" %} Hayiti's. Tous droits réservés.{% endif %}
                 </p>
                 <ul class="ft-payments">
                     <li><img src="{% static 'assets/images/visa.png' %}" alt="Visa"></li>
@@ -173,8 +173,8 @@
    FOOTER
 ═══════════════════════════════════════ */
 .site-footer {
-    background: #0f0f1a;
-    color: rgba(255,255,255,.58);
+    background: #1C0F0A;
+    color: rgba(255,252,245,.58);
     font-size: 13.5px;
     line-height: 1.6;
 }
@@ -182,7 +182,7 @@
 /* ── Newsletter bar ── */
 .ft-nl-bar {
     background: rgba(255,255,255,.04);
-    border-bottom: 1px solid rgba(255,255,255,.07);
+    border-bottom: 1px solid rgba(255,252,245,.07);
     padding: 18px 0;
 }
 .ft-nl-bar-inner {
@@ -191,10 +191,10 @@
 }
 .ft-nl-bar-text {
     display: flex; align-items: center; gap: 10px;
-    font-size: 13.5px; color: rgba(255,255,255,.55);
+    font-size: 13.5px; color: rgba(255,252,245,.55);
     flex-wrap: wrap;
 }
-.ft-nl-bar-ico { color: #ff5722; font-size: 15px; }
+.ft-nl-bar-ico { color: #C62828; font-size: 15px; }
 .ft-nl-bar-text span:nth-child(2) { font-weight: 600; color: rgba(255,255,255,.8); }
 .ft-nl-bar-muted { color: rgba(255,255,255,.35); font-size: 13px; }
 
@@ -208,8 +208,8 @@
 }
 .ft-nl-bar-input {
     padding: 9px 14px 9px 34px;
-    background: rgba(255,255,255,.07);
-    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,252,245,.07);
+    border: 1px solid rgba(255,252,245,.12);
     border-radius: 8px; color: rgba(255,255,255,.8);
     font-size: 13px; outline: none; width: 220px;
     font-family: inherit;
@@ -217,20 +217,20 @@
 }
 .ft-nl-bar-input::placeholder { color: rgba(255,255,255,.25); }
 .ft-nl-bar-input:focus {
-    border-color: rgba(255,87,34,.5);
-    background: rgba(255,255,255,.10);
+    border-color: rgba(198, 40, 40, .5);
+    background: rgba(255,252,245,.10);
 }
 .ft-nl-bar-btn {
     padding: 9px 18px;
     background: transparent;
-    border: 1px solid rgba(255,87,34,.55);
-    color: #ff5722; border-radius: 8px;
+    border: 1px solid rgba(198, 40, 40, .55);
+    color: #C62828; border-radius: 8px;
     font-size: 13px; font-weight: 700;
     cursor: pointer; transition: background .18s, color .18s, border-color .18s;
     font-family: inherit; white-space: nowrap;
 }
 .ft-nl-bar-btn:hover {
-    background: #ff5722; color: #fff; border-color: #ff5722;
+    background: #C62828; color: #fff; border-color: #C62828;
 }
 @media (max-width: 768px) {
     .ft-nl-bar-form { width: 100%; }
@@ -247,13 +247,13 @@
 }
 .ft-brand-icon {
     width: 38px; height: 38px; border-radius: 9px;
-    background: #ff5722;
+    background: #C62828;
     display: flex; align-items: center; justify-content: center;
     font-size: 16px; color: #fff; flex-shrink: 0;
 }
 .ft-brand-name { font-size: 18px; font-weight: 800; color: #fff; }
 .ft-brand-desc {
-    color: rgba(255,255,255,.45); font-size: 13px; line-height: 1.7;
+    color: rgba(255,252,245,.45); font-size: 13px; line-height: 1.7;
     margin-bottom: 22px; max-width: 320px;
 }
 
@@ -265,30 +265,30 @@
 }
 .ft-contact-icon {
     width: 28px; height: 28px; border-radius: 7px;
-    background: rgba(255,255,255,.07);
+    background: rgba(255,252,245,.07);
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px; color: #ff5722; flex-shrink: 0;
+    font-size: 12px; color: #C62828; flex-shrink: 0;
 }
 .ft-contact-list a { color: rgba(255,255,255,.5); text-decoration: none; transition: color .18s; }
-.ft-contact-list a:hover { color: #ff5722; }
+.ft-contact-list a:hover { color: #C62828; }
 
 /* ── Socials ── */
 .ft-socials { display: flex; gap: 8px; }
 .ft-social {
     width: 36px; height: 36px; border-radius: 9px;
-    background: rgba(255,255,255,.07);
+    background: rgba(255,252,245,.07);
     display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,.55); font-size: 16px; text-decoration: none;
+    color: rgba(255,252,245,.55); font-size: 16px; text-decoration: none;
     transition: background .18s, color .18s;
 }
-.ft-social:hover { background: #ff5722; color: #fff; }
+.ft-social:hover { background: #C62828; color: #fff; }
 
 /* ── Column title ── */
 .ft-col-title {
     font-size: 13px; font-weight: 800; color: #fff;
     text-transform: uppercase; letter-spacing: 1.2px;
     margin-bottom: 20px; padding-bottom: 10px;
-    border-bottom: 2px solid #ff5722;
+    border-bottom: 2px solid #C62828;
     display: inline-block;
 }
 
@@ -296,27 +296,27 @@
 .ft-links { list-style: none; padding: 0; margin: 0; }
 .ft-links li { margin-bottom: 9px; }
 .ft-links a {
-    color: rgba(255,255,255,.48); text-decoration: none;
+    color: rgba(255,252,245,.48); text-decoration: none;
     font-size: 13px; transition: color .18s, padding-left .18s;
     display: flex; align-items: center; gap: 7px;
 }
-.ft-links a i { font-size: 9px; color: #ff5722; flex-shrink: 0; }
-.ft-links a:hover { color: #ff5722; padding-left: 4px; }
+.ft-links a i { font-size: 9px; color: #C62828; flex-shrink: 0; }
+.ft-links a:hover { color: #C62828; padding-left: 4px; }
 
 /* ── Trust badges ── */
 .ft-trust { margin-top: 24px; display: flex; flex-direction: column; gap: 8px; }
 .ft-trust-item {
     display: flex; align-items: center; gap: 9px;
-    font-size: 12px; color: rgba(255,255,255,.38);
+    font-size: 12px; color: rgba(255,252,245,.38);
 }
-.ft-trust-item i { color: #ff5722; font-size: 13px; }
+.ft-trust-item i { color: #C62828; font-size: 13px; }
 
 /* ── Divider ── */
-.ft-divider { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 0; }
+.ft-divider { border: none; border-top: 1px solid rgba(255,252,245,.07); margin: 0; }
 
 /* ── Bottom bar ── */
 .ft-bottom {
-    border-top: 1px solid rgba(255,255,255,.07);
+    border-top: 1px solid rgba(255,252,245,.07);
     padding: 18px 0;
 }
 .ft-bottom-inner {

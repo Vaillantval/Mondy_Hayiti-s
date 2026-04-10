@@ -4,7 +4,7 @@
 {% block styles %}
 <style>
     .about_banner {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        background: linear-gradient(135deg, #FDF6EC 0%, #EDD9C0 100%);
         padding: 80px 0 60px;
         position: relative;
         overflow: hidden;
@@ -16,27 +16,27 @@
         right: -10%;
         width: 500px;
         height: 500px;
-        background: radial-gradient(circle, rgba(255,87,34,0.08) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(198, 40, 40, 0.08) 0%, transparent 70%);
         border-radius: 50%;
     }
     .about_banner .page_title h1 {
         font-size: 48px;
         font-weight: 700;
-        color: #1a1a2e;
+        color: #3E2723;
         line-height: 1.2;
     }
     .about_banner .page_title p {
         font-size: 18px;
-        color: #6c757d;
+        color: #6D4C41;
         max-width: 600px;
     }
-    .about_banner .breadcrumb-item a { color: #ff5722; }
-    .about_banner .breadcrumb-item.active { color: #6c757d; }
+    .about_banner .breadcrumb-item a { color: #C62828; }
+    .about_banner .breadcrumb-item.active { color: #6D4C41; }
 
     .section_title h2 {
         font-size: 36px;
         font-weight: 700;
-        color: #1a1a2e;
+        color: #3E2723;
         position: relative;
         display: inline-block;
     }
@@ -47,7 +47,7 @@
         left: 0;
         width: 60px;
         height: 3px;
-        background: #ff5722;
+        background: #C62828;
         border-radius: 2px;
     }
     .section_title.text-center h2::after {
@@ -55,7 +55,7 @@
         transform: translateX(-50%);
     }
     .section_title p {
-        color: #6c757d;
+        color: #6D4C41;
         font-size: 16px;
         margin-top: 20px;
     }
@@ -73,12 +73,12 @@
     .value_card:hover {
         transform: translateY(-8px);
         box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-        border-color: #ff5722;
+        border-color: #C62828;
     }
     .value_card .icon_wrap {
         width: 70px;
         height: 70px;
-        background: linear-gradient(135deg, #ff5722, #ff8a65);
+        background: linear-gradient(135deg, #C62828, #EF5350);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -92,11 +92,11 @@
     .value_card h5 {
         font-size: 18px;
         font-weight: 600;
-        color: #1a1a2e;
+        color: #3E2723;
         margin-bottom: 12px;
     }
     .value_card p {
-        color: #6c757d;
+        color: #6D4C41;
         font-size: 14px;
         line-height: 1.7;
         margin: 0;
@@ -109,12 +109,12 @@
     .stat_item h3 {
         font-size: 48px;
         font-weight: 800;
-        color: #ff5722;
+        color: #C62828;
         line-height: 1;
         margin-bottom: 8px;
     }
     .stat_item p {
-        color: #6c757d;
+        color: #6D4C41;
         font-size: 15px;
         font-weight: 500;
         margin: 0;
@@ -131,12 +131,12 @@
         position: absolute;
         bottom: -20px;
         right: -20px;
-        background: #ff5722;
+        background: #C62828;
         color: #fff;
         border-radius: 12px;
         padding: 20px 25px;
         text-align: center;
-        box-shadow: 0 8px 25px rgba(255,87,34,0.4);
+        box-shadow: 0 8px 25px rgba(198, 40, 40, 0.4);
     }
     .about_img_wrap .badge_floating span {
         display: block;
@@ -155,7 +155,7 @@
         color: #495057;
     }
     .page_content_block h1, .page_content_block h2, .page_content_block h3 {
-        color: #1a1a2e;
+        color: #3E2723;
         margin-top: 1.5rem;
         margin-bottom: 0.75rem;
     }
@@ -169,11 +169,11 @@
     .team_card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.12); }
     .team_card .team_img img { width: 100%; height: 280px; object-fit: cover; }
     .team_card .team_info { padding: 20px; background: #fff; text-align: center; }
-    .team_card .team_info h5 { font-weight: 600; color: #1a1a2e; margin-bottom: 4px; }
-    .team_card .team_info span { color: #ff5722; font-size: 13px; font-weight: 500; }
+    .team_card .team_info h5 { font-weight: 600; color: #3E2723; margin-bottom: 4px; }
+    .team_card .team_info span { color: #C62828; font-size: 13px; font-weight: 500; }
 
-    .stats_section { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
-    .stats_section .stat_item h3 { color: #ff5722; }
+    .stats_section { background: linear-gradient(135deg, #3E2723 0%, #33190F 100%); }
+    .stats_section .stat_item h3 { color: #C62828; }
     .stats_section .stat_item p { color: rgba(255,255,255,0.7); }
     .stats_section .divider { width: 1px; background: rgba(255,255,255,0.1); }
 </style>
@@ -211,8 +211,8 @@
                     {% if page and page.image %}
                     <img src="{{ page.image.url }}" alt="{{ page.name }}" class="img-fluid">
                     {% else %}
-                    <img src="{% static 'assets/images/about_img.jpg' %}" alt="À propos de MAT-STORE" class="img-fluid"
-                         onerror="this.src='https://via.placeholder.com/600x450/f8f9fa/1a1a2e?text=MAT-STORE'">
+                    <img src="{% static 'assets/images/about_img.jpg' %}" alt="À propos de Hayiti's" class="img-fluid"
+                         onerror="this.src='https://via.placeholder.com/600x450/f8f9fa/1a1a2e?text=Hayiti's'">
                     {% endif %}
                     <div class="badge_floating">
                         <span>5+</span>
@@ -230,12 +230,12 @@
                 </div>
                 {% else %}
                 <div class="page_content_block">
-                    <p>Bienvenue chez <strong>MAT-STORE</strong>, votre destination mode incontournable depuis plus de 5
+                    <p>Bienvenue chez <strong>Hayiti's</strong>, votre destination mode incontournable depuis plus de 5
                         ans. Nous sommes passionnés par la mode et nous nous engageons à vous offrir des produits de
                         qualité à des prix accessibles.</p>
                     <p>Notre équipe sélectionne avec soin chaque article pour vous proposer les dernières tendances en
                         matière de vêtements, accessoires et bien plus encore.</p>
-                    <p>Chez MAT-STORE, chaque client est unique. C'est pourquoi nous mettons tout en œuvre pour vous
+                    <p>Chez Hayiti's, chaque client est unique. C'est pourquoi nous mettons tout en œuvre pour vous
                         offrir une expérience d'achat exceptionnelle, en ligne comme en boutique.</p>
                 </div>
                 {% endif %}
@@ -321,12 +321,12 @@
 </section>
 
 <!-- CTA -->
-<section class="section py-5" style="background: linear-gradient(135deg, #ff5722 0%, #ff8a65 100%);">
+<section class="section py-5" style="background: linear-gradient(135deg, #C62828 0%, #EF5350 100%);">
     <div class="container text-center text-white">
         <h2 class="fw-bold mb-3" style="color:#fff;">Prêt à découvrir notre collection ?</h2>
         <p class="mb-4" style="color:rgba(255,255,255,0.85); font-size:17px;">Des milliers de produits vous attendent.
             Livraison gratuite dès 5000 HTG d'achat.</p>
-        <a href="{% url 'home' %}" class="btn btn-light btn-radius px-4 py-2 fw-semibold" style="color:#ff5722;">Voir la
+        <a href="{% url 'home' %}" class="btn btn-light btn-radius px-4 py-2 fw-semibold" style="color:#C62828;">Voir la
             boutique</a>
     </div>
 </section>

@@ -18,7 +18,7 @@ body { background: #f4f6f9; }
 /* ── Top bar ── */
 .ck-topbar {
     background: #fff;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid #EDD9C0;
     padding: 14px 0;
     position: sticky; top: 0; z-index: 100;
     box-shadow: 0 2px 12px rgba(0,0,0,0.06);
@@ -30,8 +30,8 @@ body { background: #f4f6f9; }
 .ck-back-btn {
     display: inline-flex; align-items: center; gap: 7px;
     padding: 8px 16px;
-    background: #f8f9fa;
-    border: 1.5px solid #e9ecef;
+    background: #FDF6EC;
+    border: 1.5px solid #EDD9C0;
     border-radius: 10px;
     color: #495057;
     font-size: 13.5px; font-weight: 600;
@@ -39,23 +39,23 @@ body { background: #f4f6f9; }
     transition: all .2s;
 }
 .ck-back-btn:hover {
-    background: #1a1a2e; color: #fff;
-    border-color: #1a1a2e;
+    background: #3E2723; color: #fff;
+    border-color: #3E2723;
     transform: translateX(-2px);
 }
 .ck-back-btn i { font-size: 11px; }
 
 .ck-brand {
-    font-size: 20px; font-weight: 800; color: #1a1a2e;
+    font-size: 20px; font-weight: 800; color: #3E2723;
     letter-spacing: -0.5px;
 }
-.ck-brand span { color: #ff5722; }
+.ck-brand span { color: #C62828; }
 
 .ck-secure {
     display: flex; align-items: center; gap: 6px;
-    font-size: 12.5px; color: #6c757d; font-weight: 500;
+    font-size: 12.5px; color: #6D4C41; font-weight: 500;
 }
-.ck-secure i { color: #22c55e; font-size: 14px; }
+.ck-secure i { color: #2E7D32; font-size: 14px; }
 
 /* ── Steps ── */
 .ck-steps {
@@ -66,33 +66,33 @@ body { background: #f4f6f9; }
     display: flex; align-items: center; gap: 9px;
     font-size: 14px; font-weight: 600; color: #adb5bd;
 }
-.ck-step.active { color: #ff5722; }
-.ck-step.done { color: #22c55e; }
+.ck-step.active { color: #C62828; }
+.ck-step.done { color: #2E7D32; }
 .ck-step-num {
     width: 32px; height: 32px; border-radius: 50%;
-    background: #e9ecef; color: #adb5bd;
+    background: #EDD9C0; color: #adb5bd;
     display: flex; align-items: center; justify-content: center;
     font-size: 13px; font-weight: 800; flex-shrink: 0;
     transition: all .3s;
 }
-.ck-step.active .ck-step-num { background: #ff5722; color: #fff; box-shadow: 0 0 0 4px rgba(255,87,34,.15); }
-.ck-step.done .ck-step-num { background: #22c55e; color: #fff; }
+.ck-step.active .ck-step-num { background: #C62828; color: #fff; box-shadow: 0 0 0 4px rgba(198, 40, 40, .15); }
+.ck-step.done .ck-step-num { background: #2E7D32; color: #fff; }
 .ck-step-sep {
-    width: 36px; height: 2px; background: #e9ecef; margin: 0 4px;
+    width: 36px; height: 2px; background: #EDD9C0; margin: 0 4px;
     flex-shrink: 0;
     transition: background .3s;
 }
-.ck-step.done + .ck-step-sep { background: #22c55e; }
+.ck-step.done + .ck-step-sep { background: #2E7D32; }
 
 /* ── Animated 4-step guide banner ── */
 .ck-guide-banner {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 55%, #2d1810 100%);
+    background: linear-gradient(135deg, #3E2723 0%, #33190F 55%, #2d1810 100%);
     border-radius: 18px;
     overflow: hidden;
     margin-bottom: 18px;
     padding: 18px 22px 20px;
     position: relative;
-    border: 1px solid rgba(255,87,34,.15);
+    border: 1px solid rgba(198, 40, 40, .15);
     animation: guideEntrance .55s cubic-bezier(.22,.68,0,1.2) both;
 }
 @keyframes guideEntrance {
@@ -105,12 +105,12 @@ body { background: #f4f6f9; }
 }
 .ck-guide-head-icon {
     width: 34px; height: 34px; border-radius: 9px;
-    background: rgba(255,87,34,.2);
+    background: rgba(198, 40, 40, .2);
     display: flex; align-items: center; justify-content: center;
-    color: #ff8a65; font-size: 15px; flex-shrink: 0;
+    color: #EF5350; font-size: 15px; flex-shrink: 0;
 }
 .ck-guide-head-text { color: #fff; font-size: 14px; font-weight: 700; }
-.ck-guide-head-sub  { color: rgba(255,255,255,.45); font-size: 11.5px; margin-top: 1px; }
+.ck-guide-head-sub  { color: rgba(255,252,245,.45); font-size: 11.5px; margin-top: 1px; }
 .ck-guide-steps-row {
     display: flex; align-items: flex-start; gap: 0;
 }
@@ -140,27 +140,27 @@ body { background: #f4f6f9; }
 .ck-gs.gs-done:not(:last-child)::after { background: rgba(34,197,94,.45); }
 .ck-gs-num {
     width: 30px; height: 30px; border-radius: 50%;
-    background: rgba(255,255,255,.08);
-    border: 2px solid rgba(255,255,255,.12);
+    background: rgba(255,252,245,.08);
+    border: 2px solid rgba(255,252,245,.12);
     display: flex; align-items: center; justify-content: center;
     font-size: 12px; font-weight: 800; color: rgba(255,255,255,.3);
     transition: all .35s;
     z-index: 1; position: relative;
 }
 .ck-gs.gs-active .ck-gs-num {
-    background: #ff5722; border-color: #ff5722; color: #fff;
+    background: #C62828; border-color: #C62828; color: #fff;
     animation: gsActivePulse 2.2s ease-in-out infinite;
 }
 @keyframes gsActivePulse {
-    0%,100% { box-shadow: 0 0 0 3px rgba(255,87,34,.25); }
-    50%      { box-shadow: 0 0 0 8px rgba(255,87,34,.06); }
+    0%,100% { box-shadow: 0 0 0 3px rgba(198,40,40,.25); }
+    50%      { box-shadow: 0 0 0 8px rgba(198, 40, 40, .06); }
 }
 .ck-gs.gs-done .ck-gs-num {
-    background: #22c55e; border-color: #22c55e; color: #fff;
+    background: #2E7D32; border-color: #2E7D32; color: #fff;
     animation: none; box-shadow: none;
 }
 .ck-gs-icon { font-size: 12px; color: rgba(255,255,255,.22); transition: color .3s; }
-.ck-gs.gs-active .ck-gs-icon { color: #ff8a65; }
+.ck-gs.gs-active .ck-gs-icon { color: #EF5350; }
 .ck-gs.gs-done   .ck-gs-icon { color: #4ade80; }
 .ck-gs-label {
     font-size: 10px; font-weight: 600; color: rgba(255,255,255,.28);
@@ -192,7 +192,7 @@ body { background: #f4f6f9; }
 .ck-card {
     background: #fff;
     border-radius: 18px;
-    border: 1px solid #e9ecef;
+    border: 1px solid #EDD9C0;
     box-shadow: 0 2px 20px rgba(0,0,0,0.06);
     overflow: hidden;
     margin-bottom: 18px;
@@ -208,10 +208,10 @@ body { background: #f4f6f9; }
     width: 38px; height: 38px; border-radius: 10px;
     background: #fff8f6;
     display: flex; align-items: center; justify-content: center;
-    color: #ff5722; font-size: 17px; flex-shrink: 0;
+    color: #C62828; font-size: 17px; flex-shrink: 0;
 }
 .ck-card-head h5 {
-    margin: 0; font-size: 16px; font-weight: 700; color: #1a1a2e;
+    margin: 0; font-size: 16px; font-weight: 700; color: #3E2723;
 }
 .ck-card-head small {
     font-size: 13px; color: #adb5bd; margin-left: auto; font-weight: 400;
@@ -222,12 +222,12 @@ body { background: #f4f6f9; }
 .ck-login-toggle {
     display: flex; align-items: center; gap: 10px;
     padding: 14px 24px;
-    background: #f8f9fa;
+    background: #FDF6EC;
     border-bottom: 1px solid #f0f0f0;
     font-size: 14.5px; color: #495057;
 }
 .ck-login-toggle a {
-    color: #ff5722; font-weight: 700; text-decoration: none; margin-left: 4px;
+    color: #C62828; font-weight: 700; text-decoration: none; margin-left: 4px;
 }
 .ck-login-toggle a:hover { text-decoration: underline; }
 
@@ -242,20 +242,20 @@ body { background: #f4f6f9; }
 
 /* ── Form controls ── */
 .ck-label {
-    font-size: 12.5px; font-weight: 700; color: #6c757d;
+    font-size: 12.5px; font-weight: 700; color: #6D4C41;
     text-transform: uppercase; letter-spacing: .5px;
     margin-bottom: 7px; display: block;
 }
 .ck-input {
     width: 100%; padding: 12px 16px;
-    border: 1.5px solid #e9ecef; border-radius: 10px;
-    font-size: 15px; color: #1a1a2e;
+    border: 1.5px solid #EDD9C0; border-radius: 10px;
+    font-size: 15px; color: #3E2723;
     transition: border-color .2s, box-shadow .2s;
     outline: none; background: #fff;
 }
 .ck-input:focus {
-    border-color: #ff5722;
-    box-shadow: 0 0 0 3px rgba(255,87,34,.10);
+    border-color: #C62828;
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, .10);
 }
 .ck-input.ck-select { appearance: none; cursor: pointer; }
 .ck-input.ck-textarea { resize: vertical; min-height: 80px; }
@@ -267,18 +267,18 @@ body { background: #f4f6f9; }
 .dial-btn {
     display: flex; align-items: center; gap: 6px;
     padding: 11px 12px;
-    border: 1.5px solid #e9ecef; border-radius: 10px;
+    border: 1.5px solid #EDD9C0; border-radius: 10px;
     background: #fff; cursor: pointer; outline: none;
-    font-size: 14px; color: #1a1a2e; white-space: nowrap;
+    font-size: 14px; color: #3E2723; white-space: nowrap;
     transition: border-color .2s, box-shadow .2s;
 }
 .dial-btn:focus, .dial-btn[aria-expanded="true"] {
-    border-color: #ff5722;
-    box-shadow: 0 0 0 3px rgba(255,87,34,.10);
+    border-color: #C62828;
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, .10);
 }
 .dial-menu {
     position: absolute; top: calc(100% + 4px); left: 0;
-    background: #fff; border: 1.5px solid #e9ecef; border-radius: 10px;
+    background: #fff; border: 1.5px solid #EDD9C0; border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0,0,0,.12);
     z-index: 999; min-width: 210px; max-height: 240px; overflow-y: auto;
     padding: 4px; list-style: none; margin: 0;
@@ -286,11 +286,11 @@ body { background: #f4f6f9; }
 .dial-opt {
     display: flex; align-items: center; gap: 8px;
     padding: 8px 10px; border-radius: 7px; cursor: pointer;
-    font-size: 13.5px; color: #1a1a2e;
+    font-size: 13.5px; color: #3E2723;
 }
 .dial-opt:hover { background: #fff4f0; }
 .dial-opt-code { font-weight: 600; min-width: 48px; }
-.dial-opt-name { color: #6c757d; font-size: 12.5px; }
+.dial-opt-name { color: #6D4C41; font-size: 12.5px; }
 .dial-btn .fi, .dial-opt .fi { width: 1.4em; border-radius: 2px; flex-shrink: 0; }
 .ck-form-row {
     display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
@@ -300,34 +300,34 @@ body { background: #f4f6f9; }
 /* ── Address card (existing) ── */
 .ck-addr-card {
     display: flex; gap: 14px; padding: 15px 18px;
-    border: 2px solid #e9ecef; border-radius: 14px;
+    border: 2px solid #EDD9C0; border-radius: 14px;
     cursor: pointer; transition: all .22s; margin-bottom: 12px;
     position: relative;
 }
-.ck-addr-card:hover { border-color: #ffd5c8; background: #fffaf9; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(255,87,34,.08); }
+.ck-addr-card:hover { border-color: #ffd5c8; background: #fffaf9; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(198, 40, 40, .08); }
 .ck-addr-card.selected {
-    border-color: #ff5722; background: #fff8f6;
-    box-shadow: 0 0 0 3px rgba(255,87,34,.12);
+    border-color: #C62828; background: #fff8f6;
+    box-shadow: 0 0 0 3px rgba(198,40,40,.12);
 }
 .ck-addr-selected-badge {
     position: absolute; top: 10px; right: 12px;
     width: 22px; height: 22px; border-radius: 50%;
-    background: #ff5722; color: #fff;
+    background: #C62828; color: #fff;
     display: none; align-items: center; justify-content: center;
     font-size: 11px;
 }
 .ck-addr-card.selected .ck-addr-selected-badge { display: flex; }
 .ck-addr-icon {
     width: 42px; height: 42px; border-radius: 10px;
-    background: #fff8f6; color: #ff5722;
+    background: #fff8f6; color: #C62828;
     display: flex; align-items: center; justify-content: center;
     font-size: 17px; flex-shrink: 0;
     transition: background .2s;
 }
-.ck-addr-card.selected .ck-addr-icon { background: #ff5722; color: #fff; }
+.ck-addr-card.selected .ck-addr-icon { background: #C62828; color: #fff; }
 .ck-addr-info { flex: 1; min-width: 0; padding-right: 24px; }
-.ck-addr-name { font-size: 15px; font-weight: 700; color: #1a1a2e; }
-.ck-addr-line { font-size: 13.5px; color: #6c757d; margin-top: 3px; }
+.ck-addr-name { font-size: 15px; font-weight: 700; color: #3E2723; }
+.ck-addr-line { font-size: 13.5px; color: #6D4C41; margin-top: 3px; }
 
 /* ── Toggle switch ── */
 .ck-switch-row {
@@ -341,28 +341,28 @@ body { background: #f4f6f9; }
 .ck-carrier-grid { display: flex; flex-direction: column; gap: 10px; }
 .ck-carrier {
     display: flex; align-items: center; gap: 12px;
-    padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 12px;
+    padding: 12px 16px; border: 2px solid #EDD9C0; border-radius: 12px;
     cursor: pointer; transition: all .2s; position: relative;
 }
 .ck-carrier:hover { border-color: #ffd5c8; background: #fffaf9; }
 .ck-carrier input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
 .ck-carrier input:checked ~ .ck-carrier-content { pointer-events: none; }
-.ck-carrier.checked { border-color: #ff5722; background: #fff8f6; box-shadow: 0 0 0 3px rgba(255,87,34,.10); }
+.ck-carrier.checked { border-color: #C62828; background: #fff8f6; box-shadow: 0 0 0 3px rgba(198, 40, 40, .10); }
 .ck-carrier-img {
     width: 42px; height: 42px; border-radius: 9px;
-    background: #f8f9fa; border: 1px solid #f0f0f0;
+    background: #FDF6EC; border: 1px solid #f0f0f0;
     display: flex; align-items: center; justify-content: center;
     overflow: hidden; flex-shrink: 0;
 }
 .ck-carrier-img img { width: 100%; height: 100%; object-fit: contain; }
 .ck-carrier-info { flex: 1; }
-.ck-carrier-name { font-size: 13.5px; font-weight: 700; color: #1a1a2e; }
-.ck-carrier-desc { font-size: 12px; color: #6c757d; margin-top: 1px; }
-.ck-carrier-price { font-size: 14px; font-weight: 800; color: #1a1a2e; }
-.ck-carrier-price.free { color: #22c55e; }
+.ck-carrier-name { font-size: 13.5px; font-weight: 700; color: #3E2723; }
+.ck-carrier-desc { font-size: 12px; color: #6D4C41; margin-top: 1px; }
+.ck-carrier-price { font-size: 14px; font-weight: 800; color: #3E2723; }
+.ck-carrier-price.free { color: #2E7D32; }
 .ck-carrier-check {
     width: 20px; height: 20px; border-radius: 50%;
-    background: #ff5722; color: #fff;
+    background: #C62828; color: #fff;
     display: none; align-items: center; justify-content: center;
     font-size: 10px; flex-shrink: 0;
 }
@@ -384,16 +384,16 @@ body { background: #f4f6f9; }
 
 /* Summary header gradient */
 .ck-summary .ck-card-head {
-    background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4e 100%);
+    background: linear-gradient(135deg, #3E2723 0%, #4E342E 100%);
     border-bottom: none; padding: 20px 24px;
 }
 .ck-summary .ck-card-head-icon {
-    background: rgba(255,87,34,.2); color: #ff8a65;
+    background: rgba(198, 40, 40, .2); color: #EF5350;
 }
 .ck-summary .ck-card-head h5 { color: #fff; font-size: 17px; }
 .ck-summary .ck-badge {
-    background: rgba(255,87,34,.25); color: #ff8a65;
-    border: 1px solid rgba(255,87,34,.3);
+    background: rgba(198,40,40,.25); color: #EF5350;
+    border: 1px solid rgba(198, 40, 40, .3);
 }
 
 /* Items */
@@ -417,23 +417,23 @@ body { background: #f4f6f9; }
 .ck-item-img {
     width: 54px; height: 54px; border-radius: 10px;
     object-fit: cover; border: 1px solid #f0f0f0; flex-shrink: 0;
-    background: #f8f9fa;
+    background: #FDF6EC;
 }
 .ck-item-info { flex: 1; min-width: 0; }
-.ck-item-name { font-size: 14px; font-weight: 600; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ck-item-name { font-size: 14px; font-weight: 600; color: #3E2723; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ck-item-unit { font-size: 12.5px; color: #adb5bd; margin-top: 2px; }
 .ck-item-qty {
     font-size: 12px; font-weight: 700;
     background: #f0f0f0; color: #495057;
     border-radius: 20px; padding: 3px 10px; flex-shrink: 0;
 }
-.ck-item-total { font-size: 14.5px; font-weight: 700; color: #1a1a2e; flex-shrink: 0; }
+.ck-item-total { font-size: 14.5px; font-weight: 700; color: #3E2723; flex-shrink: 0; }
 
 .ck-divider { border: none; border-top: 1px solid #f0f0f0; margin: 6px 0; }
 
 /* Price rows */
 .ck-price-block {
-    background: #f8f9fa; border-radius: 12px;
+    background: #FDF6EC; border-radius: 12px;
     padding: 14px 16px; margin: 6px 0;
     animation: fadeInUp .4s .35s ease both;
 }
@@ -443,9 +443,9 @@ body { background: #f4f6f9; }
 }
 .ck-price-row {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 6px 0; font-size: 14px; color: #6c757d;
+    padding: 6px 0; font-size: 14px; color: #6D4C41;
 }
-.ck-price-row:not(:last-child) { border-bottom: 1px dashed #e9ecef; }
+.ck-price-row:not(:last-child) { border-bottom: 1px dashed #EDD9C0; }
 
 /* Total row */
 .ck-total-row {
@@ -453,9 +453,9 @@ body { background: #f4f6f9; }
     padding: 16px 16px 6px;
     animation: fadeInUp .4s .5s ease both;
 }
-.ck-total-label { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+.ck-total-label { font-size: 16px; font-weight: 700; color: #3E2723; }
 .ck-total-amount {
-    font-size: 26px; font-weight: 800; color: #ff5722;
+    font-size: 26px; font-weight: 800; color: #C62828;
     letter-spacing: -0.5px;
     animation: popIn .5s .6s cubic-bezier(.22,.68,0,1.4) both;
 }
@@ -468,12 +468,12 @@ body { background: #f4f6f9; }
 .ck-pay-btn {
     display: flex; align-items: center; justify-content: center; gap: 9px;
     width: 100%; padding: 17px;
-    background: linear-gradient(135deg, #ff5722, #ff8a65);
+    background: linear-gradient(135deg, #C62828, #EF5350);
     color: #fff; font-size: 16px; font-weight: 700;
     border: none; border-radius: 14px; cursor: pointer;
     text-decoration: none;
     transition: all .25s; margin-top: 14px;
-    box-shadow: 0 6px 20px rgba(255,87,34,.4);
+    box-shadow: 0 6px 20px rgba(198, 40, 40, .4);
     animation: fadeInUp .4s .65s ease both;
     position: relative; overflow: hidden;
 }
@@ -481,7 +481,7 @@ body { background: #f4f6f9; }
     content: '';
     position: absolute; top: -50%; left: -60%;
     width: 40%; height: 200%;
-    background: rgba(255,255,255,.15);
+    background: rgba(255,252,245,.15);
     transform: skewX(-20deg);
     animation: shimmer 2.5s 1.5s ease-in-out infinite;
 }
@@ -491,7 +491,7 @@ body { background: #f4f6f9; }
 }
 .ck-pay-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(255,87,34,.5);
+    box-shadow: 0 12px 30px rgba(198, 40, 40, .5);
     color: #fff;
 }
 
@@ -508,18 +508,18 @@ body { background: #f4f6f9; }
 .ck-back-cart {
     display: block; text-align: center;
     margin-top: 12px; font-size: 13.5px;
-    color: #6c757d; text-decoration: none;
+    color: #6D4C41; text-decoration: none;
     font-weight: 500;
     animation: fadeInUp .4s .75s ease both;
 }
-.ck-back-cart:hover { color: #ff5722; }
+.ck-back-cart:hover { color: #C62828; }
 
 .ck-secure-badge {
     display: flex; align-items: center; justify-content: center; gap: 7px;
     margin-top: 16px; font-size: 12.5px; color: #adb5bd;
     animation: fadeInUp .4s .8s ease both;
 }
-.ck-secure-badge i { color: #22c55e; animation: pulse-lock 2s 2s ease-in-out infinite; }
+.ck-secure-badge i { color: #2E7D32; animation: pulse-lock 2s 2s ease-in-out infinite; }
 @keyframes pulse-lock {
     0%, 100% { transform: scale(1); }
     50%       { transform: scale(1.2); }
@@ -532,7 +532,7 @@ body { background: #f4f6f9; }
     overflow: hidden;
 }
 .ck-modal .modal-header {
-    background: linear-gradient(135deg, #1a1a2e, #2d2d4e);
+    background: linear-gradient(135deg, #3E2723, #4E342E);
     border: none; padding: 20px 24px;
 }
 .ck-modal .modal-title { color: #fff; font-weight: 700; }
@@ -542,14 +542,14 @@ body { background: #f4f6f9; }
 #submit {
     display: flex; align-items: center; justify-content: center; gap: 8px;
     width: 100%; padding: 14px;
-    background: linear-gradient(135deg, #ff5722, #ff8a65);
+    background: linear-gradient(135deg, #C62828, #EF5350);
     color: #fff; font-size: 14.5px; font-weight: 700;
     border: none; border-radius: 10px; cursor: pointer;
     margin-top: 20px;
     transition: all .2s;
-    box-shadow: 0 4px 14px rgba(255,87,34,.35);
+    box-shadow: 0 4px 14px rgba(198, 40, 40, .35);
 }
-#submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,87,34,.45); }
+#submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(198,40,40,.45); }
 
 .spinner { display: none; width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
 .spinner.visible { display: inline-block; }
@@ -566,7 +566,7 @@ body { background: #f4f6f9; }
 
 /* ── Badge ── */
 .ck-badge {
-    background: #fff3ee; color: #ff5722;
+    background: #fff3ee; color: #C62828;
     font-size: 11px; font-weight: 700;
     padding: 2px 8px; border-radius: 20px;
     margin-left: 8px;
@@ -656,7 +656,7 @@ body { background: #f4f6f9; }
             {% if not user.is_authenticated %}
             <div class="ck-card">
                 <div class="ck-login-toggle">
-                    <i class="ti-user" style="color:#ff5722;"></i>
+                    <i class="ti-user" style="color:#C62828;"></i>
                     Déjà client ?
                     <a href="#loginCollapse" data-bs-toggle="collapse" aria-expanded="false" class="collapsed">
                         Se connecter
@@ -664,7 +664,7 @@ body { background: #f4f6f9; }
                 </div>
                 <div id="loginCollapse" class="collapse">
                     <div class="ck-card-body" style="padding-top:16px;">
-                        <p style="font-size:13px; color:#6c757d; margin-bottom:16px;">
+                        <p style="font-size:13px; color:#6D4C41; margin-bottom:16px;">
                             Connectez-vous pour retrouver vos adresses enregistrées.
                         </p>
                         <form id="login_form" action="{% url 'login_form' %}" method="post">
@@ -681,7 +681,7 @@ body { background: #f4f6f9; }
                                 <div class="text-danger password-error" style="font-size:12px; margin-top:4px;"></div>
                             </div>
                             <button type="submit" name="login"
-                                style="width:100%; padding:11px; background:#1a1a2e; color:#fff; border:none; border-radius:9px; font-weight:700; font-size:14px; cursor:pointer;">
+                                style="width:100%; padding:11px; background:#3E2723; color:#fff; border:none; border-radius:9px; font-weight:700; font-size:14px; cursor:pointer;">
                                 <i class="ti-unlock" style="margin-right:6px;"></i> Se connecter
                             </button>
                         </form>
@@ -743,7 +743,7 @@ body { background: #f4f6f9; }
                                data-method-type="offline">
                             <input type="radio" name="payment_method_choice"
                                    value="offline" id="pm_offline">
-                            <div class="ck-carrier-img" style="background:#6c757d;">
+                            <div class="ck-carrier-img" style="background:#6D4C41;">
                                 <i class="ti-receipt" style="color:#fff; font-size:18px;"></i>
                             </div>
                             <div class="ck-carrier-info">
@@ -758,12 +758,12 @@ body { background: #f4f6f9; }
                     <!-- ── Zone upload preuve (visible si offline sélectionné) ── -->
                     <div id="offline-upload-area" style="display:none; margin-top:16px;">
                         <div style="
-                            background:#f8f9fa; border:1.5px dashed #ced4da; border-radius:12px;
+                            background:#FDF6EC; border:1.5px dashed #ced4da; border-radius:12px;
                             padding:16px 18px;
                         ">
                             <p style="font-size:13.5px; color:#495057; margin:0 0 10px; line-height:1.6;">
                                 <i class="ti-info-alt" style="color:#f59e0b; margin-right:5px;"></i>
-                                Effectuez votre virement ou dépôt sur le compte MatStore Haiti,
+                                Effectuez votre virement ou dépôt sur le compte Hayiti's,
                                 puis uploadez ici une <strong>photo ou capture de la preuve de paiement</strong>.
                             </p>
                             <label class="ck-label" for="id_payment_proof">Preuve de paiement <span style="color:#ef4444; font-weight:600;">*</span></label>
@@ -771,7 +771,7 @@ body { background: #f4f6f9; }
                                    accept="image/*,.pdf"
                                    class="ck-input"
                                    style="padding:8px 12px; cursor:pointer;">
-                            <div id="proof-preview-name" style="font-size:12.5px; color:#22c55e; margin-top:6px; display:none;">
+                            <div id="proof-preview-name" style="font-size:12.5px; color:#2E7D32; margin-top:6px; display:none;">
                                 <i class="ti-check" style="margin-right:4px;"></i><span id="proof-preview-filename"></span>
                             </div>
                             <p style="font-size:12px; color:#adb5bd; margin:8px 0 0;">
@@ -821,14 +821,14 @@ body { background: #f4f6f9; }
 
                             <!-- Toggle: new address -->
                             <label class="ck-switch-row" for="add_new_address" style="cursor:pointer;">
-                                <span class="ck-switch-label"><i class="ti-plus" style="margin-right:5px; color:#ff5722;"></i>Ajouter une nouvelle adresse</span>
+                                <span class="ck-switch-label"><i class="ti-plus" style="margin-right:5px; color:#C62828;"></i>Ajouter une nouvelle adresse</span>
                                 <input class="addNewAddress form-check-input" type="checkbox" id="add_new_address" style="width:36px; height:20px;">
                             </label>
                             <div class="d-none" id="addNewAddressForm" style="margin-top:14px;">
                                 <form action="{% url 'add_address' %}" method="post">
                                     {% csrf_token %}
                                     {% include "shop/partials/address_form_fields.html" with form=address_form %}
-                                    <button type="submit" style="width:100%; padding:11px; background:#ff5722; color:#fff; border:none; border-radius:9px; font-weight:700; font-size:14px; cursor:pointer; margin-top:4px;">
+                                    <button type="submit" style="width:100%; padding:11px; background:#C62828; color:#fff; border:none; border-radius:9px; font-weight:700; font-size:14px; cursor:pointer; margin-top:4px;">
                                         <i class="ti-save" style="margin-right:6px;"></i> Enregistrer l'adresse
                                     </button>
                                 </form>
@@ -836,7 +836,7 @@ body { background: #f4f6f9; }
 
                             <!-- Toggle: different shipping address -->
                             <label class="ck-switch-row" for="new_shipping_address" style="cursor:pointer; margin-top:6px;">
-                                <span class="ck-switch-label"><i class="ti-truck" style="margin-right:5px; color:#ff5722;"></i>Livrer à une autre adresse</span>
+                                <span class="ck-switch-label"><i class="ti-truck" style="margin-right:5px; color:#C62828;"></i>Livrer à une autre adresse</span>
                                 <input name="new_shipping_address"
                                        class="newShippingAddress form-check-input" type="checkbox"
                                        id="new_shipping_address"
@@ -846,8 +846,8 @@ body { background: #f4f6f9; }
 
                             <!-- Shipping address (conditional) -->
                             <div class="shipping_address_form {% if new_shipping_address != 'true' %}d-none{% endif %}" style="margin-top:14px;">
-                                <div style="font-size:12px; font-weight:700; color:#6c757d; text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px;">
-                                    <i class="ti-truck" style="margin-right:5px; color:#ff5722;"></i>Adresse de livraison
+                                <div style="font-size:12px; font-weight:700; color:#6D4C41; text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px;">
+                                    <i class="ti-truck" style="margin-right:5px; color:#C62828;"></i>Adresse de livraison
                                 </div>
                                 {% for address in user.adresses.all %}
                                 <label class="ck-addr-card {% if address.id == address_shipping_id %}selected{% endif %}" style="display:flex;">
@@ -865,22 +865,22 @@ body { background: #f4f6f9; }
 
                         {% else %}
                             <!-- No address yet -->
-                            <p style="font-size:13px; color:#6c757d; margin-bottom:16px;">Aucune adresse enregistrée. Remplissez le formulaire ci-dessous.</p>
+                            <p style="font-size:13px; color:#6D4C41; margin-bottom:16px;">Aucune adresse enregistrée. Remplissez le formulaire ci-dessous.</p>
                             <form action="{% url 'add_address' %}" method="post">
                                 {% csrf_token %}
                                 {% include "shop/partials/address_form_fields.html" with form=address_form %}
-                                <button type="submit" style="width:100%; padding:12px; background:#ff5722; color:#fff; border:none; border-radius:9px; font-weight:700; font-size:14px; cursor:pointer; margin-top:4px;">
+                                <button type="submit" style="width:100%; padding:12px; background:#C62828; color:#fff; border:none; border-radius:9px; font-weight:700; font-size:14px; cursor:pointer; margin-top:4px;">
                                     <i class="ti-save" style="margin-right:6px;"></i> Enregistrer et continuer
                                 </button>
                             </form>
                         {% endif %}
                     {% else %}
                         <!-- Guest form -->
-                        <p style="font-size:13px; color:#6c757d; margin-bottom:16px;">Remplissez vos coordonnées pour continuer.</p>
+                        <p style="font-size:13px; color:#6D4C41; margin-bottom:16px;">Remplissez vos coordonnées pour continuer.</p>
                         <form action="{% url 'add_address' %}" method="post">
                             {% csrf_token %}
                             {% include "shop/partials/address_form_fields.html" with form=address_form %}
-                            <button type="submit" style="width:100%; padding:12px; background:#ff5722; color:#fff; border:none; border-radius:9px; font-weight:700; font-size:14px; cursor:pointer; margin-top:4px;">
+                            <button type="submit" style="width:100%; padding:12px; background:#C62828; color:#fff; border:none; border-radius:9px; font-weight:700; font-size:14px; cursor:pointer; margin-top:4px;">
                                 <i class="ti-arrow-right" style="margin-right:6px;"></i> Continuer
                             </button>
                         </form>
@@ -894,7 +894,7 @@ body { background: #f4f6f9; }
                 <div class="ck-card-head">
                     <div class="ck-card-head-icon"><i class="ti-truck"></i></div>
                     <h5>Mode de livraison</h5>
-                    <span class="ck-badge" style="background:#f0fff4;color:#22c55e;border:1px solid #bbf7d0;">Étape 3</span>
+                    <span class="ck-badge" style="background:#f0fff4;color:#2E7D32;border:1px solid #bbf7d0;">Étape 3</span>
                 </div>
                 <div class="ck-card-body">
                     <div class="ck-carrier-grid">
@@ -964,11 +964,11 @@ body { background: #f4f6f9; }
                     <div class="ck-price-block">
                         <div class="ck-price-row">
                             <span>Sous-total HT</span>
-                            <span style="font-weight:600; color:#1a1a2e;">{{ cart.sub_total_ht|price_convert }}</span>
+                            <span style="font-weight:600; color:#3E2723;">{{ cart.sub_total_ht|price_convert }}</span>
                         </div>
                         <div class="ck-price-row">
                             <span>Taxes</span>
-                            <span style="font-weight:600; color:#1a1a2e;">{{ cart.taxe_amount|price_convert }}</span>
+                            <span style="font-weight:600; color:#3E2723;">{{ cart.taxe_amount|price_convert }}</span>
                         </div>
                         <div class="ck-price-row">
                             <span>
@@ -977,7 +977,7 @@ body { background: #f4f6f9; }
                                 <small style="display:block; color:#adb5bd; font-size:12px; margin-top:1px;">{{ cart.carrier_name }}</small>
                                 {% endif %}
                             </span>
-                            <span style="font-weight:700; {% if cart.shipping_is_free %}color:#22c55e;{% else %}color:#1a1a2e;{% endif %}">
+                            <span style="font-weight:700; {% if cart.shipping_is_free %}color:#2E7D32;{% else %}color:#3E2723;{% endif %}">
                                 {% if cart.shipping_is_free %}<i class="ti-gift" style="margin-right:4px;"></i>Gratuit{% else %}{{ cart.shipping_price|price_convert }}{% endif %}
                             </span>
                         </div>
@@ -1022,7 +1022,7 @@ body { background: #f4f6f9; }
                         {% if order_id %}
                         <button id="offline-pay-btn" type="button"
                                 data-bs-toggle="modal" data-bs-target="#offlinePayModal"
-                                class="ck-pay-btn" style="display:none; background:linear-gradient(135deg,#495057,#6c757d);">
+                                class="ck-pay-btn" style="display:none; background:linear-gradient(135deg,#495057,#6D4C41);">
                             <i class="ti-receipt"></i>
                             Envoyer ma commande
                         </button>
@@ -1101,7 +1101,7 @@ body { background: #f4f6f9; }
                 ">
                     <i class="ti-info-alt" style="margin-right:6px; color:#f59e0b;"></i>
                     Effectuez votre virement / dépôt puis uploadez la preuve ci-dessous.
-                    MatStore Haiti vous contactera sous <strong>24–48 h</strong> pour confirmer.
+                    Hayiti's vous contactera sous <strong>24–48 h</strong> pour confirmer.
                 </div>
 
                 <form id="offline-form"
@@ -1119,9 +1119,9 @@ body { background: #f4f6f9; }
                         <div id="modal-file-info" style="display:none; margin-bottom:10px;
                             background:#f0fff4; border:1px solid #bbf7d0; border-radius:9px;
                             padding:10px 14px; font-size:13px; color:#166534;">
-                            <i class="ti-check" style="margin-right:6px; color:#22c55e;"></i>
+                            <i class="ti-check" style="margin-right:6px; color:#2E7D32;"></i>
                             Fichier sélectionné : <strong id="modal-file-name"></strong>
-                            <span style="color:#6c757d; font-weight:400; margin-left:6px;">— vous pouvez le modifier ci-dessous</span>
+                            <span style="color:#6D4C41; font-weight:400; margin-left:6px;">— vous pouvez le modifier ci-dessous</span>
                         </div>
                         <input type="file" id="modal_payment_proof" name="payment_proof"
                                accept="image/*,.pdf" required
@@ -1138,7 +1138,7 @@ body { background: #f4f6f9; }
                             style="
                                 display:flex; align-items:center; justify-content:center; gap:8px;
                                 width:100%; padding:14px;
-                                background:linear-gradient(135deg,#495057,#6c757d);
+                                background:linear-gradient(135deg,#495057,#6D4C41);
                                 color:#fff; font-size:14.5px; font-weight:700;
                                 border:none; border-radius:10px; cursor:pointer;
                                 margin-top:6px; transition:all .2s;
@@ -1170,15 +1170,15 @@ body { background: #f4f6f9; }
     flex-direction:column; align-items:center; justify-content:center; gap:20px;
 ">
     <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
-         style="animation:spin .9s linear infinite; filter:drop-shadow(0 0 12px rgba(255,87,34,.6));">
-        <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,.15)" stroke-width="2.5"/>
-        <path d="M12 2 A10 10 0 0 1 22 12" stroke="#ff5722" stroke-width="2.5" stroke-linecap="round"/>
+         style="animation:spin .9s linear infinite; filter:drop-shadow(0 0 12px rgba(198, 40, 40, .6));">
+        <circle cx="12" cy="12" r="10" stroke="rgba(255,252,245,.15)" stroke-width="2.5"/>
+        <path d="M12 2 A10 10 0 0 1 22 12" stroke="#C62828" stroke-width="2.5" stroke-linecap="round"/>
     </svg>
     <div style="text-align:center;">
         <div style="color:#fff; font-size:16px; font-weight:700; margin-bottom:6px;">
             Envoi de votre commande…
         </div>
-        <div style="color:rgba(255,255,255,.55); font-size:13px;">
+        <div style="color:rgba(255,252,245,.55); font-size:13px;">
             Merci de patienter, cela peut prendre quelques secondes.
         </div>
     </div>
@@ -1467,7 +1467,7 @@ document.getElementById('paymentModal').addEventListener('shown.bs.modal', async
         elements = stripeClient.elements({
             appearance: {
                 theme: 'stripe',
-                variables: { colorPrimary: '#ff5722', borderRadius: '8px' }
+                variables: { colorPrimary: '#C62828', borderRadius: '8px' }
             },
             clientSecret: data.clientSecret,
         });

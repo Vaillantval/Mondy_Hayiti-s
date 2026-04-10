@@ -12,7 +12,7 @@
 /* ── Left brand panel ── */
 .auth-brand {
     width: 38%;
-    background: #1a1a2e;
+    background: #3E2723;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -25,7 +25,7 @@
     position: absolute;
     width: 300px; height: 300px;
     border-radius: 50%;
-    background: rgba(255,87,34,.13);
+    background: rgba(198, 40, 40, .13);
     top: -70px; right: -70px;
 }
 .auth-brand::after {
@@ -33,7 +33,7 @@
     position: absolute;
     width: 200px; height: 200px;
     border-radius: 50%;
-    background: rgba(255,87,34,.07);
+    background: rgba(198,40,40,.07);
     bottom: -30px; left: -50px;
 }
 .auth-brand-logo {
@@ -42,7 +42,7 @@
 }
 .auth-brand-icon {
     width: 42px; height: 42px;
-    background: #ff5722; border-radius: 10px;
+    background: #C62828; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     font-size: 18px; color: #fff;
 }
@@ -52,9 +52,9 @@
     font-size: 28px; font-weight: 800; color: #fff;
     line-height: 1.25; margin-bottom: 14px; position: relative; z-index: 1;
 }
-.auth-brand-title span { color: #ff5722; }
+.auth-brand-title span { color: #C62828; }
 .auth-brand-sub {
-    font-size: 13.5px; color: rgba(255,255,255,.48);
+    font-size: 13.5px; color: rgba(255,252,245,.48);
     line-height: 1.65; margin-bottom: 40px; position: relative; z-index: 1;
 }
 
@@ -65,9 +65,9 @@
 }
 .auth-perk-icon {
     width: 34px; height: 34px; border-radius: 8px;
-    background: rgba(255,87,34,.15);
+    background: rgba(198, 40, 40, .15);
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px; color: #ff5722; flex-shrink: 0; margin-top: 1px;
+    font-size: 14px; color: #C62828; flex-shrink: 0; margin-top: 1px;
 }
 .auth-perk-title { font-size: 13px; font-weight: 700; color: #fff; }
 .auth-perk-desc  { font-size: 11.5px; color: rgba(255,255,255,.4); margin-top: 1px; }
@@ -78,23 +78,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f4f5f7;
+    background: #FFF8F0;
     padding: 40px 24px;
 }
 .auth-form-box {
     width: 100%; max-width: 480px;
     background: #fff;
     border-radius: 18px;
-    border: 1px solid #eaecf0;
+    border: 1px solid #EDD9C0;
     box-shadow: 0 4px 32px rgba(0,0,0,.07);
     padding: 36px 36px;
 }
 
 .auth-form-header { margin-bottom: 24px; }
 .auth-form-header h2 {
-    font-size: 22px; font-weight: 800; color: #1a1a2e; margin: 0 0 5px;
+    font-size: 22px; font-weight: 800; color: #3E2723; margin: 0 0 5px;
 }
-.auth-form-header p { font-size: 13.5px; color: #8a94a6; margin: 0; }
+.auth-form-header p { font-size: 13.5px; color: #A1887F; margin: 0; }
 
 /* ── Alert ── */
 .auth-alert {
@@ -114,21 +114,21 @@
 .auth-field { margin-bottom: 0; }
 .auth-label {
     display: block; font-size: 12.5px; font-weight: 700;
-    color: #1a1a2e; margin-bottom: 6px; letter-spacing: .1px;
+    color: #3E2723; margin-bottom: 6px; letter-spacing: .1px;
 }
-.auth-label .req { color: #ff5722; }
+.auth-label .req { color: #C62828; }
 .auth-input {
     width: 100%; padding: 10px 13px;
     border: 1.5px solid #e2e5ea; border-radius: 9px;
-    font-size: 13.5px; color: #1a1a2e; background: #fff;
+    font-size: 13.5px; color: #3E2723; background: #fff;
     outline: none; transition: border-color .18s, box-shadow .18s;
     font-family: inherit;
 }
 .auth-input:focus {
-    border-color: #ff5722;
-    box-shadow: 0 0 0 3px rgba(255,87,34,.10);
+    border-color: #C62828;
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, .10);
 }
-.auth-input::placeholder { color: #b0b8c4; }
+.auth-input::placeholder { color: #BCAAA4; }
 .auth-field-error {
     font-size: 11.5px; color: #dc2626; margin-top: 4px;
     display: flex; align-items: center; gap: 4px;
@@ -140,21 +140,21 @@
 .pw-eye {
     position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
     background: none; border: none; cursor: pointer;
-    color: #b0b8c4; font-size: 17px; line-height: 1; padding: 2px;
+    color: #BCAAA4; font-size: 17px; line-height: 1; padding: 2px;
     transition: color .16s;
 }
-.pw-eye:hover   { color: #1a1a2e; }
-.pw-eye.visible { color: #ff5722; }
+.pw-eye:hover   { color: #3E2723; }
+.pw-eye.visible { color: #C62828; }
 
 /* ── Password requirements ── */
 .pw-reqs { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
 .pw-req {
     display: flex; align-items: center; gap: 6px;
-    font-size: 11.5px; color: #b0b8c4; transition: color .2s;
+    font-size: 11.5px; color: #BCAAA4; transition: color .2s;
 }
 .pw-req i { font-size: 11px; flex-shrink: 0; transition: color .2s; }
 .pw-req.ok   { color: #15803d; }
-.pw-req.ok i { color: #22c55e; }
+.pw-req.ok i { color: #2E7D32; }
 .pw-req.fail   { color: #dc2626; }
 .pw-req.fail i { color: #ef4444; }
 
@@ -162,23 +162,23 @@
 .auth-terms {
     display: flex; align-items: flex-start; gap: 10px;
     padding: 12px 14px;
-    background: #f8f9fa; border-radius: 9px;
-    border: 1.5px solid #eaecf0;
+    background: #FDF6EC; border-radius: 9px;
+    border: 1.5px solid #EDD9C0;
 }
 .auth-terms input[type="checkbox"] {
     width: 16px; height: 16px; margin-top: 1px;
-    accent-color: #ff5722; cursor: pointer; flex-shrink: 0;
+    accent-color: #C62828; cursor: pointer; flex-shrink: 0;
 }
 .auth-terms label {
     font-size: 13px; color: #4a5568; cursor: pointer; margin: 0; line-height: 1.5;
 }
-.auth-terms label a { color: #ff5722; font-weight: 600; text-decoration: none; }
+.auth-terms label a { color: #C62828; font-weight: 600; text-decoration: none; }
 .auth-terms label a:hover { text-decoration: underline; }
 
 /* ── Submit ── */
 .auth-submit {
     width: 100%; padding: 13px;
-    background: #ff5722; color: #fff;
+    background: #C62828; color: #fff;
     border: none; border-radius: 9px;
     font-size: 15px; font-weight: 700;
     cursor: pointer; transition: opacity .18s, transform .1s;
@@ -190,11 +190,11 @@
 
 /* ── Footer note ── */
 .auth-note {
-    text-align: center; font-size: 13.5px; color: #8a94a6;
+    text-align: center; font-size: 13.5px; color: #A1887F;
     margin-top: 20px; padding-top: 18px;
     border-top: 1px solid #f0f0f0;
 }
-.auth-note a { color: #ff5722; font-weight: 700; text-decoration: none; }
+.auth-note a { color: #C62828; font-weight: 700; text-decoration: none; }
 .auth-note a:hover { text-decoration: underline; }
 
 /* ── Responsive ── */
@@ -208,7 +208,7 @@
     <div class="auth-brand">
         <div class="auth-brand-logo">
             <div class="auth-brand-icon"><i class="linearicons-cart"></i></div>
-            <span class="auth-brand-name">MAT-STORE</span>
+            <span class="auth-brand-name">Hayiti's</span>
         </div>
 
         <h1 class="auth-brand-title">
@@ -345,7 +345,7 @@
                             <label for="{{ form.agree_terms.id_for_label }}">
                                 J'accepte les
                                 <a href="{% url 'terms' %}">conditions générales d'utilisation</a>
-                                <span style="color:#ff5722;">*</span>
+                                <span style="color:#C62828;">*</span>
                             </label>
                         </div>
                         {% for error in form.agree_terms.errors %}

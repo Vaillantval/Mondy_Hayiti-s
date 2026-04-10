@@ -29,7 +29,7 @@
 .od-badge-pending    { background:#fff8e1; color:#f59e0b; }
 .od-badge-processing { background:#eff6ff; color:#3b82f6; }
 .od-badge-shipped    { background:#f5f3ff; color:#8b5cf6; }
-.od-badge-delivered  { background:#f0fdf4; color:#22c55e; }
+.od-badge-delivered  { background:#f0fdf4; color:#2E7D32; }
 .od-badge-canceled   { background:#fef2f2; color:#ef4444; }
 
 .od-items-table { width:100%; border-collapse:collapse; font-size:13.5px; }
@@ -79,7 +79,7 @@
     background:var(--card); color:var(--muted);
     position:relative; z-index:1;
 }
-.od-tl-dot.done  { background:#f0fdf4; border-color:#22c55e; color:#22c55e; }
+.od-tl-dot.done  { background:#f0fdf4; border-color:#2E7D32; color:#2E7D32; }
 .od-tl-dot.active{ background:#eff6ff; border-color:#3b82f6; color:#3b82f6; }
 .od-tl-label { font-size:13px; font-weight:600; color:var(--dark); margin-top:4px; }
 .od-tl-sub   { font-size:11.5px; color:var(--muted); margin-top:1px; }
@@ -112,7 +112,7 @@
             · {{ order.quantity }} article{{ order.quantity|pluralize }}
             · Paiement :
             {% if order.is_paid %}
-                <span style="color:#22c55e;font-weight:700;">Confirmé</span>
+                <span style="color:#2E7D32;font-weight:700;">Confirmé</span>
             {% else %}
                 <span style="color:#ef4444;font-weight:700;">En attente</span>
             {% endif %}
@@ -205,7 +205,7 @@
                         <i class="ti-credit-card" style="color:var(--muted);"></i>
                         {{ order.payment_method }}
                         {% if order.is_paid %}
-                            <i class="ti-check-box" style="color:#22c55e;" title="Paiement confirmé"></i>
+                            <i class="ti-check-box" style="color:#2E7D32;" title="Paiement confirmé"></i>
                         {% endif %}
                     </div>
                 </div>
@@ -217,7 +217,7 @@
                         <i class="ti-truck" style="color:var(--muted);"></i>
                         {{ order.carrier_name }}
                         {% if order.carrier_price == 0 %}
-                            <span style="font-size:11px;background:#f0fdf4;color:#22c55e;padding:2px 8px;border-radius:20px;font-weight:700;">Gratuit</span>
+                            <span style="font-size:11px;background:#f0fdf4;color:#2E7D32;padding:2px 8px;border-radius:20px;font-weight:700;">Gratuit</span>
                         {% else %}
                             <span style="color:var(--muted);font-size:12.5px;">{{ order.carrier_price|price_convert }}</span>
                         {% endif %}
@@ -246,7 +246,7 @@
             <div class="od-price-row">
                 <span>Livraison</span>
                 {% if order.carrier_price == 0 %}
-                    <span style="font-weight:700;color:#22c55e;"><i class="ti-gift"></i> Gratuit</span>
+                    <span style="font-weight:700;color:#2E7D32;"><i class="ti-gift"></i> Gratuit</span>
                 {% else %}
                     <span style="font-weight:600;color:var(--dark);">{{ order.carrier_price|price_convert }}</span>
                 {% endif %}

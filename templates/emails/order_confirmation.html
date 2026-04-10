@@ -12,7 +12,7 @@
 
 <!-- Numéro et infos commande -->
 <table width="100%" cellpadding="14" cellspacing="0" border="0"
-       style="background-color:#f9f9f9;border-radius:6px;margin-bottom:24px;border-left:4px solid #e63946;">
+       style="background-color:#f9f9f9;border-radius:6px;margin-bottom:24px;border-left:4px solid #C62828;">
   <tr>
     <td style="font-size:14px;color:#333333;line-height:1.8;">
       <strong>Commande #{{ order.id }}</strong><br>
@@ -26,9 +26,9 @@
 <!-- Tableau des produits -->
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
   <tr>
-    <td style="padding:10px 8px;background-color:#e63946;color:#ffffff;font-size:13px;font-weight:bold;">Produit</td>
-    <td style="padding:10px 8px;background-color:#e63946;color:#ffffff;font-size:13px;font-weight:bold;text-align:center;width:60px;">Qté</td>
-    <td style="padding:10px 8px;background-color:#e63946;color:#ffffff;font-size:13px;font-weight:bold;text-align:right;width:110px;">Prix unit.</td>
+    <td style="padding:10px 8px;background-color:#C62828;color:#ffffff;font-size:13px;font-weight:bold;">Produit</td>
+    <td style="padding:10px 8px;background-color:#C62828;color:#ffffff;font-size:13px;font-weight:bold;text-align:center;width:60px;">Qté</td>
+    <td style="padding:10px 8px;background-color:#C62828;color:#ffffff;font-size:13px;font-weight:bold;text-align:right;width:110px;">Prix unit.</td>
   </tr>
   {% for detail in details %}
   <tr>
@@ -66,7 +66,7 @@
     <td colspan="2" style="padding:12px 8px;font-size:16px;font-weight:bold;color:#333333;text-align:right;">
       Total TTC :
     </td>
-    <td style="padding:12px 8px;font-size:16px;font-weight:bold;color:#e63946;text-align:right;">
+    <td style="padding:12px 8px;font-size:16px;font-weight:bold;color:#C62828;text-align:right;">
       {{ order.order_cost_ttc }} HTG
     </td>
   </tr>
@@ -77,7 +77,7 @@
   <tr>
     <td align="center">
       <a href="{{ site_url }}/dashboard/orders/"
-         style="display:inline-block;background-color:#e63946;color:#ffffff;text-decoration:none;padding:14px 36px;border-radius:6px;font-size:15px;font-weight:bold;">
+         style="display:inline-block;background-color:#C62828;color:#ffffff;text-decoration:none;padding:14px 36px;border-radius:6px;font-size:15px;font-weight:bold;">
         Suivre ma commande
       </a>
     </td>
@@ -87,6 +87,6 @@
 <p style="margin:0;font-size:13px;color:#888888;line-height:1.6;">
   Délai de livraison estimé : <strong>2 à 5 jours ouvrables</strong><br>
   Des questions ? Contactez-nous à
-  <a href="mailto:info@matstorehaiti.online" style="color:#e63946;">info@matstorehaiti.online</a>
+  <a href="mailto:info@hayitishaiti.online" style="color:#C62828;">info@hayitishaiti.online</a>
 </p>
 {% endblock %}

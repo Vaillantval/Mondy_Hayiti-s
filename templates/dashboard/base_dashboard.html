@@ -4,24 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Mon Compte{% endblock %} — MAT-STORE</title>
+    <title>{% block title %}Mon Compte{% endblock %} — Hayiti's</title>
 
     <link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/themify-icons.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/linearicons.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/ionicons.min.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --sidebar-w : 250px;
             --topbar-h  : 60px;
-            --dark      : #1a1a2e;
-            --accent    : #ff5722;
-            --text      : #1a1a2e;
-            --muted     : #8a94a6;
-            --border    : #eaecf0;
-            --bg        : #f4f5f7;
+            --dark      : #3E2723;
+            --accent    : #C62828;
+            --text      : #3E2723;
+            --muted     : #A1887F;
+            --border    : #EDD9C0;
+            --bg        : #FFF8F0;
             --card      : #ffffff;
             --radius    : 10px;
         }
@@ -29,7 +30,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
@@ -56,7 +57,7 @@
             align-items: center;
             gap: 11px;
             padding: 20px 22px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
+            border-bottom: 1px solid rgba(255,252,245,0.07);
             text-decoration: none;
         }
         .ds-logo-icon {
@@ -70,13 +71,13 @@
 
         .ds-user-card {
             padding: 18px 22px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
+            border-bottom: 1px solid rgba(255,252,245,0.07);
             display: flex; align-items: center; gap: 11px;
         }
         .ds-user-avatar {
             width: 40px; height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.12);
+            background: rgba(255,252,245,0.12);
             color: #fff;
             display: flex; align-items: center; justify-content: center;
             font-size: 16px; font-weight: 700; text-transform: uppercase;
@@ -104,8 +105,8 @@
             transition: color .16s, background .16s, border-color .16s;
         }
         .ds-nav-link i { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
-        .ds-nav-link:hover { color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.05); }
-        .ds-nav-link.active { color: #fff; background: rgba(255,255,255,0.07); border-left-color: var(--accent); }
+        .ds-nav-link:hover { color: rgba(255,255,255,0.88); background: rgba(255,252,245,0.05); }
+        .ds-nav-link.active { color: #fff; background: rgba(255,252,245,0.07); border-left-color: var(--accent); }
         .ds-nav-link.active i { color: var(--accent); }
 
         .ds-nav-badge {
@@ -117,18 +118,18 @@
 
         .ds-sidebar-footer {
             padding: 14px 22px 20px;
-            border-top: 1px solid rgba(255,255,255,0.07);
+            border-top: 1px solid rgba(255,252,245,0.07);
         }
         .ds-logout-btn {
             display: flex; align-items: center; gap: 9px;
             padding: 9px 14px;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255,252,245,0.06);
             color: rgba(255,255,255,0.55);
             border-radius: 8px; text-decoration: none;
             font-size: 13px; font-weight: 500;
             transition: background .18s, color .18s;
         }
-        .ds-logout-btn:hover { background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.85); }
+        .ds-logout-btn:hover { background: rgba(255,252,245,0.10); color: rgba(255,255,255,0.85); }
         .ds-logout-btn i { font-size: 14px; }
 
         /* ─── MAIN ─── */
@@ -205,14 +206,14 @@
             font-size: 18px; color: var(--muted);
             flex-shrink: 0;
         }
-        .ds-stat-card.ds-stat-orange .ds-stat-icon { background: #fff4f0; color: #ff5722; border-color: #ffd5c8; }
+        .ds-stat-card.ds-stat-orange .ds-stat-icon { background: #fff4f0; color: #C62828; border-color: #ffd5c8; }
         .ds-stat-card.ds-stat-orange:hover { border-color: #ffb49a; }
         .ds-stat-card.ds-stat-blue   .ds-stat-icon { background: #eff6ff; color: #3b82f6; border-color: #bfdbfe; }
         .ds-stat-card.ds-stat-blue:hover   { border-color: #93c5fd; }
-        .ds-stat-card.ds-stat-green  .ds-stat-icon { background: #f0fdf4; color: #22c55e; border-color: #bbf7d0; }
+        .ds-stat-card.ds-stat-green  .ds-stat-icon { background: #f0fdf4; color: #2E7D32; border-color: #bbf7d0; }
         .ds-stat-card.ds-stat-green:hover  { border-color: #86efac; }
         /* accent = orange pour les valeurs importantes */
-        .ds-stat-card.ds-stat-orange .ds-stat-value { color: #ff5722; }
+        .ds-stat-card.ds-stat-orange .ds-stat-value { color: #C62828; }
 
         .ds-stat-value { font-size: 24px; font-weight: 800; color: var(--dark); line-height: 1; }
         .ds-stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
@@ -297,7 +298,7 @@
 
     <a href="{% url 'home' %}" class="ds-sidebar-logo">
         <div class="ds-logo-icon"><i class="linearicons-cart"></i></div>
-        <span class="ds-logo-text">MAT-STORE</span>
+        <span class="ds-logo-text">Hayiti's</span>
     </a>
 
     <div class="ds-user-card">

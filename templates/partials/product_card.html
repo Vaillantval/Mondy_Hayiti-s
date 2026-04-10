@@ -1,7 +1,7 @@
 {% load static price_filters %}
 {% with first_img=product.images.first pct=product.solde_price|discount_percent:product.regular_price %}
 
-<div class="pc" onclick="if(!event.target.closest('.pc-overlay, .pc-actions')) window.location.href='{% url 'product_detail' product.slug %}'"
+<div class="pc" onclick="if(!event.target.closest('.pc-overlay, .pc-actions')) window.location.href='{% url 'product_detail' product.slug %}'">
 
     <!-- ── Image ── -->
     <div class="pc-img">
@@ -43,14 +43,14 @@
                data-product-id="{{ product.pk }}"
                data-url="{% url 'toggle_wishlist' product.pk %}"
                title="Wishlist"
-               style="{% if product.pk in wishlist_ids %}color:#ff5722;{% endif %}">
+               style="{% if product.pk in wishlist_ids %}color:#C62828;{% endif %}">
                 <i class="icon-heart"></i>
             </a>
             <a href="#" class="pc-ov-btn btn-add-compare"
                data-product-id="{{ product.pk }}"
                data-url="{% url 'add_to_compare' product.pk %}"
                title="Comparer"
-               style="{% if product.pk in compare_ids %}color:#ff5722;{% endif %}">
+               style="{% if product.pk in compare_ids %}color:#C62828;{% endif %}">
                 <i class="icon-shuffle"></i>
             </a>
         </div>

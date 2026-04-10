@@ -28,7 +28,7 @@
                        data-product-id="{{ product.pk }}"
                        data-url="{% url 'add_to_compare' product.pk %}"
                        title="Comparer"
-                       style="{% if product.pk in compare_ids %}color:#ff5722;{% endif %}">
+                       style="{% if product.pk in compare_ids %}color:#C62828;{% endif %}">
                         <i class="icon-shuffle"></i>
                     </a>
                 </li>
@@ -43,7 +43,7 @@
                        data-product-id="{{ product.pk }}"
                        data-url="{% url 'toggle_wishlist' product.pk %}"
                        title="Wishlist"
-                       style="{% if product.pk in wishlist_ids %}color:#ff5722;{% endif %}">
+                       style="{% if product.pk in wishlist_ids %}color:#C62828;{% endif %}">
                         <i class="icon-heart"></i>
                     </a>
                 </li>
@@ -62,7 +62,7 @@
             <del>{{ product.regular_price|price_convert }}</del>
             {% with pct=product.solde_price|discount_percent:product.regular_price %}
             {% if pct %}
-            <span style="color:#28a745; font-weight:700; font-size:13px; margin-left:4px;">-{{ pct }}%</span>
+            <span style="color:#388E3C; font-weight:700; font-size:13px; margin-left:4px;">-{{ pct }}%</span>
             {% endif %}
             {% endwith %}
             {% endif %}
@@ -94,7 +94,7 @@
                data-product-id="{{ product.pk }}"
                data-url="{% url 'add_to_compare' product.pk %}"
                title="Comparer"
-               style="font-size:14px; padding:6px 10px; {% if product.pk in compare_ids %}color:#ff5722; border-color:#ff5722;{% endif %}">
+               style="font-size:14px; padding:6px 10px; {% if product.pk in compare_ids %}color:#C62828; border-color:#C62828;{% endif %}">
                 <i class="icon-shuffle"></i>
             </a>
         </div>

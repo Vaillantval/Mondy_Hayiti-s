@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block styles %}
 <style>
 /* ── Layout ── */
 .auth-page {
@@ -12,7 +12,7 @@
 /* ── Left brand panel ── */
 .auth-brand {
     width: 42%;
-    background: #1a1a2e;
+    background: #3E2723;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -25,7 +25,7 @@
     position: absolute;
     width: 340px; height: 340px;
     border-radius: 50%;
-    background: rgba(255,87,34,.12);
+    background: rgba(198,40,40,.12);
     top: -80px; right: -80px;
 }
 .auth-brand::after {
@@ -33,7 +33,7 @@
     position: absolute;
     width: 220px; height: 220px;
     border-radius: 50%;
-    background: rgba(255,87,34,.07);
+    background: rgba(198,40,40,.07);
     bottom: -40px; left: -60px;
 }
 .auth-brand-logo {
@@ -42,7 +42,7 @@
 }
 .auth-brand-icon {
     width: 42px; height: 42px;
-    background: #ff5722; border-radius: 10px;
+    background: #C62828; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     font-size: 18px; color: #fff;
 }
@@ -52,7 +52,7 @@
     font-size: 30px; font-weight: 800; color: #fff;
     line-height: 1.25; margin-bottom: 14px; position: relative; z-index: 1;
 }
-.auth-brand-title span { color: #ff5722; }
+.auth-brand-title span { color: #C62828; }
 .auth-brand-sub {
     font-size: 14px; color: rgba(255,255,255,.5);
     line-height: 1.65; margin-bottom: 44px; position: relative; z-index: 1;
@@ -65,9 +65,9 @@
 }
 .auth-perk-icon {
     width: 36px; height: 36px; border-radius: 9px;
-    background: rgba(255,87,34,.15);
+    background: rgba(198, 40, 40, .15);
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px; color: #ff5722; flex-shrink: 0; margin-top: 1px;
+    font-size: 15px; color: #C62828; flex-shrink: 0; margin-top: 1px;
 }
 .auth-perk-title { font-size: 13.5px; font-weight: 700; color: #fff; }
 .auth-perk-desc  { font-size: 12px; color: rgba(255,255,255,.42); margin-top: 1px; }
@@ -78,23 +78,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f4f5f7;
+    background: #FFF8F0;
     padding: 48px 24px;
 }
 .auth-form-box {
     width: 100%; max-width: 420px;
     background: #fff;
     border-radius: 18px;
-    border: 1px solid #eaecf0;
+    border: 1px solid #EDD9C0;
     box-shadow: 0 4px 32px rgba(0,0,0,.07);
     padding: 40px 36px;
 }
 
 .auth-form-header { margin-bottom: 28px; }
 .auth-form-header h2 {
-    font-size: 23px; font-weight: 800; color: #1a1a2e; margin: 0 0 5px;
+    font-size: 23px; font-weight: 800; color: #3E2723; margin: 0 0 5px;
 }
-.auth-form-header p { font-size: 13.5px; color: #8a94a6; margin: 0; }
+.auth-form-header p { font-size: 13.5px; color: #A1887F; margin: 0; }
 
 /* ── Alert ── */
 .auth-alert {
@@ -109,20 +109,20 @@
 .auth-field { margin-bottom: 18px; }
 .auth-label {
     display: block; font-size: 12.5px; font-weight: 700;
-    color: #1a1a2e; margin-bottom: 7px; letter-spacing: .1px;
+    color: #3E2723; margin-bottom: 7px; letter-spacing: .1px;
 }
 .auth-input {
     width: 100%; padding: 11px 14px;
     border: 1.5px solid #e2e5ea; border-radius: 9px;
-    font-size: 14px; color: #1a1a2e; background: #fff;
+    font-size: 14px; color: #3E2723; background: #fff;
     outline: none; transition: border-color .18s, box-shadow .18s;
     font-family: inherit;
 }
 .auth-input:focus {
-    border-color: #ff5722;
-    box-shadow: 0 0 0 3px rgba(255,87,34,.10);
+    border-color: #C62828;
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, .10);
 }
-.auth-input::placeholder { color: #b0b8c4; }
+.auth-input::placeholder { color: #BCAAA4; }
 .auth-field-error { font-size: 12px; color: #dc2626; margin-top: 5px; display: flex; align-items: center; gap: 5px; }
 
 /* ── Password wrap ── */
@@ -131,16 +131,16 @@
 .pw-eye {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
     background: none; border: none; cursor: pointer;
-    color: #b0b8c4; font-size: 17px; line-height: 1; padding: 2px;
+    color: #BCAAA4; font-size: 17px; line-height: 1; padding: 2px;
     transition: color .16s;
 }
-.pw-eye:hover  { color: #1a1a2e; }
-.pw-eye.visible { color: #ff5722; }
+.pw-eye:hover  { color: #3E2723; }
+.pw-eye.visible { color: #C62828; }
 
 /* ── Submit btn ── */
 .auth-submit {
     width: 100%; padding: 13px;
-    background: #ff5722; color: #fff;
+    background: #C62828; color: #fff;
     border: none; border-radius: 9px;
     font-size: 15px; font-weight: 700;
     cursor: pointer; transition: opacity .18s, transform .1s;
@@ -152,22 +152,22 @@
 
 /* ── Footer note ── */
 .auth-note {
-    text-align: center; font-size: 13.5px; color: #8a94a6;
+    text-align: center; font-size: 13.5px; color: #A1887F;
     margin-top: 22px; padding-top: 20px;
     border-top: 1px solid #f0f0f0;
 }
-.auth-note a { color: #ff5722; font-weight: 700; text-decoration: none; }
+.auth-note a { color: #C62828; font-weight: 700; text-decoration: none; }
 .auth-note a:hover { text-decoration: underline; }
 
 /* ── Divider ── */
 .auth-divider {
     display: flex; align-items: center; gap: 12px;
-    margin: 22px 0; color: #b0b8c4; font-size: 12px;
+    margin: 22px 0; color: #BCAAA4; font-size: 12px;
 }
 .auth-divider::before,
 .auth-divider::after {
     content: ''; flex: 1;
-    height: 1px; background: #eaecf0;
+    height: 1px; background: #EDD9C0;
 }
 
 /* ── Responsive ── */
@@ -175,14 +175,16 @@
     .auth-brand { display: none; }
 }
 </style>
+{% endblock %}
 
+{% block content %}
 <div class="auth-page">
 
     <!-- ── Left brand ── -->
     <div class="auth-brand">
         <div class="auth-brand-logo">
             <div class="auth-brand-icon"><i class="linearicons-cart"></i></div>
-            <span class="auth-brand-name">MAT-STORE</span>
+            <span class="auth-brand-name">Hayiti's</span>
         </div>
 
         <h1 class="auth-brand-title">

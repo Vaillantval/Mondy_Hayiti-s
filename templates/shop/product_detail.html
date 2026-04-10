@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load static price_filters %}
-{% block title %}{{ product.name }} | {% if site_name %}{{ site_name }}{% else %}Jstore{% endif %} | E-commerce{% endblock %}
+{% block title %}{{ product.name }} | {% if site_name %}{{ site_name }}{% else %}Hayiti's{% endif %} | E-commerce{% endblock %}
 
 {% block styles %}
 <style>
     .product_detail_section { padding: 50px 0; }
-    .breadcrumb-item a { color: #ff5722; }
+    .breadcrumb-item a { color: #C62828; }
 
     /* ── Gallery ── */
     .product_gallery_box { position: sticky; top: 90px; }
@@ -15,7 +15,7 @@
         position: relative;
         border-radius: 16px;
         overflow: hidden;
-        background: #f8f9fa;
+        background: #FDF6EC;
         border: 1px solid #ebebeb;
         aspect-ratio: 1 / 1;
         display: flex;
@@ -70,14 +70,14 @@
         overflow: hidden;
         border: 2.5px solid transparent;
         cursor: pointer;
-        background: #f8f9fa;
+        background: #FDF6EC;
         transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
     }
     .thumb_item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .thumb_item:hover { border-color: rgba(255,87,34,0.5); transform: translateY(-2px); }
+    .thumb_item:hover { border-color: rgba(198, 40, 40, 0.5); transform: translateY(-2px); }
     .thumb_item.active {
-        border-color: #ff5722;
-        box-shadow: 0 4px 12px rgba(255,87,34,0.25);
+        border-color: #C62828;
+        box-shadow: 0 4px 12px rgba(198,40,40,0.25);
     }
 
     /* Product Info */
@@ -86,8 +86,8 @@
     .product_category_tags { margin-bottom: 12px; }
     .product_category_tags a {
         display: inline-block;
-        background: rgba(255,87,34,0.08);
-        color: #ff5722;
+        background: rgba(198, 40, 40, 0.08);
+        color: #C62828;
         border-radius: 50px;
         padding: 3px 12px;
         font-size: 12px;
@@ -95,15 +95,15 @@
         text-decoration: none;
         margin-right: 6px;
         margin-bottom: 6px;
-        border: 1px solid rgba(255,87,34,0.2);
+        border: 1px solid rgba(198, 40, 40, 0.2);
         transition: all 0.2s;
     }
-    .product_category_tags a:hover { background: #ff5722; color: #fff; }
+    .product_category_tags a:hover { background: #C62828; color: #fff; }
 
     .product_title_main {
         font-size: 28px;
         font-weight: 700;
-        color: #1a1a2e;
+        color: #3E2723;
         line-height: 1.3;
         margin-bottom: 12px;
     }
@@ -117,7 +117,7 @@
     .product_price_main .current_price {
         font-size: 32px;
         font-weight: 800;
-        color: #ff5722;
+        color: #C62828;
     }
     .product_price_main .old_price {
         font-size: 18px;
@@ -125,7 +125,7 @@
         text-decoration: line-through;
     }
     .discount_badge {
-        background: #ff5722;
+        background: #C62828;
         color: #fff;
         border-radius: 6px;
         padding: 3px 10px;
@@ -135,7 +135,7 @@
 
     .product_short_desc {
         font-size: 15px;
-        color: #6c757d;
+        color: #6D4C41;
         line-height: 1.8;
         margin-bottom: 22px;
         padding-bottom: 22px;
@@ -152,8 +152,8 @@
         border-radius: 50px;
         margin-bottom: 22px;
     }
-    .stock_status.in_stock { background: rgba(40,167,69,0.1); color: #28a745; }
-    .stock_status.out_stock { background: rgba(220,53,69,0.1); color: #dc3545; }
+    .stock_status.in_stock { background: rgba(40,167,69,0.1); color: #388E3C; }
+    .stock_status.out_stock { background: rgba(220,53,69,0.1); color: #B71C1C; }
     .stock_status i { font-size: 10px; }
 
     .qty_wrap {
@@ -162,18 +162,18 @@
         gap: 15px;
         margin-bottom: 22px;
     }
-    .qty_wrap label { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+    .qty_wrap label { font-size: 13px; font-weight: 600; color: #3E2723; }
     .qty_input_group {
         display: flex;
         align-items: center;
-        border: 1.5px solid #e9ecef;
+        border: 1.5px solid #EDD9C0;
         border-radius: 8px;
         overflow: hidden;
     }
     .qty_btn {
         width: 38px;
         height: 38px;
-        background: #f8f9fa;
+        background: #FDF6EC;
         border: none;
         font-size: 16px;
         cursor: pointer;
@@ -183,18 +183,18 @@
         justify-content: center;
         color: #495057;
     }
-    .qty_btn:hover { background: #e9ecef; }
+    .qty_btn:hover { background: #EDD9C0; }
     .qty_num {
         width: 50px;
         text-align: center;
         border: none;
-        border-left: 1.5px solid #e9ecef;
-        border-right: 1.5px solid #e9ecef;
+        border-left: 1.5px solid #EDD9C0;
+        border-right: 1.5px solid #EDD9C0;
         height: 38px;
         font-size: 15px;
         font-weight: 600;
         outline: none;
-        color: #1a1a2e;
+        color: #3E2723;
     }
 
     /* ── Action buttons ── */
@@ -214,47 +214,47 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        border: 2px solid #ff5722;
+        border: 2px solid #C62828;
     }
     .btn_add_cart {
-        background: linear-gradient(135deg, #ff5722, #ff8a65);
+        background: linear-gradient(135deg, #C62828, #EF5350);
         color: #fff;
         border-color: transparent;
     }
     .btn_buy_now {
         background: #fff;
-        color: #ff5722;
+        color: #C62828;
     }
-    .btn_add_cart:hover  { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,87,34,0.35); }
-    .btn_buy_now:hover   { background: #ff5722; color: #fff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,87,34,0.25); }
+    .btn_add_cart:hover  { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(198,40,40,0.35); }
+    .btn_buy_now:hover   { background: #C62828; color: #fff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(198,40,40,0.25); }
     .btn_add_cart:disabled, .btn_buy_now:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
 
     .btn_wishlist, .btn_compare {
         width: 48px; height: 48px;
-        border: 1.5px solid #e9ecef;
+        border: 1.5px solid #EDD9C0;
         border-radius: 10px;
         background: #fff;
         display: flex; align-items: center; justify-content: center;
-        font-size: 18px; color: #6c757d;
+        font-size: 18px; color: #6D4C41;
         cursor: pointer; transition: all 0.2s;
     }
-    .btn_wishlist:hover, .btn_compare:hover { border-color: #ff5722; color: #ff5722; }
+    .btn_wishlist:hover, .btn_compare:hover { border-color: #C62828; color: #C62828; }
 
     .product_meta {
         font-size: 13px;
-        color: #6c757d;
+        color: #6D4C41;
         padding-top: 18px;
         border-top: 1px solid #f0f0f0;
     }
     .product_meta span { display: block; margin-bottom: 6px; }
-    .product_meta strong { color: #1a1a2e; margin-right: 6px; }
-    .product_meta a { color: #ff5722; text-decoration: none; }
+    .product_meta strong { color: #3E2723; margin-right: 6px; }
+    .product_meta a { color: #C62828; text-decoration: none; }
 
     /* Tabs */
-    .product_tabs_section { padding: 50px 0; background: #f8f9fa; }
-    .product_tabs .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 30px; }
+    .product_tabs_section { padding: 50px 0; background: #FDF6EC; }
+    .product_tabs .nav-tabs { border-bottom: 2px solid #EDD9C0; margin-bottom: 30px; }
     .product_tabs .nav-link {
-        color: #6c757d;
+        color: #6D4C41;
         font-weight: 600;
         padding: 12px 24px;
         border: none;
@@ -264,8 +264,8 @@
         font-size: 14px;
     }
     .product_tabs .nav-link.active, .product_tabs .nav-link:hover {
-        color: #ff5722;
-        border-bottom-color: #ff5722;
+        color: #C62828;
+        border-bottom-color: #C62828;
         background: transparent;
     }
     .tab_content_body {
@@ -275,9 +275,9 @@
         border: 1px solid #f0f0f0;
         font-size: 15px;
         line-height: 1.9;
-        color: #6c757d;
+        color: #6D4C41;
     }
-    .tab_content_body h4, .tab_content_body h5 { color: #1a1a2e; margin-bottom: 12px; }
+    .tab_content_body h4, .tab_content_body h5 { color: #3E2723; margin-bottom: 12px; }
 
     /* Related Products */
     .related_section { padding: 50px 0; }
@@ -285,7 +285,7 @@
     .section_title_row h3 {
         font-size: 24px;
         font-weight: 700;
-        color: #1a1a2e;
+        color: #3E2723;
         position: relative;
         padding-bottom: 12px;
         display: inline-block;
@@ -297,7 +297,7 @@
         left: 0;
         width: 50px;
         height: 3px;
-        background: #ff5722;
+        background: #C62828;
         border-radius: 2px;
     }
 </style>
@@ -306,7 +306,7 @@
 {% block content %}
 
 <!-- Breadcrumb -->
-<div style="background:#f8f9fa; padding:14px 0; border-bottom:1px solid #e9ecef;">
+<div style="background:#FDF6EC; padding:14px 0; border-bottom:1px solid #EDD9C0;">
     <div class="container">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
@@ -445,20 +445,20 @@
                         <button type="button" class="btn_wishlist" id="btn-wishlist"
                                 data-url="{% url 'toggle_wishlist' product.pk %}"
                                 title="{% if in_wishlist %}Retirer de la wishlist{% else %}Ajouter à la wishlist{% endif %}"
-                                {% if in_wishlist %}style="border-color:#ff5722; color:#ff5722;"{% endif %}>
+                                {% if in_wishlist %}style="border-color:#C62828; color:#C62828;"{% endif %}>
                             <i class="icon-heart"></i>
                         </button>
                         <button type="button" class="btn_compare btn-add-compare"
                                 data-product-id="{{ product.pk }}"
                                 data-url="{% url 'add_to_compare' product.pk %}"
                                 title="Comparer"
-                                {% if product.pk in compare_ids %}style="border-color:#ff5722; color:#ff5722;"{% endif %}>
+                                {% if product.pk in compare_ids %}style="border-color:#C62828; color:#C62828;"{% endif %}>
                             <i class="icon-shuffle"></i>
                         </button>
-                        <span style="display:flex; align-items:center; gap:6px; margin-left:8px; font-size:12px; color:#6c757d;">
-                            <i class="ti-shield" style="color:#28a745;"></i> Paiement sécurisé
+                        <span style="display:flex; align-items:center; gap:6px; margin-left:8px; font-size:12px; color:#6D4C41;">
+                            <i class="ti-shield" style="color:#388E3C;"></i> Paiement sécurisé
                             &nbsp;·&nbsp;
-                            <i class="ti-truck" style="color:#17a2b8;"></i> Livraison rapide
+                            <i class="ti-truck" style="color:#0277BD;"></i> Livraison rapide
                         </span>
                     </div>
 
@@ -486,11 +486,11 @@
         <div class="product_tabs">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="tab" href="#tab_desc">Description</a>
+                    <a class="nav-link active" data-bs-toggle="tab" href="#tab_desc">À propos</a>
                 </li>
                 {% if product.additional_info %}
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#tab_info">Informations supplémentaires</a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab_info">Ingrédients</a>
                 </li>
                 {% endif %}
             </ul>
@@ -638,7 +638,7 @@ $(document).ready(function () {
             method: 'POST',
             success: function (data) {
                 if (data.in_wishlist) {
-                    btn.css({ borderColor: '#ff5722', color: '#ff5722' });
+                    btn.css({ borderColor: '#C62828', color: '#C62828' });
                     btn.attr('title', 'Retirer de la wishlist');
                     showToast('Ajouté à votre wishlist !', 'success');
                 } else {

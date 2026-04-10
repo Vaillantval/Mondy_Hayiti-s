@@ -37,18 +37,18 @@ body { background: #f4f6f9; }
 }
 .oc-icon-wrap i { font-size: 38px; color: #fff; }
 .oc-title {
-    font-size: 28px; font-weight: 800; color: #1a1a2e;
+    font-size: 28px; font-weight: 800; color: #3E2723;
     margin: 0 0 10px; letter-spacing: -.5px;
 }
 .oc-subtitle {
-    font-size: 16px; color: #6c757d; max-width: 480px; margin: 0 auto; line-height: 1.6;
+    font-size: 16px; color: #6D4C41; max-width: 480px; margin: 0 auto; line-height: 1.6;
 }
 
 /* ── Cards ── */
 .oc-card {
     background: #fff;
     border-radius: 18px;
-    border: 1px solid #e9ecef;
+    border: 1px solid #EDD9C0;
     box-shadow: 0 4px 24px rgba(0,0,0,.07);
     overflow: hidden;
     width: 100%; max-width: 640px;
@@ -64,10 +64,10 @@ body { background: #f4f6f9; }
 }
 .oc-card-head {
     padding: 16px 22px;
-    background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4e 100%);
+    background: linear-gradient(135deg, #3E2723 0%, #4E342E 100%);
     display: flex; align-items: center; gap: 10px;
 }
-.oc-card-head i { color: #ff8a65; font-size: 16px; }
+.oc-card-head i { color: #EF5350; font-size: 16px; }
 .oc-card-head h5 { margin: 0; font-size: 15px; font-weight: 700; color: #fff; }
 .oc-card-body { padding: 20px 22px; }
 
@@ -97,45 +97,45 @@ body { background: #f4f6f9; }
 .oc-step:last-child { border-bottom: none; }
 .oc-step-num {
     width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-    background: #fff8f6; border: 2px solid #ff5722;
+    background: #fff8f6; border: 2px solid #C62828;
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 800; color: #ff5722;
+    font-size: 12px; font-weight: 800; color: #C62828;
 }
 .oc-step-info { font-size: 14px; color: #495057; line-height: 1.5; }
-.oc-step-info strong { color: #1a1a2e; display: block; margin-bottom: 2px; }
+.oc-step-info strong { color: #3E2723; display: block; margin-bottom: 2px; }
 
 /* ── Order summary rows ── */
 .oc-row {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 9px 0; font-size: 14px; color: #6c757d;
+    padding: 9px 0; font-size: 14px; color: #6D4C41;
     border-bottom: 1px dashed #f0f0f0;
 }
 .oc-row:last-child { border-bottom: none; }
-.oc-row-val { font-weight: 600; color: #1a1a2e; }
+.oc-row-val { font-weight: 600; color: #3E2723; }
 .oc-total {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 0 0; font-size: 16px; font-weight: 700; color: #1a1a2e;
+    padding: 14px 0 0; font-size: 16px; font-weight: 700; color: #3E2723;
     margin-top: 4px;
 }
-.oc-total-amount { font-size: 24px; font-weight: 800; color: #ff5722; }
+.oc-total-amount { font-size: 24px; font-weight: 800; color: #C62828; }
 
 /* ── CTAs ── */
 .oc-cta { width: 100%; max-width: 640px; animation: cardIn .5s .4s ease both; }
 .oc-btn-main {
     display: flex; align-items: center; justify-content: center; gap: 8px;
     width: 100%; padding: 15px;
-    background: linear-gradient(135deg, #ff5722, #ff8a65);
+    background: linear-gradient(135deg, #C62828, #EF5350);
     color: #fff; font-size: 15px; font-weight: 700;
     border: none; border-radius: 12px; text-decoration: none;
-    box-shadow: 0 6px 20px rgba(255,87,34,.35);
+    box-shadow: 0 6px 20px rgba(198, 40, 40, .35);
     transition: all .25s; margin-bottom: 12px;
 }
-.oc-btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(255,87,34,.45); color: #fff; }
+.oc-btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(198,40,40,.45); color: #fff; }
 .oc-btn-sec {
     display: block; text-align: center;
-    font-size: 13.5px; color: #6c757d; text-decoration: none; font-weight: 500;
+    font-size: 13.5px; color: #6D4C41; text-decoration: none; font-weight: 500;
 }
-.oc-btn-sec:hover { color: #ff5722; }
+.oc-btn-sec:hover { color: #C62828; }
 </style>
 {% endblock %}
 
@@ -150,7 +150,7 @@ body { background: #f4f6f9; }
         <h1 class="oc-title">Commande enregistrée !</h1>
         <p class="oc-subtitle">
             Votre commande est bien reçue et est <strong>en cours de traitement</strong>.
-            MatStore Haiti vous contactera pour confirmer votre paiement.
+            Hayiti's vous contactera pour confirmer votre paiement.
         </p>
     </div>
 
@@ -179,7 +179,7 @@ body { background: #f4f6f9; }
                     <div class="oc-step-num">2</div>
                     <div class="oc-step-info">
                         <strong>Vérification du paiement</strong>
-                        MatStore examine votre preuve de paiement. Délai : 24–48 h.
+                        Hayiti's examine votre preuve de paiement. Délai : 24–48 h.
                     </div>
                 </li>
                 <li class="oc-step">

@@ -4,7 +4,7 @@
 {% block styles %}
 <style>
     .faq_banner {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        background: linear-gradient(135deg, #FDF6EC 0%, #EDD9C0 100%);
         padding: 80px 0 60px;
         position: relative;
         overflow: hidden;
@@ -17,13 +17,13 @@
         transform: translateY(-50%);
         font-size: 250px;
         font-weight: 900;
-        color: rgba(255,87,34,0.05);
+        color: rgba(198, 40, 40, 0.05);
         line-height: 1;
         pointer-events: none;
     }
-    .faq_banner h1 { font-size: 48px; font-weight: 700; color: #1a1a2e; }
-    .faq_banner p { font-size: 18px; color: #6c757d; }
-    .faq_banner .breadcrumb-item a { color: #ff5722; }
+    .faq_banner h1 { font-size: 48px; font-weight: 700; color: #3E2723; }
+    .faq_banner p { font-size: 18px; color: #6D4C41; }
+    .faq_banner .breadcrumb-item a { color: #C62828; }
 
     .faq_search_wrap {
         position: relative;
@@ -33,19 +33,19 @@
     .faq_search_wrap input {
         width: 100%;
         padding: 14px 50px 14px 20px;
-        border: 2px solid #e9ecef;
+        border: 2px solid #EDD9C0;
         border-radius: 50px;
         font-size: 15px;
         transition: all 0.3s;
         outline: none;
     }
-    .faq_search_wrap input:focus { border-color: #ff5722; box-shadow: 0 0 0 4px rgba(255,87,34,0.1); }
+    .faq_search_wrap input:focus { border-color: #C62828; box-shadow: 0 0 0 4px rgba(198, 40, 40, 0.1); }
     .faq_search_wrap button {
         position: absolute;
         right: 6px;
         top: 50%;
         transform: translateY(-50%);
-        background: #ff5722;
+        background: #C62828;
         border: none;
         color: #fff;
         width: 40px;
@@ -66,8 +66,8 @@
         overflow: hidden;
         transition: all 0.3s ease;
     }
-    .faq_item:hover { border-color: rgba(255,87,34,0.3); }
-    .faq_item.active { border-color: #ff5722; box-shadow: 0 4px 20px rgba(255,87,34,0.1); }
+    .faq_item:hover { border-color: rgba(198, 40, 40, 0.3); }
+    .faq_item.active { border-color: #C62828; box-shadow: 0 4px 20px rgba(198, 40, 40, 0.1); }
 
     .faq_question {
         padding: 22px 25px;
@@ -80,28 +80,28 @@
     .faq_question h6 {
         font-size: 16px;
         font-weight: 600;
-        color: #1a1a2e;
+        color: #3E2723;
         margin: 0;
         flex: 1;
         line-height: 1.5;
     }
-    .faq_item.active .faq_question h6 { color: #ff5722; }
+    .faq_item.active .faq_question h6 { color: #C62828; }
 
     .faq_toggle {
         width: 32px;
         height: 32px;
-        background: #f8f9fa;
+        background: #FDF6EC;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
         transition: all 0.3s;
-        color: #6c757d;
+        color: #6D4C41;
         font-size: 14px;
     }
     .faq_item.active .faq_toggle {
-        background: #ff5722;
+        background: #C62828;
         color: #fff;
         transform: rotate(45deg);
     }
@@ -114,15 +114,15 @@
     }
     .faq_answer p {
         margin: 15px 0 0;
-        color: #6c757d;
+        color: #6D4C41;
         line-height: 1.8;
         font-size: 15px;
     }
     .faq_item.active .faq_answer { display: block; }
 
     .faq_categories .cat_btn {
-        background: #f8f9fa;
-        border: 1.5px solid #e9ecef;
+        background: #FDF6EC;
+        border: 1.5px solid #EDD9C0;
         border-radius: 50px;
         padding: 8px 20px;
         font-size: 13px;
@@ -135,8 +135,8 @@
     }
     .faq_categories .cat_btn:hover,
     .faq_categories .cat_btn.active {
-        background: #ff5722;
-        border-color: #ff5722;
+        background: #C62828;
+        border-color: #C62828;
         color: #fff;
     }
 
@@ -145,11 +145,11 @@
         padding: 80px 20px;
     }
     .faq_empty i { font-size: 60px; color: #dee2e6; margin-bottom: 20px; display: block; }
-    .faq_empty h5 { color: #6c757d; margin-bottom: 8px; }
+    .faq_empty h5 { color: #6D4C41; margin-bottom: 8px; }
     .faq_empty p { color: #adb5bd; margin-bottom: 25px; }
 
     .contact_cta {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        background: linear-gradient(135deg, #3E2723 0%, #33190F 100%);
         border-radius: 16px;
         padding: 40px;
         text-align: center;
@@ -157,7 +157,7 @@
     }
     .contact_cta h5 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
     .contact_cta p { color: rgba(255,255,255,0.6); margin-bottom: 20px; }
-    .contact_cta .btn { background: #ff5722; color: #fff; border: none; border-radius: 8px; padding: 12px 30px; font-weight: 600; }
+    .contact_cta .btn { background: #C62828; color: #fff; border: none; border-radius: 8px; padding: 12px 30px; font-weight: 600; }
     .contact_cta .btn:hover { background: #e64a19; color: #fff; }
 </style>
 {% endblock %}
@@ -225,30 +225,30 @@
             <div class="col-lg-4">
                 <div class="contact_cta mb-4">
                     <i class="ti-headphone-alt"
-                       style="font-size:40px; color:#ff5722; margin-bottom:15px; display:block;"></i>
+                       style="font-size:40px; color:#C62828; margin-bottom:15px; display:block;"></i>
                     <h5>Vous n'avez pas trouvé votre réponse ?</h5>
                     <p>Notre équipe est disponible pour vous aider du lundi au samedi, de 9h à 18h.</p>
                     <a href="{% url 'contact' %}" class="btn">Nous contacter</a>
                 </div>
 
                 <div class="p-4 bg-light rounded-3">
-                    <h6 class="fw-bold mb-3" style="color:#1a1a2e;">Infos utiles</h6>
+                    <h6 class="fw-bold mb-3" style="color:#3E2723;">Infos utiles</h6>
                     <ul class="list-unstyled mb-0">
                         <li class="d-flex align-items-center gap-2 mb-2">
-                            <i class="ti-check" style="color:#ff5722;"></i>
-                            <span style="font-size:14px; color:#6c757d;">Livraison gratuite dès 5000 HTG</span>
+                            <i class="ti-check" style="color:#C62828;"></i>
+                            <span style="font-size:14px; color:#6D4C41;">Livraison gratuite dès 5000 HTG</span>
                         </li>
                         <li class="d-flex align-items-center gap-2 mb-2">
-                            <i class="ti-check" style="color:#ff5722;"></i>
-                            <span style="font-size:14px; color:#6c757d;">Retours sous 30 jours</span>
+                            <i class="ti-check" style="color:#C62828;"></i>
+                            <span style="font-size:14px; color:#6D4C41;">Retours sous 30 jours</span>
                         </li>
                         <li class="d-flex align-items-center gap-2 mb-2">
-                            <i class="ti-check" style="color:#ff5722;"></i>
-                            <span style="font-size:14px; color:#6c757d;">Paiement 100% sécurisé</span>
+                            <i class="ti-check" style="color:#C62828;"></i>
+                            <span style="font-size:14px; color:#6D4C41;">Paiement 100% sécurisé</span>
                         </li>
                         <li class="d-flex align-items-center gap-2">
-                            <i class="ti-check" style="color:#ff5722;"></i>
-                            <span style="font-size:14px; color:#6c757d;">Support 6j/7</span>
+                            <i class="ti-check" style="color:#C62828;"></i>
+                            <span style="font-size:14px; color:#6D4C41;">Support 6j/7</span>
                         </li>
                     </ul>
                 </div>

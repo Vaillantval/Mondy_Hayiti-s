@@ -30,10 +30,10 @@
 .o-badge-pending    { background:#fff8e1; color:#f59e0b; }
 .o-badge-processing { background:#eff6ff; color:#3b82f6; }
 .o-badge-shipped    { background:#f5f3ff; color:#8b5cf6; }
-.o-badge-delivered  { background:#f0fdf4; color:#22c55e; }
+.o-badge-delivered  { background:#f0fdf4; color:#2E7D32; }
 .o-badge-canceled   { background:#fef2f2; color:#ef4444; }
 
-.o-paid-yes { color:#22c55e; font-weight:700; }
+.o-paid-yes { color:#2E7D32; font-weight:700; }
 .o-paid-no  { color:#ef4444; font-weight:700; }
 
 .o-detail-btn {
@@ -105,7 +105,7 @@
             <td data-label="Livraison" style="color:var(--muted);">
                 {{ order.carrier_name }}
                 {% if order.carrier_price == 0 %}
-                    <span style="color:#22c55e;font-size:11px;display:block;">Gratuit</span>
+                    <span style="color:#2E7D32;font-size:11px;display:block;">Gratuit</span>
                 {% endif %}
             </td>
             <td data-label="Paiement">

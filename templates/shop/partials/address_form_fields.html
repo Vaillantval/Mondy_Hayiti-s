@@ -2,7 +2,7 @@
     <label class="ck-label">Email</label>
     <input type="email" name="email" placeholder="votre@email.com" class="ck-input"
            value="{{ form.email.value|default:'' }}">
-    {% if form.email.errors %}<div style="color:#dc3545;font-size:12px;margin-top:4px;">{{ form.email.errors|join:", " }}</div>{% endif %}
+    {% if form.email.errors %}<div style="color:#B71C1C;font-size:12px;margin-top:4px;">{{ form.email.errors|join:", " }}</div>{% endif %}
 </div>
 
 <div class="ck-form-row">
@@ -10,13 +10,13 @@
         <label class="ck-label">Nom</label>
         <input type="text" name="name" placeholder="Nom" class="ck-input"
                value="{{ form.name.value|default:'' }}">
-        {% if form.name.errors %}<div style="color:#dc3545;font-size:12px;margin-top:4px;">{{ form.name.errors|join:", " }}</div>{% endif %}
+        {% if form.name.errors %}<div style="color:#B71C1C;font-size:12px;margin-top:4px;">{{ form.name.errors|join:", " }}</div>{% endif %}
     </div>
     <div class="ck-form-group">
         <label class="ck-label">Prénom</label>
         <input type="text" name="full_name" placeholder="Prénom" class="ck-input"
                value="{{ form.full_name.value|default:'' }}">
-        {% if form.full_name.errors %}<div style="color:#dc3545;font-size:12px;margin-top:4px;">{{ form.full_name.errors|join:", " }}</div>{% endif %}
+        {% if form.full_name.errors %}<div style="color:#B71C1C;font-size:12px;margin-top:4px;">{{ form.full_name.errors|join:", " }}</div>{% endif %}
     </div>
 </div>
 
@@ -62,14 +62,14 @@
                value="">
     </div>
     <input type="hidden" name="phone" class="ck-phone-hidden" value="{{ form.phone.value|default:'' }}">
-    {% if form.phone.errors %}<div style="color:#dc3545;font-size:12px;margin-top:4px;">{{ form.phone.errors|join:", " }}</div>{% endif %}
+    {% if form.phone.errors %}<div style="color:#B71C1C;font-size:12px;margin-top:4px;">{{ form.phone.errors|join:", " }}</div>{% endif %}
 </div>
 
 <div class="ck-form-group">
     <label class="ck-label">Adresse</label>
     <input type="text" name="street" placeholder="Rue, numéro..." class="ck-input"
            value="{{ form.street.value|default:'' }}">
-    {% if form.street.errors %}<div style="color:#dc3545;font-size:12px;margin-top:4px;">{{ form.street.errors|join:", " }}</div>{% endif %}
+    {% if form.street.errors %}<div style="color:#B71C1C;font-size:12px;margin-top:4px;">{{ form.street.errors|join:", " }}</div>{% endif %}
 </div>
 
 <div class="ck-form-row">
@@ -77,13 +77,13 @@
         <label class="ck-label">Code postal</label>
         <input type="text" name="code_postal" placeholder="75001" class="ck-input"
                value="{{ form.code_postal.value|default:'' }}">
-        {% if form.code_postal.errors %}<div style="color:#dc3545;font-size:12px;margin-top:4px;">{{ form.code_postal.errors|join:", " }}</div>{% endif %}
+        {% if form.code_postal.errors %}<div style="color:#B71C1C;font-size:12px;margin-top:4px;">{{ form.code_postal.errors|join:", " }}</div>{% endif %}
     </div>
     <div class="ck-form-group">
         <label class="ck-label">Ville</label>
         <input type="text" name="city" placeholder="Paris" class="ck-input"
                value="{{ form.city.value|default:'' }}">
-        {% if form.city.errors %}<div style="color:#dc3545;font-size:12px;margin-top:4px;">{{ form.city.errors|join:", " }}</div>{% endif %}
+        {% if form.city.errors %}<div style="color:#B71C1C;font-size:12px;margin-top:4px;">{{ form.city.errors|join:", " }}</div>{% endif %}
     </div>
 </div>
 
@@ -91,7 +91,7 @@
     <label class="ck-label">Pays</label>
     <input type="text" name="country" placeholder="France" class="ck-input"
            value="{{ form.country.value|default:'' }}">
-    {% if form.country.errors %}<div style="color:#dc3545;font-size:12px;margin-top:4px;">{{ form.country.errors|join:", " }}</div>{% endif %}
+    {% if form.country.errors %}<div style="color:#B71C1C;font-size:12px;margin-top:4px;">{{ form.country.errors|join:", " }}</div>{% endif %}
 </div>
 
 <div class="ck-form-group">

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% if site_name %}{{ site_name }}{% else %}Jstore{% endif %} | E-commerce{% endblock %}</title>
+    <title>{% block title %}{% if site_name %}{{ site_name }}{% else %}Hayiti's{% endif %} | E-commerce{% endblock %}</title>
     {% if site_logo %}
     <link rel="icon" type="image/png" href="{{ site_logo.url }}">
     {% endif %}
@@ -28,6 +28,11 @@
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Nunito', sans-serif; background-color: #FFF8F0; color: #3E2723; }
+        h1, h2, h3, h4, h5, h6, .display-title, .section-title { font-family: 'Playfair Display', serif; }
+    </style>
     {% block styles %}{% endblock %}
 </head>
 
@@ -79,7 +84,7 @@
         /* ── Toast notification ── */
         window.showToast = function (message, type) {
             type = type || 'success';
-            var colors = { success: '#28a745', error: '#dc3545', info: '#17a2b8', warning: '#e67e22' };
+            var colors = { success: '#388E3C', error: '#B71C1C', info: '#0277BD', warning: '#F9A825' };
             var icons  = { success: '✓', error: '✕', info: 'ℹ', warning: '⚠' };
             var color  = colors[type] || colors.success;
             var icon   = icons[type]  || '✓';
@@ -140,7 +145,7 @@
                     }
 
                     if (data.in_wishlist) {
-                        btn.css('color', '#ff5722');
+                        btn.css('color', '#C62828');
                         showToast('Ajouté à votre liste de souhaits !', 'success');
                     } else {
                         btn.css('color', '');
@@ -167,7 +172,7 @@
                     }
                     showToast(data.message, data.msg_type);
                     if (data.success) {
-                        btn.css('color', '#ff5722');
+                        btn.css('color', '#C62828');
                         setTimeout(function () { window.location.href = COMPARE_URL; }, 800);
                     }
                 },
@@ -212,7 +217,7 @@ s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
 <!--End of Tawk.to Script-->
-</body>
 
 {% block scripts %}{% endblock %}
+</body>
 </html>
