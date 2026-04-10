@@ -279,6 +279,24 @@
     }
     .tab_content_body h4, .tab_content_body h5 { color: #3E2723; margin-bottom: 12px; }
 
+    /* ── Prix variables ── */
+    .price-variant-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+    .price-variant-pill {
+        display: inline-flex; flex-direction: column; align-items: center;
+        padding: 9px 18px; border-radius: 10px;
+        border: 2px solid #EDD9C0; background: #fff;
+        cursor: pointer; transition: all .2s;
+        min-width: 80px; text-align: center;
+    }
+    .price-variant-pill:hover { border-color: #C62828; }
+    .price-variant-pill.active {
+        border-color: #C62828; background: rgba(198,40,40,.06);
+        box-shadow: 0 4px 14px rgba(198,40,40,.15);
+    }
+    .pill-label { font-size: 12px; font-weight: 700; color: #3E2723; margin-bottom: 3px; }
+    .pill-price { font-size: 13px; font-weight: 800; color: #C62828; }
+    .price-variant-pill.active .pill-price { color: #C62828; }
+
     /* Related Products */
     .related_section { padding: 50px 0; }
     .section_title_row { margin-bottom: 30px; }
@@ -390,6 +408,39 @@
                     <h1 class="product_title_main">{{ product.name }}</h1>
 
                     <!-- Price -->
+                    {% if prices %}
+                    <!-- Sélecteur de prix variable -->
+                    <div class="product_price_main" id="price-display">
+                        <span class="current_price" id="active-price">{{ prices.0.price|price_convert }}</span>
+                        {% if prices.0.regular_price and prices.0.regular_price > prices.0.price %}
+                        <span class="old_price" id="active-old-price">{{ prices.0.regular_price|price_convert }}</span>
+                        {% if discount %}<span class="discount_badge" id="active-discount">-{{ discount }}%</span>{% endif %}
+                        {% else %}
+                        <span class="old_price" id="active-old-price" style="display:none;"></span>
+                        <span class="discount_badge" id="active-discount" style="display:none;"></span>
+                        {% endif %}
+                    </div>
+
+                    <div class="price-variants" style="margin-bottom:20px;">
+                        <div style="font-size:12.5px; font-weight:700; color:#3E2723; margin-bottom:10px; letter-spacing:.1px;">
+                            Format / Taille
+                        </div>
+                        <div class="price-variant-pills">
+                            {% for pp in prices %}
+                            <button type="button"
+                                    class="price-variant-pill {% if forloop.first %}active{% endif %}"
+                                    data-price-id="{{ pp.id }}"
+                                    data-price="{{ pp.price }}"
+                                    data-regular-price="{{ pp.regular_price|default:'' }}"
+                                    data-label="{{ pp.label }}">
+                                {% if pp.label %}<span class="pill-label">{{ pp.label }}</span>{% endif %}
+                                <span class="pill-price">{{ pp.price|price_convert }}</span>
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Prix simple (legacy) -->
                     <div class="product_price_main">
                         <span class="current_price">{{ product.solde_price|price_convert }}</span>
                         {% if product.regular_price > product.solde_price %}
@@ -397,6 +448,7 @@
                         <span class="discount_badge">-{{ discount }}%</span>
                         {% endif %}
                     </div>
+                    {% endif %}
 
                     <!-- Short Description -->
                     <p class="product_short_desc">{{ product.description }}</p>
@@ -573,6 +625,45 @@ function changeQty(delta) {
     input.value = val;
 }
 
+/* ── Sélecteur de prix variables ── */
+var selectedPriceId = null;
+(function () {
+    var pills = document.querySelectorAll('.price-variant-pill');
+    if (!pills.length) return;
+
+    // Initialiser avec le premier pill actif
+    var firstPill = pills[0];
+    selectedPriceId = firstPill ? firstPill.dataset.priceId : null;
+
+    pills.forEach(function (pill) {
+        pill.addEventListener('click', function () {
+            pills.forEach(function (p) { p.classList.remove('active'); });
+            pill.classList.add('active');
+            selectedPriceId = pill.dataset.priceId;
+
+            // Mise à jour affichage prix
+            var priceEl   = document.getElementById('active-price');
+            var oldEl     = document.getElementById('active-old-price');
+            var discEl    = document.getElementById('active-discount');
+            var rawPrice  = parseFloat(pill.dataset.price) || 0;
+            var rawReg    = parseFloat(pill.dataset.regularPrice) || 0;
+
+            if (priceEl) priceEl.textContent = pill.querySelector('.pill-price').textContent;
+            if (oldEl && rawReg && rawReg > rawPrice) {
+                oldEl.style.display = '';
+                oldEl.textContent   = rawReg.toLocaleString('fr-HT') + ' HTG';
+                if (discEl) {
+                    discEl.style.display = '';
+                    discEl.textContent   = '-' + Math.round((rawReg - rawPrice) / rawReg * 100) + '%';
+                }
+            } else {
+                if (oldEl)  oldEl.style.display = 'none';
+                if (discEl) discEl.style.display = 'none';
+            }
+        });
+    });
+})();
+
 $(document).ready(function () {
 
     /* ── Ajouter au panier (page produit) ── */
@@ -586,7 +677,7 @@ $(document).ready(function () {
         $.ajax({
             url: btn.data('url'),
             method: 'POST',
-            data: { qty: qty },
+            data: { qty: qty, price_id: selectedPriceId || '' },
             success: function (data) {
                 showToast(data.message, data.msg_type || 'success');
                 $('#cart-count-badge').text(data.cart_count);
@@ -618,7 +709,7 @@ $(document).ready(function () {
         $.ajax({
             url: btn.data('url'),
             method: 'POST',
-            data: { qty: qty },
+            data: { qty: qty, price_id: selectedPriceId || '' },
             success: function () {
                 window.location.href = btn.data('checkout');
             },

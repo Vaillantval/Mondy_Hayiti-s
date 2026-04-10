@@ -19,6 +19,7 @@ from shop.models import (
     Order,
     OrderDetail,
     Method,
+    ProductPrice,
 )
 from shop.models.Carrier import Carrier
 from shop.models.Setting import Setting
@@ -143,8 +144,16 @@ class ImageInline(admin.TabularInline):
     extra = 3
 
 
+class ProductPriceInline(admin.TabularInline):
+    model = ProductPrice
+    extra = 1
+    fields = ('label', 'price', 'regular_price', 'order')
+    verbose_name = "Prix / Variante"
+    verbose_name_plural = "Prix & Variantes"
+
+
 class ProductAdmin(admin.ModelAdmin):
-    inlines = [ImageInline]
+    inlines = [ProductPriceInline, ImageInline]
     list_display = (
         "id",
         "name",

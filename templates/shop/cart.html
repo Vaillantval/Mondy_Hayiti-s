@@ -282,7 +282,7 @@
                         </thead>
                         <tbody>
                         {% for item in items %}
-                        <tr id="cart-row-{{ item.product_id }}">
+                        <tr id="cart-row-{{ item.cart_key }}">
                             <td>
                                 <div style="display:flex; align-items:center; gap:14px;">
                                     {% if item.image %}
@@ -290,26 +290,36 @@
                                         <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-product-img">
                                     </a>
                                     {% endif %}
-                                    <a href="{% url 'product_detail' item.slug %}" class="cart-product-name">
-                                        {{ item.name }}
-                                    </a>
+                                    <div>
+                                        <a href="{% url 'product_detail' item.slug %}" class="cart-product-name">
+                                            {{ item.name }}
+                                        </a>
+                                        {% if item.price_label %}
+                                        <div style="margin-top:4px;">
+                                            <span style="display:inline-block; font-size:11px; font-weight:700; background:rgba(198,40,40,.09); color:#C62828; border:1px solid rgba(198,40,40,.2); border-radius:50px; padding:2px 10px;">
+                                                {{ item.price_label }}
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </td>
                             <td style="text-align:center; color:#C62828; font-weight:600;">{{ item.display_price }}</td>
                             <td style="text-align:center;">
                                 <div class="qty-group">
-                                    <button type="button" class="qty-btn" onclick="updateQty({{ item.product_id }}, -1)">−</button>
+                                    <button type="button" class="qty-btn" onclick="updateQty('{{ item.cart_key }}', {{ item.product_id }}, -1)">−</button>
                                     <input type="number" class="qty-input"
-                                           id="qty-{{ item.product_id }}" value="{{ item.qty }}" min="1"
-                                           onchange="setQty({{ item.product_id }}, this.value)">
-                                    <button type="button" class="qty-btn" onclick="updateQty({{ item.product_id }}, 1)">+</button>
+                                           id="qty-{{ item.cart_key }}" value="{{ item.qty }}" min="1"
+                                           onchange="setQty('{{ item.cart_key }}', {{ item.product_id }}, this.value)">
+                                    <button type="button" class="qty-btn" onclick="updateQty('{{ item.cart_key }}', {{ item.product_id }}, 1)">+</button>
                                 </div>
                             </td>
-                            <td style="text-align:center; font-weight:700; color:#3E2723;" id="line-total-{{ item.product_id }}">
+                            <td style="text-align:center; font-weight:700; color:#3E2723;" id="line-total-{{ item.cart_key }}">
                                 {{ item.display_total }}
                             </td>
                             <td style="text-align:center;">
                                 <button type="button" class="btn-remove btn-remove-cart"
+                                        data-cart-key="{{ item.cart_key }}"
                                         data-product-id="{{ item.product_id }}"
                                         data-url="{% url 'remove_from_cart' item.product_id %}"
                                         title="Supprimer">
@@ -457,26 +467,26 @@
 var CARRIER_URL = '{% url "select_carrier" %}';
 
 /* ── Qty controls ── */
-function updateQty(productId, delta) {
-    var input = document.getElementById('qty-' + productId);
+function updateQty(cartKey, productId, delta) {
+    var input = document.getElementById('qty-' + cartKey);
     var qty   = Math.max(1, parseInt(input.value) + delta);
     input.value = qty;
-    setQty(productId, qty);
+    setQty(cartKey, productId, qty);
 }
 
-function setQty(productId, qty) {
+function setQty(cartKey, productId, qty) {
     qty = parseInt(qty);
     if (isNaN(qty) || qty < 1) qty = 1;
 
     $.ajax({
         url: '/cart/update/' + productId + '/',
         method: 'POST',
-        data: { qty: qty },
+        data: { qty: qty, cart_key: cartKey },
         success: function (data) {
             if (!data.success) return;
-            if (data.actual_qty !== undefined)  $('#qty-' + productId).val(data.actual_qty);
+            if (data.actual_qty !== undefined)  $('#qty-' + cartKey).val(data.actual_qty);
             if (data.stock_warning)             showToast(data.stock_warning, 'warning');
-            if (data.line_total)                $('#line-total-' + productId).text(data.line_total);
+            if (data.line_total)                $('#line-total-' + cartKey).text(data.line_total);
             $('#cart-count-badge').text(data.cart_count);
             if (data.summary) updateSummaryUI(data.summary, null, null);
         }
@@ -486,12 +496,14 @@ function setQty(productId, qty) {
 /* ── Remove from cart ── */
 $(document).on('click', '.btn-remove-cart', function (e) {
     e.stopImmediatePropagation();
-    var btn   = $(this);
-    var url   = btn.data('url');
-    var rowId = '#cart-row-' + btn.data('product-id');
+    var btn     = $(this);
+    var url     = btn.data('url');
+    var cartKey = btn.data('cart-key') || btn.data('product-id');
+    var rowId   = '#cart-row-' + cartKey;
 
     $.ajax({
         url: url, method: 'POST',
+        data: { cart_key: cartKey },
         success: function (data) {
             if (data.success) {
                 $(rowId).fadeOut(300, function () {

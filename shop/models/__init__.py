@@ -12,3 +12,4 @@ from .Carrier import Carrier
 from .Method import Method
 from .Order import Order
 from .OrderDetail import OrderDetail
+from .ProductPrice import ProductPrice

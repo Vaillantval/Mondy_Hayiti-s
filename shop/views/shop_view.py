@@ -93,9 +93,20 @@ def product_detail(request, slug):
         categories__in=product.categories.all(), is_available=True
     ).exclude(pk=product.pk).prefetch_related('images', 'categories').distinct()[:8]
 
+    prices = list(product.prices.all())
+
+    # Calcul de la remise (sur le premier prix variable, ou le prix legacy)
+    if prices:
+        first = prices[0]
+        base_price = first.price
+        base_regular = first.regular_price or first.price
+    else:
+        base_price = product.solde_price
+        base_regular = product.regular_price
+
     discount = 0
-    if product.regular_price > product.solde_price > 0:
-        discount = round((product.regular_price - product.solde_price) / product.regular_price * 100)
+    if base_regular > base_price > 0:
+        discount = round((base_regular - base_price) / base_regular * 100)
 
     wishlist = request.session.get('wishlist', [])
     in_wishlist = product.pk in wishlist
@@ -105,6 +116,7 @@ def product_detail(request, slug):
         'product': product,
         'images': images,
         'related': related,
+        'prices': prices,
         'discount': discount,
         'in_wishlist': in_wishlist,
         'compare_ids': compare_ids,

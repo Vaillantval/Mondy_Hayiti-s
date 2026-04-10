@@ -25,10 +25,8 @@ def _display_price(price, setting):
 
 
 def _build_summary(cart_details, setting):
-    """Construit le dict résumé avec tous les montants formatés."""
     has_carrier = bool(cart_details.get('carrier_name') and cart_details['carrier_name'] != 0)
     shipping_price = cart_details['shipping_price'] if has_carrier else 0
-    # Sans carrier, le total = TTC (pas de frais de port à ajouter)
     total_raw = (cart_details['sub_total_ttc'] + shipping_price) if has_carrier else cart_details['sub_total_ttc']
 
     return {
@@ -53,6 +51,16 @@ def _save_wishlist(request, wishlist):
     request.session.modified = True
 
 
+def _build_cart_key(product_id, price_id):
+    """Construit la clé de panier composite."""
+    if price_id:
+        try:
+            return f"{product_id}_{int(price_id)}"
+        except (ValueError, TypeError):
+            pass
+    return str(product_id)
+
+
 @require_POST
 def add_to_cart(request, product_id):
     product = get_object_or_404(
@@ -73,12 +81,21 @@ def add_to_cart(request, product_id):
     except (ValueError, TypeError):
         qty = 1
 
-    cart = _migrate_cart_session(request)
-    current_qty = cart.get(str(product_id), 0)
-    already_in_cart = current_qty > 0
-    addable_qty = product.stock - current_qty
+    price_id = request.POST.get('price_id', '').strip()
+    cart_key = _build_cart_key(product_id, price_id)
 
-    # Stock déjà maxé
+    cart = _migrate_cart_session(request)
+
+    # Total qty de ce produit toutes variantes confondues (pour vérification stock)
+    pid_str = str(product_id)
+    total_product_qty = sum(
+        v for k, v in cart.items()
+        if k == pid_str or k.startswith(f"{pid_str}_")
+    )
+    variant_qty = cart.get(cart_key, 0)
+    already_in_cart = variant_qty > 0
+    addable_qty = product.stock - total_product_qty
+
     if addable_qty <= 0:
         if is_ajax:
             return JsonResponse({
@@ -92,7 +109,7 @@ def add_to_cart(request, product_id):
 
     qty_capped = qty > addable_qty
     qty = min(qty, addable_qty)
-    CartService.add_to_cart(request, product_id, qty)
+    CartService.add_to_cart(request, cart_key, qty)
 
     cart = request.session.get('cart', {})
     cart_count = sum(cart.values())
@@ -121,9 +138,11 @@ def add_to_cart(request, product_id):
 @require_POST
 def remove_from_cart(request, product_id):
     cart = request.session.get('cart', {})
-    current_qty = cart.get(str(product_id), 0)
+    # Support clé composite via POST param
+    cart_key = request.POST.get('cart_key', str(product_id))
+    current_qty = cart.get(cart_key, 0)
     if current_qty > 0:
-        CartService.remove_from_cart(request, product_id, current_qty)
+        CartService.remove_from_cart(request, cart_key, current_qty)
 
     cart = request.session.get('cart', {})
     cart_count = sum(cart.values()) if cart else 0
@@ -136,7 +155,8 @@ def remove_from_cart(request, product_id):
 @require_POST
 def update_cart(request, product_id):
     cart = request.session.get('cart', {})
-    key = str(product_id)
+    # Support clé composite via POST param
+    cart_key = request.POST.get('cart_key', str(product_id))
 
     try:
         qty = int(request.POST.get('qty', 1))
@@ -147,8 +167,8 @@ def update_cart(request, product_id):
     actual_qty = qty
 
     if qty <= 0:
-        current_qty = cart.get(key, 0)
-        CartService.remove_from_cart(request, product_id, current_qty)
+        current_qty = cart.get(cart_key, 0)
+        CartService.remove_from_cart(request, cart_key, current_qty)
         actual_qty = 0
     else:
         product = get_object_or_404(Product, pk=product_id)
@@ -156,7 +176,7 @@ def update_cart(request, product_id):
             stock_warning = f'Seulement {product.stock} unité(s) disponible(s) pour « {product.name} ».'
             qty = product.stock
         actual_qty = qty
-        cart[key] = qty
+        cart[cart_key] = qty
         request.session['cart'] = cart
         request.session.modified = True
 
@@ -170,7 +190,7 @@ def update_cart(request, product_id):
     if cart:
         cart_details = CartService.get_cart_details(request)
         item = next(
-            (i for i in cart_details['items'] if str(i['product']['id']) == key),
+            (i for i in cart_details['items'] if i['product']['cart_key'] == cart_key),
             None,
         )
         if item:
@@ -194,7 +214,6 @@ def cart_detail(request):
     items = []
     summary = None
 
-    # Ensure a default carrier is set in session
     if not request.session.get('carrier_id'):
         default = Carrier.objects.first()
         if default:
@@ -218,10 +237,12 @@ def cart_detail(request):
 
             items.append({
                 'product_id': prod_data['id'],
+                'cart_key': prod_data['cart_key'],
                 'name': prod_data['name'],
                 'slug': prod_data['slug'],
                 'qty': item['quantity'],
                 'image': image_url,
+                'price_label': prod_data.get('price_label', ''),
                 'display_price': _display_price(prod_data['solde_price'], setting),
                 'display_total': _display_price(item['sub_total_ht'], setting),
             })
@@ -230,7 +251,6 @@ def cart_detail(request):
 
     carriers = list(Carrier.objects.all())
 
-    # Pré-sélectionner le premier carrier si aucun en session (cohérent avec checkout)
     selected_carrier_id = request.session.get('carrier_id')
     if not selected_carrier_id and carriers:
         first = carriers[0]
@@ -241,7 +261,6 @@ def cart_detail(request):
             'name': first.name,
             'price': float(first.price),
         }
-        # Recalculer le résumé avec le carrier désormais en session
         if summary is not None:
             summary = _build_summary(CartService.get_cart_details(request), setting)
 
