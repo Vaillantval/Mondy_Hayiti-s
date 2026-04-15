@@ -20,9 +20,9 @@
             --dark      : #1A1A1A;
             --accent    : #C62828;
             --text      : #1A1A1A;
-            --muted     : #9E9E9E;
+            --muted     : #757575;
             --border    : #FFCDD2;
-            --bg        : #FFF8F0;
+            --bg        : #FFF5F5;
             --card      : #ffffff;
             --radius    : 10px;
         }
@@ -43,7 +43,7 @@
         .ds-sidebar {
             width: var(--sidebar-w);
             min-height: 100vh;
-            background: var(--dark);
+            background: #8B0000;
             display: flex;
             flex-direction: column;
             position: fixed;
@@ -57,7 +57,7 @@
             align-items: center;
             gap: 11px;
             padding: 20px 22px;
-            border-bottom: 1px solid rgba(255,252,245,0.07);
+            border-bottom: 1px solid rgba(255,255,255,0.15);
             text-decoration: none;
         }
         .ds-logo-icon {
@@ -74,20 +74,20 @@
 
         .ds-user-card {
             padding: 18px 22px;
-            border-bottom: 1px solid rgba(255,252,245,0.07);
+            border-bottom: 1px solid rgba(255,255,255,0.15);
             display: flex; align-items: center; gap: 11px;
         }
         .ds-user-avatar {
             width: 40px; height: 40px;
             border-radius: 50%;
-            background: rgba(255,252,245,0.12);
+            background: rgba(255,255,255,0.40);
             color: #fff;
             display: flex; align-items: center; justify-content: center;
             font-size: 16px; font-weight: 700; text-transform: uppercase;
             flex-shrink: 0;
         }
         .ds-user-name  { color: #fff; font-size: 13.5px; font-weight: 600; }
-        .ds-user-role  { color: rgba(255,255,255,0.38); font-size: 11px; margin-top: 1px; }
+        .ds-user-role  { color: rgba(255,255,255,0.65); font-size: 11px; margin-top: 1px; }
 
         .ds-nav { flex: 1; padding: 10px 0; overflow-y: auto; }
 
@@ -95,21 +95,21 @@
             padding: 14px 22px 4px;
             font-size: 9.5px; font-weight: 700;
             letter-spacing: 1.6px; text-transform: uppercase;
-            color: rgba(255,255,255,0.22);
+            color: rgba(255,255,255,0.40);
         }
 
         .ds-nav-link {
             display: flex; align-items: center; gap: 11px;
             padding: 10px 22px;
-            color: rgba(255,255,255,0.58);
+            color: rgba(255,255,255,0.88);
             text-decoration: none;
             font-size: 13.5px; font-weight: 500;
             border-left: 3px solid transparent;
             transition: color .16s, background .16s, border-color .16s;
         }
         .ds-nav-link i { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
-        .ds-nav-link:hover { color: rgba(255,255,255,0.88); background: rgba(255,252,245,0.05); }
-        .ds-nav-link.active { color: #fff; background: rgba(255,252,245,0.07); border-left-color: var(--accent); }
+        .ds-nav-link:hover { color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.10); }
+        .ds-nav-link.active { color: #fff; background: rgba(255,255,255,0.15); border-left-color: var(--accent); }
         .ds-nav-link.active i { color: var(--accent); }
 
         .ds-nav-badge {
@@ -121,18 +121,18 @@
 
         .ds-sidebar-footer {
             padding: 14px 22px 20px;
-            border-top: 1px solid rgba(255,252,245,0.07);
+            border-top: 1px solid rgba(255,255,255,0.15);
         }
         .ds-logout-btn {
             display: flex; align-items: center; gap: 9px;
             padding: 9px 14px;
-            background: rgba(255,252,245,0.06);
-            color: rgba(255,255,255,0.55);
+            background: rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.85);
             border-radius: 8px; text-decoration: none;
             font-size: 13px; font-weight: 500;
             transition: background .18s, color .18s;
         }
-        .ds-logout-btn:hover { background: rgba(255,252,245,0.10); color: rgba(255,255,255,0.85); }
+        .ds-logout-btn:hover { background: rgba(255,255,255,0.20); color: rgba(255,255,255,0.85); }
         .ds-logout-btn i { font-size: 14px; }
 
         /* ─── MAIN ─── */
@@ -300,8 +300,12 @@
 <aside class="ds-sidebar" id="dsSidebar">
 
     <a href="{% url 'home' %}" class="ds-sidebar-logo">
+        {% if site_logo %}
+        <img src="{{ site_logo.url }}" alt="Hayiti's" style="max-height:38px; width:auto; border-radius:8px; flex-shrink:0;">
+        {% else %}
         <div class="ds-logo-icon" style="font-size:18px;">&#127856;</div>
         <span class="ds-logo-text">Hayiti's</span>
+        {% endif %}
     </a>
 
     <div class="ds-user-card">

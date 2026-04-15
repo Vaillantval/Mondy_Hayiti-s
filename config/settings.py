@@ -203,11 +203,11 @@ JAZZMIN_SETTINGS = {
     # ── CSS custom ────────────────────────────────────────────────────────────
     "custom_css": "assets/css/admin_matstore.css",
     # ── Branding ──────────────────────────────────────────────────────────────
-    "site_title": "matstore Admin",
-    "site_header": "matstore",
-    "site_brand": "matstore",
-    "welcome_sign": "Bienvenue sur le back-office matstore",
-    "copyright": "matstore © 2026",
+    "site_title": "Hayiti's Store Admin",
+    "site_header": "Hayiti's Store",
+    "site_brand": "Hayiti's Store",
+    "welcome_sign": "Bienvenue sur le back-office Hayiti's Store",
+    "copyright": "Hayiti's Store © 2026",
     # Icône onglet navigateur (favicon) — utilise le logo du site si dispo,
     # sinon Bootstrap Icons intégrées à Jazzmin (aucun fichier requis)
     "site_icon": None,
