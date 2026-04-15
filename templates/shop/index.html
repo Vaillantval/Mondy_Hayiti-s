@@ -8,7 +8,7 @@
     .shop_container .product_info { flex: 1; display: flex; flex-direction: column; }
     .shop_container .product_img {
         position: relative; width: 100%; padding-top: 72%;
-        background: #FDF6EC; overflow: hidden;
+        background: #FFF5F5; overflow: hidden;
     }
     .shop_container .product_img > a { position: absolute; inset: 0; }
     .shop_container .product_img > .product_action_box {
@@ -30,7 +30,7 @@
        ════════════════════════════════ */
     .hs-collections-section {
         padding: 48px 0 40px;
-        background: #FDF6EC;
+        background: #FFF5F5;
     }
     .hs-collections-header {
         display: flex;
@@ -41,14 +41,14 @@
     .hs-collections-header h2 {
         font-size: 28px;
         font-weight: 900;
-        color: #3E2723;
+        color: #1A1A1A;
         margin: 0;
         letter-spacing: -0.5px;
         line-height: 1.1;
     }
     .hs-collections-header h2 span { color: #C62828; }
     .hs-collections-header p {
-        color: #6D4C41;
+        color: #616161;
         font-size: 14px;
         margin: 6px 0 0;
     }
@@ -58,8 +58,8 @@
         gap: 6px;
         padding: 9px 20px;
         border-radius: 50px;
-        border: 2px solid #3E2723;
-        color: #3E2723;
+        border: 2px solid #1A1A1A;
+        color: #1A1A1A;
         font-size: 13px;
         font-weight: 700;
         text-decoration: none;
@@ -67,7 +67,7 @@
         white-space: nowrap;
     }
     .hs-collections-viewall:hover {
-        background: #3E2723;
+        background: #B71C1C;
         color: #fff;
     }
 
@@ -86,7 +86,7 @@
         overflow: hidden;
         display: block;
         text-decoration: none !important;
-        background: #3E2723;
+        background: #B71C1C;
     }
     /* Première carte : grande, occupe 2 lignes à gauche */
     .hs-col-card--featured {
@@ -166,7 +166,7 @@
         gap: 7px;
         padding: 9px 18px;
         background: #fff;
-        color: #3E2723;
+        color: #1A1A1A;
         font-size: 12.5px;
         font-weight: 700;
         border-radius: 50px;
@@ -278,46 +278,46 @@
     <!-- /.collections -->
 
     <!-- ── Nos Spécialités ── -->
-    <section class="hs-specialties py-5" style="background:#FDF6EC;">
+    <section class="hs-specialties py-5" style="background:#FFF5F5;">
         <div class="container">
-            <h2 class="text-center mb-2" style="font-family:'Playfair Display',serif;color:#3E2723;font-size:28px;font-weight:800;">
+            <h2 class="text-center mb-2" style="font-family:'Playfair Display',serif;color:#1A1A1A;font-size:28px;font-weight:800;">
                 Nos <span style="color:#C62828;">Spécialités</span>
             </h2>
-            <p class="text-center mb-4" style="color:#A1887F;font-size:14px;">Découvrez nos créations artisanales, préparées chaque jour avec amour.</p>
+            <p class="text-center mb-4" style="color:#9E9E9E;font-size:14px;">Découvrez nos créations artisanales, préparées chaque jour avec amour.</p>
             <div class="row g-3 justify-content-center">
                 <div class="col-6 col-md-2">
                     <a href="{% url 'shop_list' %}?category=gateaux" class="hs-spec-card d-block text-center text-decoration-none"
-                       style="background:#fff;border:1.5px solid #EDD9C0;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
+                       style="background:#fff;border:1.5px solid #FFCDD2;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
                         <div style="font-size:36px;margin-bottom:8px;">&#127856;</div>
-                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#3E2723;">Gâteaux</span>
+                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#1A1A1A;">Gâteaux</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-2">
                     <a href="{% url 'shop_list' %}?category=pizza" class="hs-spec-card d-block text-center text-decoration-none"
-                       style="background:#fff;border:1.5px solid #EDD9C0;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
+                       style="background:#fff;border:1.5px solid #FFCDD2;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
                         <div style="font-size:36px;margin-bottom:8px;">&#127829;</div>
-                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#3E2723;">Pizza</span>
+                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#1A1A1A;">Pizza</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-2">
                     <a href="{% url 'shop_list' %}?category=fromage" class="hs-spec-card d-block text-center text-decoration-none"
-                       style="background:#fff;border:1.5px solid #EDD9C0;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
+                       style="background:#fff;border:1.5px solid #FFCDD2;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
                         <div style="font-size:36px;margin-bottom:8px;">&#129472;</div>
-                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#3E2723;">Fromages</span>
+                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#1A1A1A;">Fromages</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-2">
                     <a href="{% url 'shop_list' %}?category=bacon" class="hs-spec-card d-block text-center text-decoration-none"
-                       style="background:#fff;border:1.5px solid #EDD9C0;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
+                       style="background:#fff;border:1.5px solid #FFCDD2;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
                         <div style="font-size:36px;margin-bottom:8px;">&#129385;</div>
-                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#3E2723;">Bacon</span>
+                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#1A1A1A;">Bacon</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-2">
                     <a href="{% url 'shop_list' %}?category=douceurs" class="hs-spec-card d-block text-center text-decoration-none"
-                       style="background:#fff;border:1.5px solid #EDD9C0;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
+                       style="background:#fff;border:1.5px solid #FFCDD2;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
                         <div style="font-size:36px;margin-bottom:8px;">&#127851;</div>
-                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#3E2723;">Douceurs</span>
+                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#1A1A1A;">Douceurs</span>
                     </a>
                 </div>
             </div>

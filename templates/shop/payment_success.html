@@ -2,7 +2,7 @@
 {% load static price_filters %}
 
 {% block content %}
-<div class="section" style="min-height:100vh; background:#FDF6EC; padding: 60px 0;">
+<div class="section" style="min-height:100vh; background:#FFF5F5; padding: 60px 0;">
     <div class="container">
 
         {# ── En-tête confirmation ── #}
@@ -14,7 +14,7 @@
                     align-items:center; justify-content:center; margin-bottom:20px;">
                     <i class="ti-check" style="font-size:36px; color:#fff;"></i>
                 </div>
-                <h2 style="font-weight:700; color:#3E2723; margin-bottom:8px;">
+                <h2 style="font-weight:700; color:#1A1A1A; margin-bottom:8px;">
                     Commande confirmée !
                 </h2>
                 <p class="text-muted">
@@ -31,7 +31,7 @@
 
                 {# Récapitulatif commande #}
                 <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header" style="background:#3E2723; color:#fff; border-radius:6px 6px 0 0;">
+                    <div class="card-header" style="background: #B71C1C; color:#fff; border-radius:6px 6px 0 0;">
                         <div class="d-flex justify-content-between align-items-center">
                             <span style="font-weight:600;">
                                 <i class="ti-receipt" style="margin-right:6px;"></i>
@@ -77,13 +77,13 @@
                     <div class="card-body" style="font-size:14px;">
                         <div class="row">
                             <div class="col-6">
-                                <p style="font-weight:600; margin-bottom:4px; color:#3E2723;">
+                                <p style="font-weight:600; margin-bottom:4px; color:#1A1A1A;">
                                     <i class="ti-home" style="margin-right:4px;"></i> Adresse de facturation
                                 </p>
                                 <p class="text-muted mb-0" style="white-space:pre-line;">{{ order.billing_address }}</p>
                             </div>
                             <div class="col-6">
-                                <p style="font-weight:600; margin-bottom:4px; color:#3E2723;">
+                                <p style="font-weight:600; margin-bottom:4px; color:#1A1A1A;">
                                     <i class="ti-truck" style="margin-right:4px;"></i> Adresse de livraison
                                 </p>
                                 <p class="text-muted mb-0" style="white-space:pre-line;">{{ order.shipping_address }}</p>
@@ -99,7 +99,7 @@
 
                 {# Totaux #}
                 <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header" style="background:#3E2723; color:#fff; border-radius:6px 6px 0 0;">
+                    <div class="card-header" style="background: #B71C1C; color:#fff; border-radius:6px 6px 0 0;">
                         <span style="font-weight:600;">
                             <i class="ti-money" style="margin-right:6px;"></i>Récapitulatif
                         </span>

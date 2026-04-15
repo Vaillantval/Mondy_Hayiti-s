@@ -18,16 +18,16 @@
         border-bottom: 1px solid #f0f0f0;
         display: flex; align-items: center; justify-content: space-between;
     }
-    .cart-card-header h5 { margin:0; font-weight:700; color:#3E2723; font-size:16px; }
+    .cart-card-header h5 { margin:0; font-weight:700; color:#1A1A1A; font-size:16px; }
 
     /* ── Table ── */
     .cart-table { width:100%; border-collapse:collapse; }
     .cart-table thead th {
-        background:#FDF6EC; padding:12px 20px;
+        background:#FFF5F5; padding:12px 20px;
         font-size:11px; text-transform:uppercase; letter-spacing:.6px;
-        color:#6D4C41; font-weight:700; border-bottom:1px solid #f0f0f0;
+        color:#616161; font-weight:700; border-bottom:1px solid #f0f0f0;
     }
-    .cart-table tbody tr { border-bottom:1px solid #FDF6EC; transition:background .15s; }
+    .cart-table tbody tr { border-bottom:1px solid #FFF5F5; transition:background .15s; }
     .cart-table tbody tr:hover { background:#fafafa; }
     .cart-table tbody td { padding:16px 20px; vertical-align:middle; }
 
@@ -36,7 +36,7 @@
         border-radius:10px; border:1px solid #f0f0f0; flex-shrink:0;
     }
     .cart-product-name {
-        font-weight:600; color:#3E2723; font-size:14px;
+        font-weight:600; color:#1A1A1A; font-size:14px;
         text-decoration:none; transition:color .2s;
     }
     .cart-product-name:hover { color:#C62828; }
@@ -44,17 +44,17 @@
     /* ── Qty ── */
     .qty-group {
         display:inline-flex; align-items:center;
-        border:1.5px solid #EDD9C0; border-radius:8px; overflow:hidden;
+        border:1.5px solid #FFCDD2; border-radius:8px; overflow:hidden;
     }
     .qty-btn {
-        width:32px; height:32px; border:none; background:#FDF6EC;
+        width:32px; height:32px; border:none; background:#FFF5F5;
         cursor:pointer; font-size:15px; color:#495057; transition:background .15s;
     }
-    .qty-btn:hover { background:#EDD9C0; }
+    .qty-btn:hover { background:#FFCDD2; }
     .qty-input {
         width:44px; text-align:center; border:none;
-        border-left:1.5px solid #EDD9C0; border-right:1.5px solid #EDD9C0;
-        height:32px; font-size:14px; font-weight:600; outline:none; color:#3E2723;
+        border-left:1.5px solid #FFCDD2; border-right:1.5px solid #FFCDD2;
+        height:32px; font-size:14px; font-weight:600; outline:none; color:#1A1A1A;
     }
 
     /* ── Remove ── */
@@ -77,7 +77,7 @@
         align-items: center;
         gap: 12px;
         padding: 14px 16px;
-        border: 2px solid #EDD9C0;
+        border: 2px solid #FFCDD2;
         border-radius: 12px;
         background: #fff;
         cursor: pointer;
@@ -93,7 +93,7 @@
 
     .carrier-img-wrap {
         width: 44px; height: 44px; border-radius: 8px;
-        background: #FDF6EC; border: 1px solid #f0f0f0;
+        background: #FFF5F5; border: 1px solid #f0f0f0;
         display: flex; align-items: center; justify-content: center;
         overflow: hidden; flex-shrink: 0;
     }
@@ -101,15 +101,15 @@
     .carrier-img-placeholder { font-size:20px; color:#ced4da; }
 
     .carrier-info { flex: 1; min-width: 0; }
-    .carrier-name { font-size:13.5px; font-weight:700; color:#3E2723; }
-    .carrier-desc { font-size:11.5px; color:#6D4C41; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .carrier-name { font-size:13.5px; font-weight:700; color:#1A1A1A; }
+    .carrier-desc { font-size:11.5px; color:#616161; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
     .carrier-price {
         font-size:14px; font-weight:800;
         flex-shrink: 0;
     }
     .carrier-price.free { color:#2E7D32; }
-    .carrier-price.paid { color:#3E2723; }
+    .carrier-price.paid { color:#1A1A1A; }
 
     .carrier-check {
         position: absolute; top: 8px; right: 8px;
@@ -142,7 +142,7 @@
     }
     .summary-card-header {
         padding: 20px 24px;
-        background: linear-gradient(135deg, #3E2723 0%, #4E342E 100%);
+        background: linear-gradient(135deg, #1A1A1A 0%, #C62828 100%);
         color: #fff;
         font-weight: 700; font-size: 17px;
         display: flex; align-items: center; gap: 10px;
@@ -156,7 +156,7 @@
     .summary-card-body { padding: 20px 24px; }
 
     .summary-price-block {
-        background: #FDF6EC; border-radius: 12px;
+        background: #FFF5F5; border-radius: 12px;
         padding: 14px 16px; margin-bottom: 6px;
         animation: fadeUp .4s .2s ease both;
     }
@@ -166,18 +166,18 @@
     }
     .summary-row {
         display: flex; justify-content: space-between; align-items: center;
-        padding: 7px 0; font-size: 14px; color: #6D4C41;
-        border-bottom: 1px dashed #EDD9C0;
+        padding: 7px 0; font-size: 14px; color: #616161;
+        border-bottom: 1px dashed #FFCDD2;
     }
     .summary-row:last-of-type { border-bottom: none; }
-    .summary-row span { font-weight: 600; color: #3E2723; }
+    .summary-row span { font-weight: 600; color: #1A1A1A; }
 
     .summary-total-row {
         display: flex; justify-content: space-between; align-items: center;
         padding: 14px 0 8px;
         animation: fadeUp .4s .35s ease both;
     }
-    .summary-total-label { font-size: 16px; font-weight: 700; color: #3E2723; }
+    .summary-total-label { font-size: 16px; font-weight: 700; color: #1A1A1A; }
     .summary-total-amount {
         font-size: 26px; font-weight: 800; color: #C62828;
         letter-spacing: -.5px;
@@ -217,12 +217,12 @@
     .summary-continue-btn {
         display: block; text-align: center;
         padding: 12px; margin-top: 10px;
-        border: 1.5px solid #EDD9C0; border-radius: 12px;
-        color: #6D4C41; font-size: 14px; font-weight: 600;
+        border: 1.5px solid #FFCDD2; border-radius: 12px;
+        color: #616161; font-size: 14px; font-weight: 600;
         text-decoration: none; transition: all .2s;
         animation: fadeUp .4s .6s ease both;
     }
-    .summary-continue-btn:hover { border-color: #3E2723; color: #3E2723; background: #FDF6EC; }
+    .summary-continue-btn:hover { border-color: #1A1A1A; color: #1A1A1A; background: #FFF5F5; }
 
     .summary-secure {
         display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -241,7 +241,7 @@
 {% block content %}
 
 <!-- Breadcrumb -->
-<div style="background:#FDF6EC; padding:13px 0; border-bottom:1px solid #EDD9C0;">
+<div style="background:#FFF5F5; padding:13px 0; border-bottom:1px solid #FFCDD2;">
     <div class="container">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
@@ -265,7 +265,7 @@
                 <div class="cart-card">
                     <div class="cart-card-header">
                         <h5>Mon panier</h5>
-                        <span style="font-size:13px; color:#6D4C41;">
+                        <span style="font-size:13px; color:#616161;">
                             {{ cart_count }} article{{ cart_count|pluralize }}
                         </span>
                     </div>
@@ -314,7 +314,7 @@
                                     <button type="button" class="qty-btn" onclick="updateQty('{{ item.cart_key }}', {{ item.product_id }}, 1)">+</button>
                                 </div>
                             </td>
-                            <td style="text-align:center; font-weight:700; color:#3E2723;" id="line-total-{{ item.cart_key }}">
+                            <td style="text-align:center; font-weight:700; color:#1A1A1A;" id="line-total-{{ item.cart_key }}">
                                 {{ item.display_total }}
                             </td>
                             <td style="text-align:center;">
@@ -342,7 +342,7 @@
                 {% if carriers %}
                 <div class="cart-card" style="margin-top:16px;" id="carrierCard">
                     <div class="cart-card-header">
-                        <h5><i class="ti-truck" style="margin-right:8px; color:#6D4C41;"></i>Mode de livraison</h5>
+                        <h5><i class="ti-truck" style="margin-right:8px; color:#616161;"></i>Mode de livraison</h5>
                         <span style="font-size:12px; color:#adb5bd;">Sélectionnez un transporteur</span>
                     </div>
                     <div style="padding:20px 24px;">
@@ -389,19 +389,19 @@
 
                         <div class="summary-price-block">
                             <div class="summary-row">
-                                <span style="color:#6D4C41; font-weight:400;">Sous-total HT</span>
+                                <span style="color:#616161; font-weight:400;">Sous-total HT</span>
                                 <span id="s-ht">{% if summary %}{{ summary.sub_total_ht }}{% endif %}</span>
                             </div>
                             <div class="summary-row">
-                                <span style="color:#6D4C41; font-weight:400;">Taxes</span>
+                                <span style="color:#616161; font-weight:400;">Taxes</span>
                                 <span id="s-tva">{% if summary %}{{ summary.taxe_amount }}{% endif %}</span>
                             </div>
                             <div class="summary-row">
-                                <span style="color:#6D4C41; font-weight:400;">Sous-total TTC</span>
+                                <span style="color:#616161; font-weight:400;">Sous-total TTC</span>
                                 <span id="s-ttc">{% if summary %}{{ summary.sub_total_ttc }}{% endif %}</span>
                             </div>
                             <div class="summary-row">
-                                <span style="color:#6D4C41; font-weight:400;">
+                                <span style="color:#616161; font-weight:400;">
                                     Livraison
                                     <small id="s-carrier-name" style="display:block; color:#adb5bd; font-size:12px; font-weight:400; margin-top:1px;">
                                         {% if summary and summary.carrier_name %}{{ summary.carrier_name }}{% endif %}
@@ -447,8 +447,8 @@
         {% else %}
         <div class="empty-cart">
             <i class="linearicons-cart empty-cart-icon"></i>
-            <h3 style="font-weight:700; color:#3E2723; margin-bottom:12px;">Votre panier est vide</h3>
-            <p style="color:#6D4C41; margin-bottom:30px;">
+            <h3 style="font-weight:700; color:#1A1A1A; margin-bottom:12px;">Votre panier est vide</h3>
+            <p style="color:#616161; margin-bottom:30px;">
                 Explorez notre boutique et ajoutez des produits à votre panier.
             </p>
             <a href="{% url 'shop_list' %}" class="btn btn-fill-out btn-radius"

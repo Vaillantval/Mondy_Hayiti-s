@@ -4,11 +4,11 @@
 {% block styles %}
 <style>
     .shop_banner {
-        background: linear-gradient(135deg, #FDF6EC 0%, #EDD9C0 100%);
+        background: linear-gradient(135deg, #FFF5F5 0%, #FFCDD2 100%);
         padding: 55px 0 45px;
-        border-bottom: 1px solid #EDD9C0;
+        border-bottom: 1px solid #FFCDD2;
     }
-    .shop_banner h1 { font-size: 36px; font-weight: 700; color: #3E2723; margin-bottom: 6px; }
+    .shop_banner h1 { font-size: 36px; font-weight: 700; color: #1A1A1A; margin-bottom: 6px; }
     .shop_banner .breadcrumb-item a { color: #C62828; }
 
     /* Sidebar */
@@ -27,7 +27,7 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: #3E2723;
+        color: #1A1A1A;
         margin-bottom: 18px;
         padding-bottom: 12px;
         border-bottom: 2px solid #f0f0f0;
@@ -52,7 +52,7 @@
     }
     .cat_list li a .count {
         background: #f0f0f0;
-        color: #6D4C41;
+        color: #616161;
         font-size: 11px;
         padding: 2px 8px;
         border-radius: 50px;
@@ -92,16 +92,16 @@
         flex-wrap: wrap;
         gap: 10px;
     }
-    .shop_toolbar .result_count { font-size: 14px; color: #6D4C41; }
-    .shop_toolbar .result_count strong { color: #3E2723; }
+    .shop_toolbar .result_count { font-size: 14px; color: #616161; }
+    .shop_toolbar .result_count strong { color: #1A1A1A; }
     .toolbar_right { display: flex; align-items: center; gap: 12px; }
     .sort_select {
-        border: 1.5px solid #EDD9C0;
+        border: 1.5px solid #FFCDD2;
         border-radius: 8px;
         padding: 7px 30px 7px 12px;
         font-size: 13px;
         color: #495057;
-        background-color: #FDF6EC;
+        background-color: #FFF5F5;
         appearance: none;
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
         background-repeat: no-repeat;
@@ -114,10 +114,10 @@
 
     .view_btn {
         width: 34px; height: 34px;
-        border: 1.5px solid #EDD9C0;
+        border: 1.5px solid #FFCDD2;
         border-radius: 6px;
         display: flex; align-items: center; justify-content: center;
-        color: #6D4C41;
+        color: #616161;
         cursor: pointer;
         transition: all 0.2s;
         background: transparent;
@@ -159,7 +159,7 @@
     /* Search bar in page */
     .page_search {
         display: flex;
-        border: 1.5px solid #EDD9C0;
+        border: 1.5px solid #FFCDD2;
         border-radius: 8px;
         overflow: hidden;
         transition: border-color 0.2s;
@@ -220,7 +220,7 @@
         position: relative;
         width: 100%;
         padding-top: 75%;   /* ratio 4:3 */
-        background: #FDF6EC;
+        background: #FFF5F5;
         overflow: hidden;
     }
     .pc-img > a { position: absolute; inset: 0; }
@@ -243,7 +243,7 @@
     }
     .pc-new   { background: #388E3C; color: #fff; }
     .pc-promo { background: #C62828; color: #fff; }
-    .pc-hot   { background: #ffc107; color: #3E2723; }
+    .pc-hot   { background: #ffc107; color: #1A1A1A; }
 
     /* % réduction */
     .pc-discount-img {
@@ -265,7 +265,7 @@
         width: 40px; height: 40px;
         background: #fff; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        color: #3E2723; font-size: 16px; text-decoration: none;
+        color: #1A1A1A; font-size: 16px; text-decoration: none;
         transition: all 0.2s; transform: translateY(8px);
     }
     .pc:hover .pc-ov-btn { transform: translateY(0); }
@@ -288,14 +288,14 @@
     .pc-cat:hover { background: #C62828; color: #fff; }
 
     .pc-name {
-        font-size: 15px; font-weight: 700; color: #3E2723;
+        font-size: 15px; font-weight: 700; color: #1A1A1A;
         margin: 0; line-height: 1.35;
     }
     .pc-name a { color: inherit; text-decoration: none; }
     .pc-name a:hover { color: #C62828; }
 
     .pc-desc {
-        font-size: 12px; color: #6D4C41; line-height: 1.55; margin: 0;
+        font-size: 12px; color: #616161; line-height: 1.55; margin: 0;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
@@ -304,7 +304,7 @@
 
     .pc-stars { font-size: 11px; color: #ffc107; display: flex; align-items: center; gap: 2px; }
     .pc-stars i { font-size: 11px; }
-    .pc-rating { color: #6D4C41; margin-left: 4px; }
+    .pc-rating { color: #616161; margin-left: 4px; }
     .pc-brand  { color: #adb5bd; }
 
     .pc-price-row  { display: flex; align-items: baseline; gap: 7px; }
@@ -359,7 +359,7 @@
         position: relative;
         width: 230px;
         min-width: 230px;
-        background: #FDF6EC;
+        background: #FFF5F5;
         overflow: hidden;
         flex-shrink: 0;
     }
@@ -381,7 +381,7 @@
     }
     .plc-new   { background: #388E3C; color: #fff; }
     .plc-promo { background: #C62828; color: #fff; }
-    .plc-hot   { background: #ffc107; color: #3E2723; }
+    .plc-hot   { background: #ffc107; color: #1A1A1A; }
 
     /* Body */
     .plc-body {
@@ -401,14 +401,14 @@
     .plc-cat:hover { background: #C62828; color: #fff; }
 
     .plc-name {
-        font-size: 17px; font-weight: 700; color: #3E2723;
+        font-size: 17px; font-weight: 700; color: #1A1A1A;
         margin: 0; line-height: 1.35;
     }
     .plc-name a { color: inherit; text-decoration: none; }
     .plc-name a:hover { color: #C62828; }
 
     .plc-desc {
-        font-size: 13px; color: #6D4C41; line-height: 1.6; margin: 0;
+        font-size: 13px; color: #616161; line-height: 1.6; margin: 0;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
@@ -418,7 +418,7 @@
     .plc-meta { display: flex; align-items: center; gap: 10px; font-size: 12px; }
     .plc-stars { color: #ffc107; display: flex; align-items: center; gap: 2px; }
     .plc-stars i { font-size: 12px; }
-    .plc-rating-num { color: #6D4C41; margin-left: 4px; }
+    .plc-rating-num { color: #616161; margin-left: 4px; }
     .plc-sep { color: #dee2e6; }
     .plc-brand { color: #adb5bd; font-size: 12px; }
 
@@ -457,9 +457,9 @@
 
     .plc-icon-btn {
         width: 36px; height: 36px;
-        border: 1.5px solid #EDD9C0; border-radius: 8px;
+        border: 1.5px solid #FFCDD2; border-radius: 8px;
         display: inline-flex; align-items: center; justify-content: center;
-        color: #6D4C41; text-decoration: none !important;
+        color: #616161; text-decoration: none !important;
         font-size: 15px; transition: all 0.2s; flex-shrink: 0;
     }
     .plc-icon-btn:hover { border-color: #C62828; color: #C62828; }
@@ -480,13 +480,13 @@
         border: 1px solid #f0f0f0;
     }
     .empty_products i { font-size: 60px; color: #dee2e6; display: block; margin-bottom: 20px; }
-    .empty_products h5 { color: #3E2723; margin-bottom: 8px; }
-    .empty_products p { color: #6D4C41; margin-bottom: 20px; }
+    .empty_products h5 { color: #1A1A1A; margin-bottom: 8px; }
+    .empty_products p { color: #616161; margin-bottom: 20px; }
 
     /* Pagination */
     .pagination .page-link {
         color: #C62828;
-        border-color: #EDD9C0;
+        border-color: #FFCDD2;
         border-radius: 8px !important;
         margin: 0 3px;
         padding: 8px 14px;
@@ -623,7 +623,7 @@
                         </div>
 
                         <!-- Séparateur -->
-                        <span style="width:1px;height:20px;background:#EDD9C0;display:inline-block;"></span>
+                        <span style="width:1px;height:20px;background:#FFCDD2;display:inline-block;"></span>
 
                         <form method="GET" action="{% url 'shop_list' %}" id="sortForm">
                             {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
@@ -727,7 +727,7 @@
 
                 </div>
                 <!-- Info pagination -->
-                <p class="text-center mt-3" style="font-size:13px;color:#6D4C41;">
+                <p class="text-center mt-3" style="font-size:13px;color:#616161;">
                     Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
                     &nbsp;·&nbsp; {{ total }} produit{{ total|pluralize }} au total
                 </p>
