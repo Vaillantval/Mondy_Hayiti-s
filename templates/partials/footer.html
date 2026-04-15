@@ -195,7 +195,7 @@
     display: flex; align-items: center; gap: 10px;
     font-size: 13.5px; font-weight: 700; color: rgba(255,255,255,.82);
 }
-.ft-nl-bar-ico  { font-size: 15px; color: #C62828; }
+.ft-nl-bar-ico  { font-size: 15px; color: rgba(255,255,255,.80); }
 .ft-nl-bar-muted { font-weight: 400; color: rgba(255,255,255,.45); font-size: 13px; }
 .ft-nl-bar-form  { display: flex; align-items: center; gap: 8px; }
 .ft-nl-bar-field { position: relative; }
@@ -212,18 +212,18 @@
     outline: none; transition: border-color .18s, background .18s;
 }
 .ft-nl-bar-input:focus {
-    border-color: rgba(198,40,40,.50); background: rgba(255,255,255,.10);
+    border-color: rgba(255,255,255,.50); background: rgba(255,255,255,.10);
 }
 .ft-nl-bar-input::placeholder { color: rgba(255,255,255,.30); }
 .ft-nl-bar-btn {
     padding: 9px 18px;
-    border: 1px solid rgba(198,40,40,.55);
-    background: transparent; color: #EF5350;
+    border: 1px solid rgba(255,255,255,.30);
+    background: transparent; color: rgba(255,255,255,.90);
     border-radius: 8px; font-family: 'Nunito', sans-serif;
     font-size: 13px; font-weight: 700; cursor: pointer;
     transition: background .18s, color .18s, border-color .18s;
 }
-.ft-nl-bar-btn:hover { background: #C62828; color: #fff; border-color: #C62828; }
+.ft-nl-bar-btn:hover { background: rgba(255,255,255,.18); color: #fff; border-color: rgba(255,255,255,.55); }
 
 /* ─── Main section ────────────────────────────────────────── */
 .ft-main { padding: 52px 0 36px; }
@@ -250,12 +250,12 @@
     font-size: 13px; color: rgba(255,255,255,.55);
 }
 .ft-contact-list li a { color: rgba(255,255,255,.55); text-decoration: none; transition: color .18s; }
-.ft-contact-list li a:hover { color: #EF5350; }
+.ft-contact-list li a:hover { color: #fff; }
 .ft-contact-icon {
     width: 28px; height: 28px; flex-shrink: 0;
-    background: rgba(255,255,255,.07); border-radius: 7px;
+    background: rgba(255,255,255,.12); border-radius: 7px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 13px; color: #C62828; margin-top: 1px;
+    font-size: 13px; color: rgba(255,255,255,.80); margin-top: 1px;
 }
 
 /* Socials */
@@ -267,14 +267,14 @@
     font-size: 16px; color: rgba(255,255,255,.52);
     text-decoration: none; transition: background .18s, color .18s;
 }
-.ft-social:hover { background: #C62828; color: #fff; }
+.ft-social:hover { background: rgba(255,255,255,.22); color: #fff; }
 
 /* Column titles */
 .ft-col-title {
     font-family: 'Playfair Display', serif;
     font-size: 14px; font-weight: 700; color: #fff;
     margin-bottom: 16px; padding-bottom: 8px;
-    border-bottom: 2px solid #C62828; display: inline-block;
+    border-bottom: 2px solid rgba(255,255,255,.40); display: inline-block;
 }
 
 /* Links */
@@ -285,8 +285,8 @@
     display: flex; align-items: center; gap: 7px;
     transition: color .18s, padding-left .18s;
 }
-.ft-links li a i { font-size: 9px; color: #C62828; flex-shrink: 0; }
-.ft-links li a:hover { color: #EF5350; padding-left: 4px; }
+.ft-links li a i { font-size: 9px; color: rgba(255,255,255,.45); flex-shrink: 0; }
+.ft-links li a:hover { color: #fff; padding-left: 4px; }
 
 /* Trust badges */
 .ft-trust { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
@@ -295,7 +295,7 @@
     font-family: 'Nunito', sans-serif; font-size: 12.5px;
     color: rgba(255,255,255,.40);
 }
-.ft-trust-item i { font-size: 14px; color: #C62828; flex-shrink: 0; }
+.ft-trust-item i { font-size: 14px; color: rgba(255,255,255,.65); flex-shrink: 0; }
 
 /* ─── Bottom bar ──────────────────────────────────────────── */
 .ft-bottom {
