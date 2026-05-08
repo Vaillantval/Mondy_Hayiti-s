@@ -80,6 +80,18 @@ def index(request):
     cart = CartService.get_cart_details(request)
     carriers = Carrier.objects.all()
 
+    # Bloquer si un article est en rupture avant tout traitement de paiement
+    if cart.get("has_stock_issues"):
+        for item in cart["items"]:
+            if not item["stock_ok"]:
+                messages.error(
+                    request,
+                    f"Le produit \"{item['product']['name']}\" n'est plus disponible "
+                    f"en quantité suffisante (stock : {item['available_stock']}). "
+                    "Veuillez mettre à jour votre panier."
+                )
+        return redirect("cart")
+
     payment_service = StripeService()
     order_id = None
     if ready_to_pay:
@@ -111,10 +123,14 @@ def index(request):
                 order_id = existing_order.id
 
         if not order_id:
-            order_id = create_order(
-                request, billing_address_str, shipping_address_str
-            )
-            request.session['pending_order_id'] = order_id
+            try:
+                order_id = create_order(
+                    request, billing_address_str, shipping_address_str
+                )
+                request.session['pending_order_id'] = order_id
+            except ValueError as e:
+                messages.error(request, str(e))
+                return redirect("cart")
 
     address_form = CheckoutAddressForm()
     login_form_instance = CustomLoginForm()

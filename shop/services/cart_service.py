@@ -85,6 +85,8 @@ class CartService:
             taxe_amount = sub_total_ht * tax_rate
             sub_total_ttc = sub_total_ht + taxe_amount
 
+            stock_ok = product.is_available and product.stock >= quantity
+
             result["items"].append({
                 "product": {
                     "id": product.id,
@@ -97,6 +99,8 @@ class CartService:
                     "price_label": price_label,
                 },
                 "quantity": quantity,
+                "available_stock": product.stock,
+                "stock_ok": stock_ok,
                 "sub_total": round(sub_total_ttc, 2),
                 "taxe_amount": round(taxe_amount, 2),
                 "sub_total_ht": round(sub_total_ht, 2),
@@ -108,6 +112,7 @@ class CartService:
         result["taxe_amount"] = round(result["sub_total_ht"] * tax_rate, 2)
         result["sub_total_ttc"] = round(result["sub_total_ht"] * (1 + tax_rate), 2)
         result["sub_total"] = result["sub_total_ttc"]
+        result["has_stock_issues"] = any(not item["stock_ok"] for item in result["items"])
 
         if carrier:
             result["carrier_id"] = carrier.id

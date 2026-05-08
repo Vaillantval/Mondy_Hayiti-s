@@ -26,20 +26,20 @@
     }
 
     /* ════════════════════════════════
-       SECTION COLLECTIONS — Premium
+       SECTION COLLECTIONS — Carrousel
        ════════════════════════════════ */
     .hs-collections-section {
-        padding: 48px 0 40px;
+        padding: 28px 0 24px;
         background: #FFF5F5;
     }
     .hs-collections-header {
         display: flex;
-        align-items: flex-end;
+        align-items: center;
         justify-content: space-between;
-        margin-bottom: 28px;
+        margin-bottom: 16px;
     }
     .hs-collections-header h2 {
-        font-size: 28px;
+        font-size: 22px;
         font-weight: 900;
         color: #1A1A1A;
         margin: 0;
@@ -47,150 +47,152 @@
         line-height: 1.1;
     }
     .hs-collections-header h2 span { color: #C62828; }
-    .hs-collections-header p {
-        color: #616161;
-        font-size: 14px;
-        margin: 6px 0 0;
-    }
     .hs-collections-viewall {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 9px 20px;
+        padding: 7px 16px;
         border-radius: 50px;
         border: 2px solid #1A1A1A;
         color: #1A1A1A;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
         text-decoration: none;
         transition: all .2s;
         white-space: nowrap;
     }
-    .hs-collections-viewall:hover {
-        background: #B71C1C;
-        color: #fff;
+    .hs-collections-viewall:hover { background: #B71C1C; border-color: #B71C1C; color: #fff; }
+
+    /* Wrapper relatif pour positionner les flèches */
+    .hs-carousel-wrapper {
+        position: relative;
     }
 
-    /* Grille : première grande + les autres petites */
-    .hs-col-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
-        gap: 16px;
+    /* Track scrollable */
+    .hs-carousel-track {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
     }
+    .hs-carousel-track::-webkit-scrollbar { display: none; }
 
     /* Carte collection */
     .hs-col-card {
+        flex: 0 0 calc(33.333% - 10px);
+        min-width: 220px;
+        height: 200px;
+        scroll-snap-align: start;
         position: relative;
-        border-radius: 18px;
+        border-radius: 14px;
         overflow: hidden;
         display: block;
         text-decoration: none !important;
         background: #B71C1C;
-    }
-    /* Première carte : grande, occupe 2 lignes à gauche */
-    .hs-col-card--featured {
-        grid-row: span 2;
     }
 
     /* Image */
     .hs-col-card-img {
         width: 100%;
         height: 100%;
-        min-height: 220px;
         object-fit: cover;
         display: block;
-        transition: transform .55s cubic-bezier(.25,.46,.45,.94), filter .4s;
-        filter: brightness(0.88);
+        transition: transform .5s cubic-bezier(.25,.46,.45,.94), filter .35s;
+        filter: brightness(0.85);
     }
-    .hs-col-card--featured .hs-col-card-img { min-height: 460px; }
-    .hs-col-card:hover .hs-col-card-img {
-        transform: scale(1.06);
-        filter: brightness(0.75);
-    }
+    .hs-col-card:hover .hs-col-card-img { transform: scale(1.06); filter: brightness(0.72); }
 
     /* Overlay dégradé */
     .hs-col-card-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(
-            to top,
-            rgba(0,0,0,0.72) 0%,
-            rgba(0,0,0,0.18) 50%,
-            transparent 100%
-        );
+        background: linear-gradient(to top, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.10) 55%, transparent 100%);
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        padding: 26px 28px;
-        transition: padding .3s;
+        padding: 16px 18px;
     }
-    .hs-col-card:hover .hs-col-card-overlay { padding-bottom: 32px; }
 
-    /* Étiquette catégorie */
+    /* Étiquette */
     .hs-col-card-tag {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        background: rgba(198, 40, 40, 0.90);
+        gap: 4px;
+        background: rgba(198,40,40,0.90);
         color: #fff;
-        font-size: 10px;
+        font-size: 9px;
         font-weight: 700;
         letter-spacing: 1.5px;
         text-transform: uppercase;
-        padding: 4px 10px;
+        padding: 3px 8px;
         border-radius: 20px;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
         width: fit-content;
-        backdrop-filter: blur(4px);
     }
     .hs-col-card-subtitle {
         color: rgba(255,255,255,0.70);
-        font-size: 12px;
-        margin: 0 0 4px;
+        font-size: 11px;
+        margin: 0 0 3px;
     }
     .hs-col-card-title {
         color: #fff;
-        font-size: 22px;
+        font-size: 16px;
         font-weight: 800;
-        margin: 0 0 14px;
+        margin: 0 0 10px;
         line-height: 1.2;
-        letter-spacing: -0.3px;
     }
-    .hs-col-card--small .hs-col-card-title { font-size: 17px; margin-bottom: 10px; }
 
     /* Bouton CTA */
     .hs-col-card-btn {
         display: inline-flex;
         align-items: center;
-        gap: 7px;
-        padding: 9px 18px;
+        gap: 6px;
+        padding: 6px 14px;
         background: #fff;
         color: #1A1A1A;
-        font-size: 12.5px;
+        font-size: 11.5px;
         font-weight: 700;
         border-radius: 50px;
         text-decoration: none;
         width: fit-content;
-        transition: background .2s, color .2s, transform .2s;
+        transition: background .2s, color .2s;
     }
-    .hs-col-card-btn:hover { background: #C62828; color: #fff; transform: translateX(3px); }
-    .hs-col-card-btn i { font-size: 13px; }
+    .hs-col-card-btn:hover { background: #C62828; color: #fff; }
 
-    /* Colonne droite en flex column */
-    .hs-col-right {
+    /* Flèches de navigation */
+    .hs-carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #fff;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        cursor: pointer;
         display: flex;
-        flex-direction: column;
-        gap: 16px;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        transition: background .2s, color .2s;
+        color: #1A1A1A;
     }
-    .hs-col-right .hs-col-card { flex: 1; }
+    .hs-carousel-btn:hover { background: #C62828; color: #fff; }
+    .hs-carousel-btn--prev { left: -17px; }
+    .hs-carousel-btn--next { right: -17px; }
 
-    @media (max-width: 767px) {
-        .hs-col-grid { grid-template-columns: 1fr; }
-        .hs-col-card--featured { grid-row: span 1; }
-        .hs-col-card--featured .hs-col-card-img { min-height: 260px; }
-        .hs-col-card-img { min-height: 180px; }
-        .hs-collections-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    @media (max-width: 991px) {
+        .hs-col-card { flex: 0 0 calc(50% - 7px); }
+    }
+    @media (max-width: 575px) {
+        .hs-col-card { flex: 0 0 78%; height: 170px; }
+        .hs-carousel-btn { display: none; }
+        .hs-collections-header h2 { font-size: 18px; }
     }
 </style>
 {% endblock %}
@@ -215,62 +217,34 @@
                 </a>
             </div>
 
-            {% if collections|length == 1 %}
-            {% with col=collections.0 %}
-            <a href="{{ col.button_link }}" class="hs-col-card" style="display:block;">
-                <img src="{{ col.image.url }}" alt="{{ col.title }}" class="hs-col-card-img" style="min-height:340px;">
-                <div class="hs-col-card-overlay">
-                    <span class="hs-col-card-tag"><i class="ti-star"></i> Collection</span>
-                    <p class="hs-col-card-subtitle">{{ col.description }}</p>
-                    <h3 class="hs-col-card-title">{{ col.title }}</h3>
-                    <span class="hs-col-card-btn">{{ col.button_text }} <i class="ti-arrow-right"></i></span>
-                </div>
-            </a>
-            {% endwith %}
-
-            {% elif collections|length == 2 %}
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                {% for col in collections %}
-                <a href="{{ col.button_link }}" class="hs-col-card" style="display:block;">
-                    <img src="{{ col.image.url }}" alt="{{ col.title }}" class="hs-col-card-img" style="min-height:380px;">
-                    <div class="hs-col-card-overlay">
-                        <span class="hs-col-card-tag"><i class="ti-star"></i> Collection</span>
-                        <p class="hs-col-card-subtitle">{{ col.description }}</p>
-                        <h3 class="hs-col-card-title">{{ col.title }}</h3>
-                        <span class="hs-col-card-btn">{{ col.button_text }} <i class="ti-arrow-right"></i></span>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-
-            {% else %}
-            <div class="hs-col-grid">
-                {% with col=collections.0 %}
-                <a href="{{ col.button_link }}" class="hs-col-card hs-col-card--featured">
-                    <img src="{{ col.image.url }}" alt="{{ col.title }}" class="hs-col-card-img">
-                    <div class="hs-col-card-overlay">
-                        <span class="hs-col-card-tag"><i class="ti-crown"></i> À la une</span>
-                        <p class="hs-col-card-subtitle">{{ col.description }}</p>
-                        <h3 class="hs-col-card-title">{{ col.title }}</h3>
-                        <span class="hs-col-card-btn">{{ col.button_text }} <i class="ti-arrow-right"></i></span>
-                    </div>
-                </a>
-                {% endwith %}
-                <div class="hs-col-right">
-                    {% for col in collections %}{% if forloop.counter > 1 %}
-                    <a href="{{ col.button_link }}" class="hs-col-card hs-col-card--small">
+            <div class="hs-carousel-wrapper">
+                <button class="hs-carousel-btn hs-carousel-btn--prev" onclick="hsCarouselScroll(-1)" aria-label="Précédent">
+                    <i class="ti-angle-left"></i>
+                </button>
+                <div class="hs-carousel-track" id="hsColTrack">
+                    {% for col in collections %}
+                    <a href="{{ col.button_link }}" class="hs-col-card">
                         <img src="{{ col.image.url }}" alt="{{ col.title }}" class="hs-col-card-img">
                         <div class="hs-col-card-overlay">
-                            <span class="hs-col-card-tag"><i class="ti-tag"></i> Collection</span>
+                            <span class="hs-col-card-tag"><i class="ti-star"></i> Collection</span>
                             <p class="hs-col-card-subtitle">{{ col.description }}</p>
                             <h3 class="hs-col-card-title">{{ col.title }}</h3>
                             <span class="hs-col-card-btn">{{ col.button_text }} <i class="ti-arrow-right"></i></span>
                         </div>
                     </a>
-                    {% endif %}{% endfor %}
+                    {% endfor %}
                 </div>
+                <button class="hs-carousel-btn hs-carousel-btn--next" onclick="hsCarouselScroll(1)" aria-label="Suivant">
+                    <i class="ti-angle-right"></i>
+                </button>
             </div>
-            {% endif %}
+            <script>
+            function hsCarouselScroll(dir) {
+                const track = document.getElementById('hsColTrack');
+                const card = track.querySelector('.hs-col-card');
+                track.scrollBy({ left: dir * (card ? card.offsetWidth + 14 : 280), behavior: 'smooth' });
+            }
+            </script>
 
         </div>
     </section>
