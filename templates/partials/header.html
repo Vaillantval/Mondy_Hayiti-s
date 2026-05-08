@@ -492,14 +492,11 @@
     /* Barre en-tête du drawer */
     .hd-drawer-head {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 14px 16px;
+        padding: 10px 16px;
         border-bottom: 1px solid #f0f0f0;
-        flex-shrink: 0;
+        flex-shrink: 0; min-height: 64px;
     }
-    .hd-drawer-head-title {
-        font-family: 'Nunito', sans-serif;
-        font-size: 15px; font-weight: 800; color: #1A1A1A;
-    }
+    .hd-drawer-logo { text-decoration: none; display: flex; align-items: center; }
     .hd-drawer-close-btn {
         width: 32px; height: 32px;
         background: #f5f5f5; border: none; border-radius: 6px;
@@ -759,7 +756,17 @@
 
                     <!-- En-tête drawer (mobile uniquement) -->
                     <div class="hd-drawer-head d-lg-none">
-                        <span class="hd-drawer-head-title">Menu</span>
+                        <a href="{% url 'home' %}" class="hd-drawer-logo" data-keep-open>
+                            {% if site_logo %}
+                            <img src="{{ site_logo.url }}"
+                                 alt="{% if site_name %}{{ site_name }}{% else %}Hayiti's{% endif %}"
+                                 style="max-height:52px;width:auto;display:block;">
+                            {% else %}
+                            <div style="display:flex;align-items:center;gap:7px;font-family:'Playfair Display',serif;font-size:20px;font-weight:800;color:#1A1A1A;line-height:1;">
+                                <span style="font-size:24px;line-height:1;">&#127856;</span>Hayiti's
+                            </div>
+                            {% endif %}
+                        </a>
                         <button class="hd-drawer-close-btn" id="hdDrawerClose" aria-label="Fermer">✕</button>
                     </div>
 
