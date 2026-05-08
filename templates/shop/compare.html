@@ -1,6 +1,54 @@
 {% extends "base.html" %}
 {% load price_filters %}
 
+{% block styles %}
+<style>
+    /* Scroll horizontal fluide */
+    .table-responsive { -webkit-overflow-scrolling: touch; }
+
+    /* Première colonne sticky pendant le scroll horizontal */
+    .compare-table .row_title {
+        position: sticky;
+        left: 0;
+        background: #fff;
+        z-index: 2;
+        font-size: 12px;
+        font-weight: 700;
+        color: #616161;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        white-space: nowrap;
+        min-width: 100px;
+        border-right: 1px solid #f0f0f0;
+    }
+
+    .compare-table td, .compare-table th { padding: 14px 18px; vertical-align: middle; }
+    .compare-table .row_img img { width: 140px; height: 140px; object-fit: cover; border-radius: 10px; border: 1px solid #f0f0f0; }
+    .compare-table .product_name a { font-weight: 700; color: #1A1A1A; text-decoration: none; font-size: 14px; }
+    .compare-table .product_name a:hover { color: #C62828; }
+    .compare-table .price { font-weight: 800; color: #C62828; font-size: 16px; }
+    .compare-table .in-stock  { color: #2E7D32; font-weight: 700; font-size: 13px; }
+    .compare-table .out-stock { color: #B71C1C; font-weight: 700; font-size: 13px; }
+    .compare-table tr { border-bottom: 1px solid #f0f0f0; }
+    .compare-table tr:last-child { border-bottom: none; }
+
+    /* Indicateur scroll sur mobile */
+    .compare-scroll-hint {
+        display: none;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #adb5bd;
+        margin-bottom: 10px;
+    }
+    @media (max-width: 767px) {
+        .compare-scroll-hint { display: flex; }
+        .compare-table .row_img img { width: 110px; height: 110px; }
+        .compare-table td, .compare-table th { padding: 12px 14px; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
 <div style="background:#FFF5F5; padding:18px 0; margin-bottom:30px; border-bottom:1px solid #FFCDD2;">
@@ -25,8 +73,11 @@
             <div class="col-md-12">
                 {% if compares %}
                 <div class="compare_box">
+                    <div class="compare-scroll-hint">
+                        <i class="ti-arrows-horizontal"></i> Faites défiler pour voir tous les produits
+                    </div>
                     <div class="table-responsive">
-                        <table class="table table-bordered text-center">
+                        <table class="table table-bordered compare-table">
                             <tbody>
                                 <tr class="pr_image">
                                     <td class="row_title">Image</td>

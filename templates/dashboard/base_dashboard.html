@@ -307,10 +307,28 @@
             .ds-topbar { padding: 0 16px; }
             .ds-burger { display: flex !important; }
         }
+        @media (max-width: 575px) {
+            .ds-content { padding: 12px; }
+            .ds-topbar-shop-btn span { display: none; }
+            .ds-topbar-breadcrumb { display: none; }
+            .ds-topbar-title { font-size: 14px; }
+        }
+
+        /* Overlay sidebar mobile */
+        .ds-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.45);
+            z-index: 999;
+        }
+        .ds-overlay.show { display: block; }
     </style>
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
+
+<!-- Overlay mobile -->
+<div class="ds-overlay" id="dsOverlay"></div>
 
 <!-- ── Sidebar ── -->
 <aside class="ds-sidebar" id="dsSidebar">
@@ -396,7 +414,7 @@
             </div>
         </div>
         <a href="{% url 'shop_list' %}" class="ds-topbar-shop-btn">
-            <i class="linearicons-cart"></i> Boutique
+            <i class="linearicons-cart"></i> <span>Boutique</span>
         </a>
     </header>
 
@@ -409,15 +427,17 @@
 <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
 <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}"></script>
 <script>
-    document.addEventListener('click', function(e) {
-        const sidebar = document.getElementById('dsSidebar');
-        const burger  = document.querySelector('.ds-burger');
-        if (sidebar && sidebar.classList.contains('open')) {
-            if (!sidebar.contains(e.target) && (!burger || !burger.contains(e.target))) {
-                sidebar.classList.remove('open');
-            }
-        }
+    const sidebar = document.getElementById('dsSidebar');
+    const overlay = document.getElementById('dsOverlay');
+    const burger  = document.querySelector('.ds-burger');
+
+    function openSidebar()  { sidebar.classList.add('open');  overlay.classList.add('show'); }
+    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+
+    if (burger) burger.addEventListener('click', function() {
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
     });
+    if (overlay) overlay.addEventListener('click', closeSidebar);
 </script>
 {% block extra_scripts %}{% endblock %}
 </body>
