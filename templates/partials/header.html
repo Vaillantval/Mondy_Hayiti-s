@@ -475,12 +475,34 @@
 /* ─── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 991px) {
     .hd-topbar { display: none; }
-    .hd-navbar-wrap .navbar { min-height: 56px; }
-    .navbar-brand { position: static !important; margin-right: 0; padding: 6px 0; }
-    .navbar-brand img { max-height: 42px !important; }
-    .brand-text { font-size: 18px !important; }
-    .brand-text span { font-size: 22px !important; }
-    .hd-mobile-icons { display: flex; }
+
+    /* Force flex (le thème met display:table sur mobile) */
+    .hd-navbar-wrap nav.navbar {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        min-height: 54px !important;
+        padding: 0 !important;
+        width: 100%;
+    }
+
+    .navbar-brand {
+        position: static !important;
+        margin-right: 0; padding: 5px 0;
+        flex-shrink: 0;
+    }
+    .navbar-brand img { max-height: 40px !important; }
+    .brand-text { font-size: 17px !important; }
+    .brand-text span { font-size: 21px !important; }
+
+    /* Icônes + burger poussés à droite */
+    .hd-mobile-icons {
+        display: flex; margin-left: auto;
+        align-items: center; gap: 0;
+    }
+    .hd-mobile-icons .nav-link { padding: 6px 8px !important; font-size: 19px; }
+    .navbar-toggler { margin-left: 4px; padding: 6px 8px; border: none; }
+
     .hd-account-wrap { display: none; }
     .hd-cart-wrap .hd-cart-preview { display: none; }
     .attr-nav { display: none; }
