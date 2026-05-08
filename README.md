@@ -1,9 +1,9 @@
-# MatStore Haiti
+# Hayiti's
 
-**Plateforme e-commerce complète pour la vente de matériaux de construction en Haïti.**
+**Plateforme e-commerce complète pour la vente de pâtisseries et produits alimentaires en Haïti.**
 
 Développée avec Django, Django REST Framework et une application mobile Android (Flutter/Dart),
-MatStore Haiti offre une expérience d'achat fluide avec plusieurs méthodes de paiement adaptées
+Hayiti's offre une expérience d'achat fluide avec plusieurs méthodes de paiement adaptées
 au marché haïtien.
 
 ---
@@ -27,9 +27,8 @@ au marché haïtien.
 
 ## Aperçu du projet
 
-MatStore Haiti est une boutique en ligne spécialisée dans la vente de matériaux de construction, de produits
-alimenraires
-et de vetements.
+Hayiti's est une boutique en ligne spécialisée dans la vente de pâtisseries et produits alimentaires
+(gâteaux, pizzas, et autres spécialités).
 Elle s'adresse à la clientèle haïtienne avec des méthodes de paiement locales (MonCash, virement,
 dépôt) et internationales (Stripe / carte bancaire).
 
@@ -66,7 +65,11 @@ dépôt) et internationales (Stripe / carte bancaire).
 
 - Navigation par catégories et filtres
 - Recherche produits avec suggestions
-- Pages produit avec galerie d'images, description, prix HT/TTC
+- Pages produit avec galerie d'images, description, prix HT/TTC, variantes de prix
+- Comparaison de produits
+- Liste de favoris (wishlist)
+- Avis clients sur les produits
+- Collections et pages éditoriales (FAQ, À propos, CGV…)
 - Gestion du panier (session ou compte utilisateur)
 - Sélection du transporteur avec mise à jour dynamique du récapitulatif
 
@@ -77,10 +80,13 @@ dépôt) et internationales (Stripe / carte bancaire).
 - Formulaire d'adresse de facturation et de livraison
 - Récapitulatif en temps réel (sous-total HT, taxes, livraison, total TTC)
 - Plusieurs méthodes de paiement activables depuis l'administration
+- Vérification du stock disponible à la validation de commande
 
 ### Gestion des commandes
 
 - Suivi des statuts : en attente, en cours, expédiée, livrée, annulée
+- Annulation client avec restitution automatique du stock
+- Suivi public sans authentification (ID commande + email)
 - Historique des commandes dans le tableau de bord client
 - Notifications email automatiques (confirmation client, alerte admin)
 - Paiement hors ligne avec preuve de paiement jointe
@@ -105,7 +111,7 @@ dépôt) et internationales (Stripe / carte bancaire).
 
 ```bash
 git clone <URL_DU_DEPOT>
-cd matstore
+cd Mondy_Hayiti-s
 ```
 
 ### Environnement virtuel
@@ -126,7 +132,7 @@ pip install -r requirements.txt
 
 ```bash
 # Créer la base de données PostgreSQL
-createdb matstore_db
+createdb hayitis_db
 
 # Appliquer les migrations
 python manage.py migrate
@@ -157,13 +163,13 @@ DEBUG = False
 ALLOWED_HOSTS = votre-domaine.railway.app,localhost
 
 # -- Base de données --
-DATABASE_URL = postgresql://user:password@host:5432/matstore_db
+DATABASE_URL = postgresql://user:password@host:5432/hayitis_db
 
 # -- Email (Resend) --
 RESEND_API_KEY = votre_api_key_resend
-DEFAULT_FROM_EMAIL = MatStore Haiti <info@matstorehaiti.online>
-ADMINS_NOTIFY = info@matstorehaiti.online
-SITE_URL = https://matstorehaiti.online
+DEFAULT_FROM_EMAIL = Hayiti's <info@votre-domaine.com>
+ADMINS_NOTIFY = info@votre-domaine.com
+SITE_URL = https://votre-domaine.com
 
 # -- Stripe --
 STRIPE_PUBLIC_KEY = pk_live_...
@@ -186,50 +192,70 @@ FIREBASE_SERVICE_ACCOUNT_JSON = {"type":"service_account",...}
 ## Structure du projet
 
 ```
-matstore/
+Mondy_Hayiti-s/
 ├── accounts/                   # Authentification et profils clients
 │   ├── models/
 │   │   └── Customer.py
 │   ├── views/
 │   └── forms/
 │
-├── shop/                       # Coeur e-commerce
+├── shop/                       # Cœur e-commerce
 │   ├── models/
 │   │   ├── Product.py
+│   │   ├── ProductPrice.py     # Variantes de prix par label
 │   │   ├── Category.py
+│   │   ├── Collection.py
 │   │   ├── Order.py
 │   │   ├── OrderDetail.py
 │   │   ├── Carrier.py
 │   │   ├── Method.py
 │   │   ├── Setting.py
-│   │   └── ExchangeRate.py
+│   │   ├── ExchangeRate.py
+│   │   ├── Image.py
+│   │   ├── Slider.py
+│   │   ├── FAQ.py
+│   │   ├── Page.py
+│   │   └── ContactMessage.py
 │   ├── views/
 │   │   ├── checkout_view.py
 │   │   ├── payment_view.py
-│   │   └── cart_view.py
+│   │   ├── cart_view.py
+│   │   ├── shop_view.py
+│   │   └── compare_view.py
 │   ├── services/
 │   │   ├── cart_service.py
 │   │   ├── payment_service.py  # Stripe
-│   │   └── moncash_service.py
+│   │   ├── moncash_service.py
+│   │   └── compare_service.py
 │   └── templatetags/
 │       └── price_filters.py
 │
 ├── api/                        # API REST (DRF)
 │   ├── auth/
 │   ├── products/
+│   ├── categories/
 │   ├── cart/
 │   ├── orders/
-│   └── payments/
+│   ├── payments/
+│   ├── addresses/
+│   ├── reviews/
+│   ├── wishlist/
+│   └── admin_backoffice/
 │
 ├── dashboard/                  # Espace client (commandes, adresses, profil)
 │   ├── models/
 │   │   └── Adress.py
 │   └── views/
 │
-├── emails/                     # Utilitaires d'envoi d'emails
+├── emails/                     # Envoi d'emails transactionnels (Resend)
 │   ├── utils.py
 │   ├── signals.py
 │   └── apps.py
+│
+├── notifications/              # Notifications push Firebase (FCM)
+│   ├── fcm.py
+│   ├── firebase_config.py
+│   └── signals.py
 │
 ├── templates/                  # Templates HTML Django
 │   ├── base.html
@@ -299,7 +325,7 @@ Authorization: Bearer <access_token>
 | Méthode | Endpoint                         | Description                                         |
 |---------|----------------------------------|-----------------------------------------------------|
 | GET     | `/api/products/`                 | Liste des produits (filtres, recherche, pagination) |
-| GET     | `/api/products/{id}/`            | Détail d'un produit                                 |
+| GET     | `/api/products/{slug}/`          | Détail d'un produit                                 |
 | GET     | `/api/categories/`               | Liste des catégories                                |
 | GET     | `/api/categories/{id}/products/` | Produits par catégorie                              |
 
@@ -314,6 +340,26 @@ Authorization: Bearer <access_token>
 | GET     | `/api/orders/`      | Historique des commandes (auth requis) |
 | GET     | `/api/orders/{id}/` | Détail d'une commande                  |
 | POST    | `/api/orders/`      | Créer une commande                     |
+| POST    | `/api/orders/{id}/cancel/` | Annuler une commande (si PENDING) |
+| GET     | `/api/orders/{id}/track/`  | Suivi public (sans auth, email requis) |
+
+**Payload `POST /api/orders/` :**
+
+```json
+{
+  "items": [{"product_id": 1, "quantity": 2}],
+  "payment_method": "moncash",
+  "carrier_id": 1,
+  "delivery_address": {
+    "street": "Rue des Miracles",
+    "city": "Port-au-Prince",
+    "department": "Ouest"
+  },
+  "notes": ""
+}
+```
+
+> `carrier_id` est optionnel — si absent, le premier transporteur disponible est utilisé.
 
 ### Paiement
 
@@ -335,6 +381,16 @@ Authorization: Bearer <access_token>
 | DELETE  | `/api/addresses/{id}/`             | Supprimer une adresse            |
 | PATCH   | `/api/addresses/{id}/set-default/` | Définir comme adresse par défaut |
 
+### Favoris & Avis
+
+| Méthode | Endpoint                  | Description               |
+|---------|---------------------------|---------------------------|
+| GET     | `/api/wishlist/`          | Liste des favoris         |
+| POST    | `/api/wishlist/add/`      | Ajouter aux favoris       |
+| DELETE  | `/api/wishlist/{id}/`     | Retirer des favoris       |
+| GET     | `/api/reviews/`           | Avis sur les produits     |
+| POST    | `/api/reviews/`           | Laisser un avis           |
+
 ---
 
 ## Systèmes de paiement
@@ -347,6 +403,7 @@ Paiement par carte bancaire internationale via **Stripe PaymentIntents**.
 - Conversion automatique depuis la devise de base configurée dans les paramètres du site
 - Confirmation de paiement côté client via Stripe.js (Elements)
 - Callback de succès : `GET /payment/success/?payment_intent=pi_xxx`
+- Webhook : `POST /api/payments/webhook/stripe/`
 
 ### MonCash
 
@@ -357,6 +414,7 @@ Paiement mobile local via **MonCash** (Digicel Haiti).
 - Identifiant de commande unique envoyé à MonCash : `{order_id}-{uuid8}`
 - Callback de retour : `GET /payment/moncash/callback/?transactionId=xxx`
 - Vérification du montant payé avec tolérance de 1 HTG
+- Webhook : `POST /api/payments/webhook/moncash/`
 
 ### Paiement hors ligne
 
@@ -376,7 +434,7 @@ Pour les clients souhaitant payer par virement bancaire, dépôt ou autre.
 - La commande doit avoir `payment_method="offline"` pour accepter la preuve
 - Formats acceptés : JPG, PNG — taille maximale : 5 MB
 - La commande reste `is_paid=False` jusqu'à validation manuelle de l'admin
-- Notifications email automatiques envoyées au client et à l'administrateur
+- Notification email envoyée au client à la soumission de la preuve
 
 ---
 
@@ -449,8 +507,7 @@ lib/
 
 1. L'application obtient un token FCM au démarrage via `FirebaseMessaging.instance.getToken()`
 2. Après login réussi, envoyer le token via `POST /api/auth/fcm-token/`
-3. Le backend utilise ce token pour envoyer des notifications ciblées (confirmation de commande, changement de statut de
-   livraison)
+3. Le backend utilise ce token pour envoyer des notifications ciblées (confirmation de commande, changement de statut de livraison)
 
 ---
 
@@ -462,14 +519,17 @@ L'interface d'administration Django (`/admin/`) permet de gérer l'ensemble de l
 
 | Module                   | Fonctionnalités                                                       |
 |--------------------------|-----------------------------------------------------------------------|
-| **Produits**             | Création, modification, images, gestion du stock, prix promo          |
+| **Produits**             | Création, modification, images, gestion du stock, variantes de prix (ex : taille de gâteau) |
 | **Catégories**           | Arborescence, images de catégorie                                     |
+| **Collections**          | Sections éditoriales avec image et lien                               |
 | **Commandes**            | Suivi des statuts, détail des articles, preuve de paiement hors ligne |
 | **Clients**              | Liste, profil, historique des commandes                               |
 | **Transporteurs**        | Nom, tarif, activation/désactivation                                  |
 | **Méthodes de paiement** | Activation par méthode (Stripe, MonCash, Hors Ligne)                  |
 | **Paramètres**           | Devise de base, taux de TVA, coordonnées de la boutique, APK Android  |
 | **Taux de change**       | Gestion des paires de devises (HTG, USD, EUR...)                      |
+| **Pages / FAQ**          | Contenu éditorial statique                                            |
+| **Messages contact**     | Messages reçus via le formulaire de contact                           |
 
 ### Gestion des taux de change
 
@@ -516,10 +576,10 @@ preuves de paiement, APK Android) sont persistés entre les déploiements.
 Développeur & Ingénieur — Faculté des Sciences (FDS-UEH)
 *Université d'État d'Haïti*
 
-Conception, développement et déploiement complets de la plateforme MatStore Haiti :
-backend Django, API REST, intégrations de paiement (Stripe, MonCash), application mobile Flutter,
+Conception, développement et déploiement complets de la plateforme Hayiti's :
+backend Django, API REST, intégrations de paiement (Stripe, MonCash), application mobile Flutter
 et infrastructure Railway.
 
 ---
 
-*MatStore Haiti — Votre partenaire de confiance pour les matériaux de construction.*
+*Hayiti's — Vos pâtisseries et spécialités livrées en Haïti.*
