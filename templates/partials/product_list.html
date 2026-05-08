@@ -1,15 +1,16 @@
 {% load static price_filters %}
 {% with first_img=product.images.first pct=product.solde_price|discount_percent:product.regular_price %}
 
-<div class="plc" onclick="if(!event.target.closest('.plc-actions')) window.location.href='{% url 'product_detail' product.slug %}'"
+<div class="plc" onclick="if(!event.target.closest('.plc-actions')) window.location.href='{% url 'product_detail' product.slug %}'">
 
     <!-- ── Image ── -->
     <div class="plc-img">
         <a href="{% url 'product_detail' product.slug %}" onclick="event.stopPropagation()">
             {% if first_img %}
-            <img src="{{ first_img.image.url }}" alt="{{ product.name }}">
+            <img src="{{ first_img.image.url }}" alt="{{ product.name }}" loading="lazy">
             {% else %}
             <img src="{% static 'assets/images/product_placeholder.jpg' %}" alt="{{ product.name }}"
+                 loading="lazy"
                  onerror="this.src='https://via.placeholder.com/240x240/f8f9fa/adb5bd?text=No+Image'">
             {% endif %}
         </a>
@@ -58,6 +59,7 @@
             <span class="plc-price-old">{{ product.regular_price|price_convert }}</span>
             {% if pct %}<span class="plc-discount">-{{ pct }}%</span>{% endif %}
             {% endif %}
+            <span class="pc-price-usd">≈ {{ product.solde_price|price_in:'USD' }}</span>
         </div>
 
         <!-- Stock -->

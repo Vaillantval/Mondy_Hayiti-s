@@ -13,7 +13,7 @@ from shop.models.Setting import Setting
 
 def setup_site():
     site, created = Site.objects.update_or_create(
-        id=1, defaults={"domain": "matstorehaiti.online", "name": "matstore"}
+        id=1, defaults={"domain": "hayitis.com", "name": "hayitis"}
     )
     status = "créé" if created else "mis à jour"
     print(f"✓ Site {status}: {site.domain}")

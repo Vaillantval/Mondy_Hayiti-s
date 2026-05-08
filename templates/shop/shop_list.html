@@ -734,14 +734,14 @@
                 {% endif %}
 
                 {% else %}
-                <div class="empty_products">
-                    <i class="linearicons-magnifier"></i>
-                    <h5>Aucun produit trouvé</h5>
-                    <p>
-                        {% if q %}Aucun résultat pour "{{ q }}". Essayez d'autres mots-clés.
+                <div class="empty-state">
+                    <div class="es-icon">🔍</div>
+                    <h2 class="es-title">Aucun résultat trouvé</h2>
+                    <p class="es-desc">
+                        {% if q %}Aucun résultat pour « {{ q }} ». Essayez avec d'autres mots-clés ou parcourez nos catégories.
                         {% else %}Aucun produit ne correspond à ce filtre.{% endif %}
                     </p>
-                    <a href="{% url 'shop_list' %}" class="btn btn-fill-out btn-radius">Voir tous les produits</a>
+                    <a href="{% url 'shop_list' %}" class="es-btn">Voir tous les produits</a>
                 </div>
                 {% endif %}
 

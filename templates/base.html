@@ -40,7 +40,7 @@
        ============================================================= */
     .pc {
         background: #fff;
-        border: 1px solid #FFCDD2;
+        border: 1px solid #EDE0D8;
         border-radius: 20px;
         overflow: hidden;
         display: flex; flex-direction: column;
@@ -56,8 +56,9 @@
 
     /* Image */
     .pc-img {
-        position: relative; width: 100%; padding-top: 90%;
-        background: #FFF5F5; overflow: hidden; flex-shrink: 0;
+        position: relative; width: 100%;
+        aspect-ratio: 1 / 1;
+        background: #FDF6F0; overflow: hidden; flex-shrink: 0;
     }
     .pc-img > a {
         position: absolute; inset: 0; display: block;
@@ -75,7 +76,7 @@
     }
     .pc-badge {
         font-family: 'Nunito', sans-serif;
-        font-size: 10px; font-weight: 800; letter-spacing: .4px;
+        font-size: 11px; font-weight: 800; letter-spacing: .4px;
         padding: 4px 10px; border-radius: 20px;
         text-transform: uppercase;
     }
@@ -120,7 +121,7 @@
     }
     .pc-cat {
         font-family: 'Nunito', sans-serif;
-        font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+        font-size: 12px; font-weight: 700; text-transform: uppercase;
         letter-spacing: .5px; color: #9E9E9E; text-decoration: none;
         padding: 2px 8px; border: 1px solid #FFCDD2; border-radius: 20px;
         transition: color .15s, border-color .15s;
@@ -130,7 +131,7 @@
     /* Name */
     .pc-name {
         margin: 0 0 5px; font-family: 'Playfair Display', serif;
-        font-size: 15px; font-weight: 700; line-height: 1.35;
+        font-size: 15px; font-weight: 800; line-height: 1.35;
     }
     .pc-name a { color: #1A1A1A; text-decoration: none; transition: color .18s; }
     .pc-name a:hover { color: #C62828; }
@@ -138,7 +139,7 @@
     /* Description */
     .pc-desc {
         font-family: 'Nunito', sans-serif;
-        font-size: 12.5px; color: #9E9E9E; line-height: 1.5;
+        font-size: 14px; color: #9E9E9E; line-height: 1.5;
         margin: 0 0 10px;
         display: -webkit-box; -webkit-line-clamp: 2;
         -webkit-box-orient: vertical; overflow: hidden;
@@ -161,6 +162,11 @@
     .pc-price-old {
         font-family: 'Nunito', sans-serif;
         font-size: 13px; color: #BDBDBD; text-decoration: line-through;
+    }
+    .pc-price-usd {
+        font-size: 11px; color: #9E9E9E;
+        background: #EDE0D8; border-radius: 10px;
+        padding: 1px 7px; margin-left: 6px; font-weight: 600;
     }
 
     /* Stock */
@@ -204,6 +210,94 @@
     /* Grid equal height */
     .shop_container > [class*="col-"] { display: flex; }
     .shop_container .product { display: flex; flex-direction: column; width: 100%; }
+
+    /* ── Animation entrée cartes ── */
+    .pc { animation: cardFadeIn .35s ease both; }
+    .pc:nth-child(1) { animation-delay: .00s; }
+    .pc:nth-child(2) { animation-delay: .05s; }
+    .pc:nth-child(3) { animation-delay: .10s; }
+    .pc:nth-child(4) { animation-delay: .15s; }
+    .pc:nth-child(5) { animation-delay: .20s; }
+    .pc:nth-child(6) { animation-delay: .25s; }
+    @keyframes cardFadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Breadcrumb unifié ── */
+    .hs-breadcrumb { padding: 10px 0; font-size: 12px; color: #9E9E9E; }
+    .hs-breadcrumb a { color: #4A3728; font-weight: 600; text-decoration: none; }
+    .hs-breadcrumb a:hover { color: #C62828; }
+    .hs-bc-sep { color: #C62828; margin: 0 6px; font-size: 10px; }
+    .hs-bc-current { color: #C62828; font-weight: 700; }
+
+    /* ── États vides ── */
+    .empty-state {
+        text-align: center; padding: 60px 20px;
+        background: #FFFAF6; border-radius: 16px;
+        border: 1px solid #EDE0D8;
+    }
+    .es-icon  { font-size: 48px; margin-bottom: 12px; }
+    .es-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 20px; font-weight: 800; color: #1A1A1A; margin-bottom: 8px;
+    }
+    .es-desc  { font-size: 14px; color: #9E9E9E; margin-bottom: 20px; }
+    .es-btn {
+        display: inline-block; background: #C62828; color: #fff;
+        border-radius: 10px; padding: 10px 24px;
+        font-size: 13px; font-weight: 800;
+        font-family: 'Nunito', sans-serif; text-decoration: none;
+    }
+    .es-btn:hover { background: #B71C1C; color: #fff; }
+
+    /* ── Skeleton loading ── */
+    @keyframes shimmer {
+        from { background-position: 200% 0; }
+        to   { background-position: -200% 0; }
+    }
+    .pc-skeleton {
+        background: #fff; border: 1px solid #EDE0D8;
+        border-radius: 20px; overflow: hidden;
+    }
+    .pc-sk-img {
+        width: 100%; aspect-ratio: 1/1;
+        background: linear-gradient(90deg, #F0E8E0 25%, #EDE0D8 50%, #F0E8E0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite;
+    }
+    .pc-sk-body { padding: 12px; }
+    .pc-sk-line {
+        height: 10px; border-radius: 5px; margin-bottom: 8px;
+        background: linear-gradient(90deg, #F0E8E0 25%, #EDE0D8 50%, #F0E8E0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite;
+    }
+    .pc-sk-line.w-80 { width: 80%; }
+    .pc-sk-line.w-50 { width: 50%; }
+    .pc-sk-line.w-30 { width: 30%; }
+
+    /* ── Mobile bottom nav ── */
+    .mob-bottom-nav {
+        position: fixed; bottom: 0; left: 0; right: 0; z-index: 1050;
+        background: #fff; border-top: 1px solid #EDE0D8;
+        display: flex; justify-content: space-around; align-items: center;
+        padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+    }
+    .mob-nav-item {
+        display: flex; flex-direction: column; align-items: center;
+        gap: 2px; font-size: 10px; font-weight: 700; color: #9E9E9E;
+        text-decoration: none; position: relative; padding: 0 8px;
+    }
+    .mob-nav-item i { font-size: 20px; line-height: 1; }
+    .mob-nav-item.active { color: #C62828; }
+    .mob-nav-badge {
+        position: absolute; top: -4px; right: 2px;
+        background: #C62828; color: #fff; font-size: 9px; font-weight: 800;
+        width: 15px; height: 15px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+    }
+    @media (max-width: 991px) { body { padding-bottom: 70px; } }
     </style>
     {% block styles %}{% endblock %}
 </head>
@@ -378,5 +472,27 @@
 </script>
 
 {% block scripts %}{% endblock %}
+
+<!-- ── Mobile bottom navigation ── -->
+<nav class="mob-bottom-nav d-lg-none" aria-label="Navigation principale mobile">
+    <a href="{% url 'home' %}" class="mob-nav-item {% if request.path == '/' %}active{% endif %}">
+        <i class="ti-home"></i><span>Accueil</span>
+    </a>
+    <a href="{% url 'shop_list' %}" class="mob-nav-item {% if 'shop' in request.path and 'checkout' not in request.path %}active{% endif %}">
+        <i class="ti-search"></i><span>Boutique</span>
+    </a>
+    <a href="{% url 'cart' %}" class="mob-nav-item {% if 'cart' in request.path %}active{% endif %}" style="position:relative;">
+        <i class="ti-shopping-cart"></i>
+        {% if cart_count %}<span class="mob-nav-badge">{{ cart_count }}</span>{% endif %}
+        <span>Panier</span>
+    </a>
+    <a href="{% url 'wishlist' %}" class="mob-nav-item {% if 'wishlist' in request.path %}active{% endif %}">
+        <i class="ti-heart"></i><span>Favoris</span>
+    </a>
+    <a href="{% if user.is_authenticated %}{% url 'dashboard:overview' %}{% else %}{% url 'accounts:signin' %}{% endif %}"
+       class="mob-nav-item {% if 'dashboard' in request.path or 'signin' in request.path %}active{% endif %}">
+        <i class="ti-user"></i><span>Compte</span>
+    </a>
+</nav>
 </body>
 </html>
