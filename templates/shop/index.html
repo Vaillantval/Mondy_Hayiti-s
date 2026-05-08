@@ -251,65 +251,6 @@
     {% endif %}
     <!-- /.collections -->
 
-    <!-- ── Nos Spécialités ── -->
-    <section class="hs-specialties py-5" style="background:#FFF5F5;">
-        <div class="container">
-            <h2 class="text-center mb-2" style="font-family:'Playfair Display',serif;color:#1A1A1A;font-size:28px;font-weight:800;">
-                Nos <span style="color:#C62828;">Spécialités</span>
-            </h2>
-            <p class="text-center mb-4" style="color:#9E9E9E;font-size:14px;">Découvrez nos créations artisanales, préparées chaque jour avec amour.</p>
-            <div class="row g-3 justify-content-center">
-                <div class="col-6 col-md-2">
-                    <a href="{% url 'shop_list' %}?category=gateaux" class="hs-spec-card d-block text-center text-decoration-none"
-                       style="background:#fff;border:1.5px solid #FFCDD2;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
-                        <div style="font-size:36px;margin-bottom:8px;">&#127856;</div>
-                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#1A1A1A;">Gâteaux</span>
-                    </a>
-                </div>
-                <div class="col-6 col-md-2">
-                    <a href="{% url 'shop_list' %}?category=pizza" class="hs-spec-card d-block text-center text-decoration-none"
-                       style="background:#fff;border:1.5px solid #FFCDD2;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
-                        <div style="font-size:36px;margin-bottom:8px;">&#127829;</div>
-                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#1A1A1A;">Pizza</span>
-                    </a>
-                </div>
-                <div class="col-6 col-md-2">
-                    <a href="{% url 'shop_list' %}?category=fromage" class="hs-spec-card d-block text-center text-decoration-none"
-                       style="background:#fff;border:1.5px solid #FFCDD2;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
-                        <div style="font-size:36px;margin-bottom:8px;">&#129472;</div>
-                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#1A1A1A;">Fromages</span>
-                    </a>
-                </div>
-                <div class="col-6 col-md-2">
-                    <a href="{% url 'shop_list' %}?category=bacon" class="hs-spec-card d-block text-center text-decoration-none"
-                       style="background:#fff;border:1.5px solid #FFCDD2;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
-                        <div style="font-size:36px;margin-bottom:8px;">&#129385;</div>
-                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#1A1A1A;">Bacon</span>
-                    </a>
-                </div>
-                <div class="col-6 col-md-2">
-                    <a href="{% url 'shop_list' %}?category=douceurs" class="hs-spec-card d-block text-center text-decoration-none"
-                       style="background:#fff;border:1.5px solid #FFCDD2;border-radius:16px;padding:20px 12px;transition:transform .2s,box-shadow .2s,border-color .2s;">
-                        <div style="font-size:36px;margin-bottom:8px;">&#127851;</div>
-                        <span style="font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#1A1A1A;">Douceurs</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-    <style>
-        .hs-spec-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(198,40,40,0.12);
-            border-color: #C62828 !important;
-        }
-        @media (max-width: 480px) {
-            .hs-spec-card { padding: 14px 8px !important; }
-            .hs-spec-card div[style*="font-size:36px"] { font-size: 28px !important; margin-bottom: 5px !important; }
-            .hs-spec-card span { font-size: 12px !important; }
-        }
-    </style>
-    <!-- /.specialties -->
 
     <div class="section small_pt pb_70">
         <div class="container">
