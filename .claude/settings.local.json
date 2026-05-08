@@ -47,7 +47,12 @@
       "Bash(cat config/__pycache__/*)",
       "Bash(\"../myenv/Scripts/pip\" install:*)",
       "Bash(\"../myenv/Scripts/python\" manage.py check)",
-      "Bash(xxd README.md)"
+      "Bash(xxd README.md)",
+      "Bash(python3 manage.py migrate --check)",
+      "Bash(python3 *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

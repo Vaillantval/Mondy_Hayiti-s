@@ -453,11 +453,13 @@
 .hd-mobile-nav-link.logout i { color: #B71C1C; }
 
 /* ─── DRAWER OVERLAY ──────────────────────────────────────── */
+/* z-index 1053 : dans le même stacking context que le header (1030),
+   en dessous du drawer (1055) mais au-dessus du contenu de la page */
 .hd-drawer-overlay {
     display: none;
     position: fixed; inset: 0;
     background: rgba(0,0,0,.45);
-    z-index: 1052;
+    z-index: 1053;
 }
 .hd-drawer-overlay.show { display: block; }
 
@@ -470,23 +472,22 @@
     .hd-cart-wrap .hd-cart-preview { display: none; }
     .attr-nav { display: none; }
 
-    /* ── Drawer panel ── */
+    /* ── Drawer panel — géré 100% en JS custom (sans Bootstrap collapse) ── */
     #navbarMain {
-        position: fixed !important;
-        top: 0 !important; right: 0 !important;
-        width: 78vw !important; max-width: 280px !important;
-        height: 100dvh !important;
-        background: #fff !important;
+        position: fixed;
+        top: 0; right: 0;
+        width: 78vw; max-width: 280px;
+        height: 100dvh;
+        background: #fff;
         z-index: 1055;
-        transform: translateX(110%) !important;
-        transition: transform .28s ease !important;
-        overflow-y: auto !important; overflow-x: hidden !important;
-        display: flex !important; flex-direction: column !important;
-        box-shadow: -4px 0 24px rgba(0,0,0,.15) !important;
-        padding: 0 !important;
+        transform: translateX(110%);
+        transition: transform .28s ease;
+        overflow-y: auto; overflow-x: hidden;
+        display: flex; flex-direction: column;
+        box-shadow: -4px 0 24px rgba(0,0,0,.15);
+        padding: 0;
     }
-    #navbarMain.show       { transform: translateX(0) !important; }
-    #navbarMain.collapsing { height: 100dvh !important; transition: transform .28s ease !important; }
+    #navbarMain.hd-open { transform: translateX(0); }
 
     /* Barre en-tête du drawer */
     .hd-drawer-head {
@@ -749,13 +750,12 @@
                 </div>
 
                 <!-- Burger -->
-                <button type="button" class="navbar-toggler collapsed"
-                        data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-expanded="false">
+                <button type="button" id="hdBurger" class="navbar-toggler" aria-label="Ouvrir le menu" aria-expanded="false">
                     <span class="ion-android-menu"></span>
                 </button>
 
-                <!-- Liens nav -->
-                <div id="navbarMain" class="navbar-collapse justify-content-between collapse">
+                <!-- Drawer -->
+                <div id="navbarMain" class="navbar-collapse justify-content-between">
 
                     <!-- En-tête drawer (mobile uniquement) -->
                     <div class="hd-drawer-head d-lg-none">
@@ -1124,37 +1124,35 @@
             </nav>
         </div>
     </div>
+    <!-- Overlay drawer — doit être DANS le header (même stacking context que #navbarMain) -->
+    <div class="hd-drawer-overlay" id="hdDrawerOverlay"></div>
+
     <!-- /.hd-navbar-wrap -->
 
 </header>
-
-<!-- Overlay drawer mobile -->
-<div class="hd-drawer-overlay" id="hdDrawerOverlay"></div>
 
 <script>
 (function () {
     var drawer   = document.getElementById('navbarMain');
     var overlay  = document.getElementById('hdDrawerOverlay');
+    var burger   = document.getElementById('hdBurger');
     var closeBtn = document.getElementById('hdDrawerClose');
-    var toggler  = document.querySelector('.navbar-toggler');
+
+    function openDrawer() {
+        drawer.classList.add('hd-open');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
 
     function closeDrawer() {
-        /* Cliquer le toggler quand le drawer est ouvert = le ferme via Bootstrap */
-        if (drawer && drawer.classList.contains('show') && toggler) {
-            toggler.click();
-        }
+        drawer.classList.remove('hd-open');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
     }
 
-    if (drawer) {
-        drawer.addEventListener('show.bs.collapse', function () {
-            if (overlay) overlay.classList.add('show');
-            document.body.classList.add('hd-drawer-open');
-        });
-        drawer.addEventListener('hidden.bs.collapse', function () {
-            if (overlay) overlay.classList.remove('show');
-            document.body.classList.remove('hd-drawer-open');
-        });
-    }
+    if (burger)   burger.addEventListener('click', function () {
+        drawer.classList.contains('hd-open') ? closeDrawer() : openDrawer();
+    });
     if (overlay)  overlay.addEventListener('click', closeDrawer);
     if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
 })();
