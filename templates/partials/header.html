@@ -456,10 +456,8 @@
 .hd-drawer-overlay {
     display: none;
     position: fixed; inset: 0;
-    background: rgba(0,0,0,.50);
+    background: rgba(0,0,0,.45);
     z-index: 1052;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
 }
 .hd-drawer-overlay.show { display: block; }
 
@@ -476,83 +474,73 @@
     #navbarMain {
         position: fixed !important;
         top: 0 !important; right: 0 !important;
-        width: min(82vw, 300px) !important;
+        width: 78vw !important; max-width: 280px !important;
         height: 100dvh !important;
         background: #fff !important;
         z-index: 1055;
-        transform: translateX(105%) !important;
-        transition: transform .30s cubic-bezier(.4,0,.2,1) !important;
+        transform: translateX(110%) !important;
+        transition: transform .28s ease !important;
         overflow-y: auto !important; overflow-x: hidden !important;
         display: flex !important; flex-direction: column !important;
-        box-shadow: -6px 0 40px rgba(0,0,0,.20) !important;
+        box-shadow: -4px 0 24px rgba(0,0,0,.15) !important;
         padding: 0 !important;
     }
-    #navbarMain.show     { transform: translateX(0) !important; }
-    #navbarMain.collapsing { height: 100dvh !important; transition: transform .30s !important; }
+    #navbarMain.show       { transform: translateX(0) !important; }
+    #navbarMain.collapsing { height: 100dvh !important; transition: transform .28s ease !important; }
 
-    /* Drawer header */
+    /* Barre en-tête du drawer */
     .hd-drawer-head {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 16px 18px;
-        background: #1C1410; flex-shrink: 0;
-        border-bottom: 1px solid rgba(255,255,255,.08);
+        padding: 14px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        flex-shrink: 0;
     }
-    .hd-drawer-brand {
-        font-family: 'Playfair Display', serif;
-        font-size: 18px; font-weight: 800; color: #fff;
-        display: flex; align-items: center; gap: 8px; text-decoration: none;
+    .hd-drawer-head-title {
+        font-family: 'Nunito', sans-serif;
+        font-size: 15px; font-weight: 800; color: #1A1A1A;
     }
     .hd-drawer-close-btn {
-        width: 34px; height: 34px;
-        background: rgba(255,255,255,.10);
-        border: 1px solid rgba(255,255,255,.15); border-radius: 8px;
-        color: rgba(255,255,255,.75); font-size: 17px;
+        width: 32px; height: 32px;
+        background: #f5f5f5; border: none; border-radius: 6px;
+        color: #616161; font-size: 18px; line-height: 1;
         cursor: pointer; display: flex; align-items: center; justify-content: center;
-        transition: background .18s; flex-shrink: 0;
     }
-    .hd-drawer-close-btn:hover { background: rgba(255,255,255,.22); color: #fff; }
+    .hd-drawer-close-btn:active { background: #FFCDD2; color: #C62828; }
 
-    /* User greeting */
+    /* Nom utilisateur connecté */
     .hd-drawer-user {
-        padding: 13px 18px;
+        padding: 10px 16px;
         background: #FFF5F5; border-bottom: 1px solid #FFCDD2;
-        display: flex; align-items: center; gap: 10px;
-        font-family: 'Nunito', sans-serif; flex-shrink: 0;
+        font-family: 'Nunito', sans-serif; font-size: 13px;
+        color: #616161; flex-shrink: 0;
     }
-    .hd-drawer-user-avatar {
-        width: 36px; height: 36px; border-radius: 50%;
-        background: linear-gradient(135deg, #C62828, #EF5350);
-        color: #fff; font-size: 15px; font-weight: 800;
-        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .hd-drawer-user-name { font-size: 13.5px; font-weight: 700; color: #1A1A1A; }
-    .hd-drawer-user-sub  { font-size: 11px; color: #9E9E9E; margin-top: 1px; }
+    .hd-drawer-user strong { color: #1A1A1A; }
 
-    /* Nav links inside drawer */
-    .navbar-nav { padding: 4px 0; flex-shrink: 0; }
+    /* Liens nav */
+    .navbar-nav { padding: 0; flex-shrink: 0; }
     .navbar-nav .nav-link {
-        padding: 13px 18px !important;
+        padding: 13px 16px !important;
         border-bottom: 1px solid #f5f5f5 !important;
+        font-size: 14px; color: #1A1A1A !important;
     }
     .navbar-nav .nav-link::after { display: none; }
     .navbar-nav .dropdown-menu {
         position: static !important; box-shadow: none !important;
         border: none !important; border-radius: 0 !important;
-        border-left: 3px solid #FFCDD2 !important;
-        margin: 0 !important; padding: 4px 0 4px 8px !important;
-        background: #FFF5F5 !important; min-width: 0 !important;
+        border-left: 2px solid #FFCDD2 !important;
+        margin: 0 !important; padding: 2px 0 6px 12px !important;
+        background: #FFFAF6 !important; min-width: 0 !important;
     }
-    .navbar-nav .dropdown-item { font-size: 13px; padding: 8px 14px; }
+    .navbar-nav .dropdown-item { font-size: 13px; padding: 8px 12px; color: #1A1A1A; }
 
-    /* Mobile section at bottom of drawer */
+    /* Section compte en bas */
     .hd-mobile-nav-section {
         display: flex; flex-direction: column;
-        padding: 14px 18px 30px;
-        border-top: 1px solid #FFCDD2;
+        padding: 12px 16px 32px;
+        border-top: 1px solid #f0f0f0;
         margin-top: auto; flex-shrink: 0;
     }
 
-    /* Lock body scroll when drawer open */
     body.hd-drawer-open { overflow: hidden; }
 }
 @media (max-width: 480px) {
@@ -769,22 +757,16 @@
                 <!-- Liens nav -->
                 <div id="navbarMain" class="navbar-collapse justify-content-between collapse">
 
-                    <!-- ── En-tête drawer (mobile uniquement) ── -->
+                    <!-- En-tête drawer (mobile uniquement) -->
                     <div class="hd-drawer-head d-lg-none">
-                        <a href="{% url 'home' %}" class="hd-drawer-brand">
-                            <span style="font-size:22px;">&#127856;</span> Hayiti's
-                        </a>
-                        <button class="hd-drawer-close-btn" id="hdDrawerClose" aria-label="Fermer le menu">✕</button>
+                        <span class="hd-drawer-head-title">Menu</span>
+                        <button class="hd-drawer-close-btn" id="hdDrawerClose" aria-label="Fermer">✕</button>
                     </div>
 
-                    <!-- ── User (mobile uniquement) ── -->
+                    <!-- Utilisateur connecté -->
                     {% if user.is_authenticated %}
                     <div class="hd-drawer-user d-lg-none">
-                        <div class="hd-drawer-user-avatar">{{ user.username|slice:":1" }}</div>
-                        <div>
-                            <div class="hd-drawer-user-name">{{ user.username }}</div>
-                            <div class="hd-drawer-user-sub">Compte client</div>
-                        </div>
+                        Bonjour, <strong>{{ user.username }}</strong>
                     </div>
                     {% endif %}
 
@@ -1151,15 +1133,16 @@
 
 <script>
 (function () {
-    var drawer  = document.getElementById('navbarMain');
-    var overlay = document.getElementById('hdDrawerOverlay');
+    var drawer   = document.getElementById('navbarMain');
+    var overlay  = document.getElementById('hdDrawerOverlay');
     var closeBtn = document.getElementById('hdDrawerClose');
+    var toggler  = document.querySelector('.navbar-toggler');
 
     function closeDrawer() {
-        if (!drawer) return;
-        var bsC = window.bootstrap && bootstrap.Collapse.getInstance(drawer);
-        if (bsC) { bsC.hide(); }
-        else { drawer.classList.remove('show'); }
+        /* Cliquer le toggler quand le drawer est ouvert = le ferme via Bootstrap */
+        if (drawer && drawer.classList.contains('show') && toggler) {
+            toggler.click();
+        }
     }
 
     if (drawer) {
