@@ -441,31 +441,119 @@
 
 .hd-mobile-nav-link {
     display: flex; align-items: center; gap: 10px;
-    padding: 11px 0; font-family: 'Nunito', sans-serif;
+    padding: 11px 2px; font-family: 'Nunito', sans-serif;
     font-size: 14px; font-weight: 600; color: #1A1A1A;
-    text-decoration: none; border-bottom: 1px solid #FFCDD2; transition: color .15s;
+    text-decoration: none; border-bottom: 1px solid #f0f0f0; transition: color .15s;
 }
-.hd-mobile-nav-link i    { font-size: 14px; width: 16px; text-align: center; color: #9E9E9E; }
+.hd-mobile-nav-link i    { font-size: 14px; width: 18px; text-align: center; color: #9E9E9E; }
 .hd-mobile-nav-link:hover { color: #C62828; }
-.hd-mobile-nav-link span { margin-left: auto; background: #C62828; color: #fff; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 10px; }
-.hd-mobile-nav-link.logout { color: #B71C1C; border-bottom: none; }
+.hd-mobile-nav-link:hover i { color: #C62828; }
+.hd-mobile-nav-link span { margin-left: auto; background: #C62828; color: #fff; font-size: 10px; font-weight: 800; padding: 1px 7px; border-radius: 10px; }
+.hd-mobile-nav-link.logout { color: #B71C1C; border-bottom: none; padding-top: 14px; }
 .hd-mobile-nav-link.logout i { color: #B71C1C; }
+
+/* ─── DRAWER OVERLAY ──────────────────────────────────────── */
+.hd-drawer-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.50);
+    z-index: 1052;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+.hd-drawer-overlay.show { display: block; }
 
 /* ─── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 991px) {
     .hd-topbar { display: none; }
     .navbar-brand { position: static !important; margin-right: 0; }
     .hd-mobile-icons { display: flex; }
-    .hd-mobile-nav-section {
-        display: flex; flex-direction: column;
-        padding: 12px 0; margin-top: 8px;
-        border-top: 1px solid #FFCDD2;
-    }
-    .navbar-nav .nav-link { padding: 10px 0; border-bottom: 1px solid #FFCDD2; }
-    .navbar-nav .nav-link::after { display: none; }
     .hd-account-wrap { display: none; }
     .hd-cart-wrap .hd-cart-preview { display: none; }
     .attr-nav { display: none; }
+
+    /* ── Drawer panel ── */
+    #navbarMain {
+        position: fixed !important;
+        top: 0 !important; right: 0 !important;
+        width: min(82vw, 300px) !important;
+        height: 100dvh !important;
+        background: #fff !important;
+        z-index: 1055;
+        transform: translateX(105%) !important;
+        transition: transform .30s cubic-bezier(.4,0,.2,1) !important;
+        overflow-y: auto !important; overflow-x: hidden !important;
+        display: flex !important; flex-direction: column !important;
+        box-shadow: -6px 0 40px rgba(0,0,0,.20) !important;
+        padding: 0 !important;
+    }
+    #navbarMain.show     { transform: translateX(0) !important; }
+    #navbarMain.collapsing { height: 100dvh !important; transition: transform .30s !important; }
+
+    /* Drawer header */
+    .hd-drawer-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 18px;
+        background: #1C1410; flex-shrink: 0;
+        border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .hd-drawer-brand {
+        font-family: 'Playfair Display', serif;
+        font-size: 18px; font-weight: 800; color: #fff;
+        display: flex; align-items: center; gap: 8px; text-decoration: none;
+    }
+    .hd-drawer-close-btn {
+        width: 34px; height: 34px;
+        background: rgba(255,255,255,.10);
+        border: 1px solid rgba(255,255,255,.15); border-radius: 8px;
+        color: rgba(255,255,255,.75); font-size: 17px;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: background .18s; flex-shrink: 0;
+    }
+    .hd-drawer-close-btn:hover { background: rgba(255,255,255,.22); color: #fff; }
+
+    /* User greeting */
+    .hd-drawer-user {
+        padding: 13px 18px;
+        background: #FFF5F5; border-bottom: 1px solid #FFCDD2;
+        display: flex; align-items: center; gap: 10px;
+        font-family: 'Nunito', sans-serif; flex-shrink: 0;
+    }
+    .hd-drawer-user-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: linear-gradient(135deg, #C62828, #EF5350);
+        color: #fff; font-size: 15px; font-weight: 800;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .hd-drawer-user-name { font-size: 13.5px; font-weight: 700; color: #1A1A1A; }
+    .hd-drawer-user-sub  { font-size: 11px; color: #9E9E9E; margin-top: 1px; }
+
+    /* Nav links inside drawer */
+    .navbar-nav { padding: 4px 0; flex-shrink: 0; }
+    .navbar-nav .nav-link {
+        padding: 13px 18px !important;
+        border-bottom: 1px solid #f5f5f5 !important;
+    }
+    .navbar-nav .nav-link::after { display: none; }
+    .navbar-nav .dropdown-menu {
+        position: static !important; box-shadow: none !important;
+        border: none !important; border-radius: 0 !important;
+        border-left: 3px solid #FFCDD2 !important;
+        margin: 0 !important; padding: 4px 0 4px 8px !important;
+        background: #FFF5F5 !important; min-width: 0 !important;
+    }
+    .navbar-nav .dropdown-item { font-size: 13px; padding: 8px 14px; }
+
+    /* Mobile section at bottom of drawer */
+    .hd-mobile-nav-section {
+        display: flex; flex-direction: column;
+        padding: 14px 18px 30px;
+        border-top: 1px solid #FFCDD2;
+        margin-top: auto; flex-shrink: 0;
+    }
+
+    /* Lock body scroll when drawer open */
+    body.hd-drawer-open { overflow: hidden; }
 }
 @media (max-width: 480px) {
     .brand-text       { font-size: 20px !important; }
@@ -680,6 +768,26 @@
 
                 <!-- Liens nav -->
                 <div id="navbarMain" class="navbar-collapse justify-content-between collapse">
+
+                    <!-- ── En-tête drawer (mobile uniquement) ── -->
+                    <div class="hd-drawer-head d-lg-none">
+                        <a href="{% url 'home' %}" class="hd-drawer-brand">
+                            <span style="font-size:22px;">&#127856;</span> Hayiti's
+                        </a>
+                        <button class="hd-drawer-close-btn" id="hdDrawerClose" aria-label="Fermer le menu">✕</button>
+                    </div>
+
+                    <!-- ── User (mobile uniquement) ── -->
+                    {% if user.is_authenticated %}
+                    <div class="hd-drawer-user d-lg-none">
+                        <div class="hd-drawer-user-avatar">{{ user.username|slice:":1" }}</div>
+                        <div>
+                            <div class="hd-drawer-user-name">{{ user.username }}</div>
+                            <div class="hd-drawer-user-sub">Compte client</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <ul class="navbar-nav">
 
                         <!-- Accueil -->
@@ -1037,3 +1145,34 @@
     <!-- /.hd-navbar-wrap -->
 
 </header>
+
+<!-- Overlay drawer mobile -->
+<div class="hd-drawer-overlay" id="hdDrawerOverlay"></div>
+
+<script>
+(function () {
+    var drawer  = document.getElementById('navbarMain');
+    var overlay = document.getElementById('hdDrawerOverlay');
+    var closeBtn = document.getElementById('hdDrawerClose');
+
+    function closeDrawer() {
+        if (!drawer) return;
+        var bsC = window.bootstrap && bootstrap.Collapse.getInstance(drawer);
+        if (bsC) { bsC.hide(); }
+        else { drawer.classList.remove('show'); }
+    }
+
+    if (drawer) {
+        drawer.addEventListener('show.bs.collapse', function () {
+            if (overlay) overlay.classList.add('show');
+            document.body.classList.add('hd-drawer-open');
+        });
+        drawer.addEventListener('hidden.bs.collapse', function () {
+            if (overlay) overlay.classList.remove('show');
+            document.body.classList.remove('hd-drawer-open');
+        });
+    }
+    if (overlay)  overlay.addEventListener('click', closeDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+})();
+</script>
