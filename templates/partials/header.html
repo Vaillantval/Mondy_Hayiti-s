@@ -463,6 +463,15 @@
 }
 .hd-drawer-overlay.show { display: block; }
 
+/* ─── DESKTOP : remplace Bootstrap .navbar-expand-lg .navbar-collapse ─── */
+@media (min-width: 992px) {
+    #navbarMain {
+        display: flex !important;
+        flex: 1;
+        align-items: center;
+    }
+}
+
 /* ─── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 991px) {
     .hd-topbar { display: none; }
@@ -752,7 +761,7 @@
                 </button>
 
                 <!-- Drawer -->
-                <div id="navbarMain" class="navbar-collapse justify-content-between">
+                <div id="navbarMain" class="justify-content-between">
 
                     <!-- En-tête drawer (mobile uniquement) -->
                     <div class="hd-drawer-head d-lg-none">
