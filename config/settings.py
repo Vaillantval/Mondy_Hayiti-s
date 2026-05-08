@@ -118,6 +118,33 @@ else:
         }
     }
 
+# --- CACHE (Redis en prod, mémoire locale en dev) ---
+_REDIS_URL = os.environ.get("REDIS_URL")
+
+if _REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": _REDIS_URL,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "SOCKET_CONNECT_TIMEOUT": 5,
+                "SOCKET_TIMEOUT": 5,
+                "IGNORE_EXCEPTIONS": True,  # fallback silencieux si Redis est down
+            },
+            "KEY_PREFIX": "hayitis",
+            "TIMEOUT": 300,  # 5 min par défaut
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+
 # --- FICHIERS STATIQUES & WHITENOISE ---
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
