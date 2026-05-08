@@ -1158,9 +1158,9 @@
     if (overlay)  overlay.addEventListener('click', closeDrawer);
     if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
 
-    /* Fermeture sur clic d'un lien dans le drawer */
+    /* Fermeture sur clic d'un lien dans le drawer (exclut les toggles dropdown) */
     if (drawer) {
-        drawer.querySelectorAll('a:not([data-keep-open])').forEach(function (link) {
+        drawer.querySelectorAll('a:not([data-keep-open]):not(.dropdown-toggle)').forEach(function (link) {
             link.addEventListener('click', closeDrawer);
         });
     }
