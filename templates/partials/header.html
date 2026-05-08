@@ -475,7 +475,11 @@
 /* ─── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 991px) {
     .hd-topbar { display: none; }
-    .navbar-brand { position: static !important; margin-right: 0; }
+    .hd-navbar-wrap .navbar { min-height: 56px; }
+    .navbar-brand { position: static !important; margin-right: 0; padding: 6px 0; }
+    .navbar-brand img { max-height: 42px !important; }
+    .brand-text { font-size: 18px !important; }
+    .brand-text span { font-size: 22px !important; }
     .hd-mobile-icons { display: flex; }
     .hd-account-wrap { display: none; }
     .hd-cart-wrap .hd-cart-preview { display: none; }
