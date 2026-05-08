@@ -1,7 +1,12 @@
 from django.db import models
 from shop.models.Order import Order
 
+
 class OrderDetail(models.Model):
+    product = models.ForeignKey(
+        'shop.Product', null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='ordered_items',
+    )
     product_name = models.CharField(max_length=255)
     product_description = models.TextField()
     solde_price = models.FloatField()

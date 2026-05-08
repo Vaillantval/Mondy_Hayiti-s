@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import F
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
@@ -26,7 +27,7 @@ def _build_order_from_request(user, validated_data):
     tax_rate = (setting.taxe_rate / 100) if setting else 0
     currency = setting.base_currency if setting else "HTG"
 
-    carrier = Carrier.objects.first()
+    carrier = validated_data.get("carrier_id") or Carrier.objects.first()
     carrier_name = carrier.name if carrier else "Standard"
     carrier_price = carrier.price if carrier else 0.0
 
@@ -98,6 +99,7 @@ def _build_order_from_request(user, validated_data):
         for d in details_to_create:
             OrderDetail.objects.create(
                 order=order,
+                product=d["product"],
                 product_name=d["product_name"],
                 product_description=d["product_description"],
                 solde_price=d["solde_price"],
@@ -108,10 +110,10 @@ def _build_order_from_request(user, validated_data):
                 sub_total_ttc=d["sub_total_ttc"],
             )
 
-        # Decrement stock
+        # Decrement stock (bug 3 : F() évite la valeur stale en cas de concurrence)
         for d in details_to_create:
             Product.objects.filter(pk=d["product"].pk).update(
-                stock=d["product"].stock - d["quantity"]
+                stock=F("stock") - d["quantity"]
             )
 
     return order
@@ -179,11 +181,16 @@ class OrderCancelView(APIView):
             raise ApiError("ORDER_NOT_CANCELLABLE")
 
         with transaction.atomic():
-            # Restore stock best-effort (OrderDetail stores name snapshot, not FK)
             for detail in order.order_details.all():
-                Product.objects.filter(name=detail.product_name).update(
-                    stock=F("stock") + detail.quantity
-                )
+                if detail.product_id:
+                    Product.objects.filter(pk=detail.product_id).update(
+                        stock=F("stock") + detail.quantity
+                    )
+                else:
+                    # Fallback pour les anciennes commandes sans FK
+                    Product.objects.filter(name=detail.product_name).update(
+                        stock=F("stock") + detail.quantity
+                    )
             order.status = "canceled"
             order.save(update_fields=["status"])
 

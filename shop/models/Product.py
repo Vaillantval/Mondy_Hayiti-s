@@ -6,7 +6,7 @@ from shop.models.Category import Category
 
 class Product(models.Model):
     name = models.CharField(max_length=60, blank=False, null=False)
-    slug = models.SlugField(max_length=255, blank=False, null=False)
+    slug = models.SlugField(max_length=255, blank=False, null=False, unique=True)
     description = models.CharField(max_length=120, blank=False, null=False)
     more_description = models.TextField(blank=True, null=True)
     #   image = models.ImageField(blank=True, null=True)
@@ -26,5 +26,11 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            base = slugify(self.name)
+            slug = base
+            n = 1
+            while Product.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base}-{n}"
+                n += 1
+            self.slug = slug
         super().save(*args, **kwargs)

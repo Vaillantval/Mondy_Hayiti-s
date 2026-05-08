@@ -64,14 +64,13 @@ class CartAddView(APIView):
         quantity = serializer.validated_data["quantity"]
 
         item, created = CartItem.objects.get_or_create(
-            user=request.user, product=product, defaults={"quantity": quantity}
+            user=request.user, product=product, defaults={"quantity": 0}
         )
-        if not created:
-            new_qty = item.quantity + quantity
-            if product.stock < new_qty:
-                raise ApiError("INSUFFICIENT_STOCK", f"Stock insuffisant. Disponible : {product.stock}")
-            item.quantity = new_qty
-            item.save(update_fields=["quantity"])
+        new_qty = item.quantity + quantity
+        if product.stock < new_qty:
+            raise ApiError("INSUFFICIENT_STOCK", f"Stock insuffisant. Disponible : {product.stock}")
+        item.quantity = new_qty
+        item.save(update_fields=["quantity"])
 
         return Response(_build_cart_response(request.user), status=status.HTTP_201_CREATED)
 

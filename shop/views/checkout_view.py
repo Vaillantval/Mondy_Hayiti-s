@@ -13,8 +13,10 @@ from django.contrib.auth.hashers import make_password
 import random
 import string
 from django.db import transaction
+from django.db.models import F
 from shop.models.Order import Order
 from shop.models.Method import Method
+from shop.models.Product import Product
 from dashboard.models.Adress import Adress
 from shop.models.OrderDetail import OrderDetail
 from shop.services.payment_service import StripeService
@@ -221,9 +223,8 @@ def offline_payment(request):
                 'moncash_mc_order_id', 'moncash_order_id'):
         request.session.pop(key, None)
 
-    from emails.utils import send_offline_order_notification, send_admin_new_order
+    from emails.utils import send_offline_order_notification
     send_offline_order_notification(order)
-    send_admin_new_order(order)
 
     return render(request, 'shop/offline_confirm.html', {'order': order})
 
@@ -264,7 +265,9 @@ def create_order(request, billing_address, shipping_address=None, payment_method
         order.save()
 
         for item in cart['items']:
+            product_id = item.get("product").get("id")
             order_details = OrderDetail()
+            order_details.product_id = product_id
             order_details.product_name = item.get("product").get("name")
             order_details.product_description = item.get("product").get("description")
             order_details.solde_price = item.get("product").get("solde_price")
@@ -275,5 +278,15 @@ def create_order(request, billing_address, shipping_address=None, payment_method
             order_details.sub_total_ttc = item.get("sub_total_ttc")
             order_details.order = order
             order_details.save()
+
+        for item in cart['items']:
+            updated = Product.objects.filter(
+                pk=item['product']['id'], stock__gte=item['quantity']
+            ).update(stock=F('stock') - item['quantity'])
+            if not updated:
+                raise ValueError(
+                    f"Stock insuffisant pour \"{item['product']['name']}\". "
+                    "Veuillez mettre à jour votre panier."
+                )
 
     return order.id
