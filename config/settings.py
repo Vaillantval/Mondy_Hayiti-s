@@ -20,7 +20,7 @@ if _railway_domain:
     ALLOWED_HOSTS.append(_railway_domain)
 
 # Domaine extrait de SITE_URL — source de vérité unique pour le domaine de production
-# Ex: SITE_URL=https://matstorehaiti.online → ajoute "matstorehaiti.online"
+# Ex: SITE_URL=https://hayitis.com → ajoute "hayitis.com"
 _site_url = os.environ.get("SITE_URL", "")
 if _site_url:
     from urllib.parse import urlparse as _urlparse
@@ -28,7 +28,7 @@ if _site_url:
     if _site_host and _site_host not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(_site_host)
 
-# Domaines supplémentaires via variable Railway ALLOWED_HOSTS (ex: "matstorehaiti.online,www.matstorehaiti.online")
+# Domaines supplémentaires via variable Railway ALLOWED_HOSTS (ex: "hayitis.com,www.hayitis.com")
 _extra_hosts = os.environ.get("ALLOWED_HOSTS", "")
 if _extra_hosts:
     ALLOWED_HOSTS += [h.strip() for h in _extra_hosts.split(",") if h.strip()]
@@ -182,7 +182,7 @@ if _railway_domain:
 if _site_url and _site_url not in CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS.append(_site_url)
 
-# Origines supplémentaires via variable Railway CSRF_TRUSTED_ORIGINS (ex: "https://matstorehaiti.online")
+# Origines supplémentaires via variable Railway CSRF_TRUSTED_ORIGINS (ex: "https://hayitis.com")
 _extra_origins = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
 if _extra_origins:
     CSRF_TRUSTED_ORIGINS += [o.strip() for o in _extra_origins.split(",") if o.strip()]
@@ -386,10 +386,10 @@ ANYMAIL = {
 }
 
 DEFAULT_FROM_EMAIL = os.environ.get(
-    "DEFAULT_FROM_EMAIL", "MatStore Haiti <info@matstorehaiti.online>"
+    "DEFAULT_FROM_EMAIL", "Hayiti's <info@hayitis.com>"
 )
-ADMINS_NOTIFY = os.environ.get("ADMINS_NOTIFY", "info@matstorehaiti.online")
-SITE_URL = os.environ.get("SITE_URL", "https://matstorehaiti.online")
+ADMINS_NOTIFY = os.environ.get("ADMINS_NOTIFY", "info@hayitis.com")
+SITE_URL = os.environ.get("SITE_URL", "https://hayitis.com")
 
 # --- DJANGO REST FRAMEWORK ---
 REST_FRAMEWORK = {
@@ -430,8 +430,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # --- DRF SPECTACULAR (OpenAPI docs) ---
 SPECTACULAR_SETTINGS = {
-    "TITLE": "MatStore Haiti API",
-    "DESCRIPTION": "API REST pour l'application mobile et le back office MatStore Haiti.",
+    "TITLE": "Hayiti's API",
+    "DESCRIPTION": "API REST pour l'application mobile et le back office Hayiti's.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,

@@ -2,11 +2,11 @@ services:
 
   db:
     image: postgres:15
-    container_name: matstore_db
+    container_name: hayitis_db
     environment:
-      POSTGRES_DB: matstore
-      POSTGRES_USER: matstore
-      POSTGRES_PASSWORD: matstore123
+      POSTGRES_DB: hayitis
+      POSTGRES_USER: hayitis
+      POSTGRES_PASSWORD: hayitis123
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -14,7 +14,7 @@ services:
 
   web:
     build: .
-    container_name: matstore_web
+    container_name: hayitis_web
     command: >
       sh -c "python manage.py migrate --noinput &&
              python manage.py collectstatic --noinput &&
@@ -30,7 +30,7 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgres://matstore:matstore123@db:5432/matstore
+      - DATABASE_URL=postgres://hayitis:hayitis123@db:5432/hayitis
 
 volumes:
   postgres_data:

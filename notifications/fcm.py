@@ -5,7 +5,7 @@ from firebase_admin import messaging
 
 logger = logging.getLogger(__name__)
 
-TOPIC_MATSTORE = "matstore"  # tous les utilisateurs connectés
+TOPIC_MATSTORE = "hayitis"  # tous les utilisateurs connectés
 TOPIC_ADMIN = "admin"        # administrateurs seulement
 
 
@@ -26,7 +26,7 @@ def send_to_token(token: str, title: str, body: str, data: dict = None):
                 priority="high",
                 notification=messaging.AndroidNotification(
                     icon="ic_notification",
-                    color="#ff5722",
+                    color="#C62828",
                     sound="default",
                 ),
             ),
@@ -52,7 +52,7 @@ def send_to_topic(topic: str, title: str, body: str, data: dict = None):
                 priority="high",
                 notification=messaging.AndroidNotification(
                     icon="ic_notification",
-                    color="#ff5722",
+                    color="#C62828",
                     sound="default",
                 ),
             ),
