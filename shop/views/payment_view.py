@@ -69,7 +69,7 @@ def create_payment_intent(request, order_id):
                 "order_id": str(order.id),
                 "user_id":  str(order.author_id),
             },
-            description=f"matstore — commande #{order.id}",
+            description=f"Hayiti's — commande #{order.id}",
             receipt_email=order.author.email if order.author_id else None,
         )
         order.stripe_payment_intent = payment_intent["id"]
