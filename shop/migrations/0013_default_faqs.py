@@ -47,16 +47,16 @@ DEFAULT_FAQS = [
 
     (10, "Mes informations personnelles sont-elles en sécurité ?",
          "Oui. Nous ne partageons jamais vos données avec des tiers à des fins commerciales. "
-         "Les paiements en ligne sont traités par Stripe (certifié PCI-DSS) et MonCash — MatStore Haiti ne stocke aucune donnée de carte bancaire. "
+         "Les paiements en ligne sont traités par Stripe (certifié PCI-DSS) et MonCash — Hayiti's ne stocke aucune donnée de carte bancaire. "
          "Consultez notre politique de confidentialité pour plus de détails."),
 
     (11, "Comment utiliser le paiement hors ligne ?",
          "Sélectionnez « Paiement Hors Ligne » lors du checkout. "
-         "Effectuez votre virement ou dépôt sur le compte MatStore Haiti, puis uploadez une photo ou capture d'écran de la preuve de paiement. "
+         "Effectuez votre virement ou dépôt sur le compte Hayiti's, puis uploadez une photo ou capture d'écran de la preuve de paiement. "
          "Notre équipe vérifiera le paiement sous 24 à 48 h et vous contactera pour confirmer votre commande."),
 
     (12, "Comment contacter le service client ?",
-         "Vous pouvez nous joindre via le formulaire de contact sur le site, par email à info@matstorehaiti.online, "
+         "Vous pouvez nous joindre via le formulaire de contact sur le site, par email à info@hayitis.com, "
          "ou par téléphone du lundi au samedi de 9h à 18h (heure d'Haïti). "
          "Nous nous efforçons de répondre dans les 24 h ouvrables."),
 ]
