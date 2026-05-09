@@ -94,7 +94,7 @@ class PaymentInitiateView(APIView):
                         "message": "Paiement NatCash: composez *202# et suivez les instructions.",
                         "order_id": order.id,
                         "amount": order.order_cost_ttc,
-                        "reference": f"MATSTORE-{order.id}",
+                        "reference": f"HAYITIS-{order.id}",
                     },
                 })
 
@@ -130,7 +130,7 @@ class PaymentInitiateView(APIView):
                     amount=amount_cents,
                     currency="usd",
                     metadata={"order_id": order.id},
-                    description=f"matstore — commande #{order.id}",
+                    description=f"Hayiti's — commande #{order.id}",
                     receipt_email=order.author.email,
                 )
                 order.stripe_payment_intent = intent["id"]

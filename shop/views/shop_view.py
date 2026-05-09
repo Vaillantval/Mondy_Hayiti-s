@@ -183,7 +183,7 @@ def download_apk(request):
         raise Http404("Fichier APK introuvable sur le serveur.")
 
     version = setting.apk_version or "latest"
-    filename = f"MatStore-Haiti-v{version}.apk"
+    filename = f"Hayitis-v{version}.apk"
 
     response = FileResponse(
         open(apk_path, "rb"),

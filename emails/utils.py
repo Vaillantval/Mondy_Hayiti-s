@@ -31,7 +31,7 @@ def send_order_confirmation(order):
             'details': order.order_details.all(),
             'site_url': settings.SITE_URL,
         }
-        subject = f'Confirmation de votre commande #{order.id} - MatStore Haiti'
+        subject = f'Confirmation de votre commande #{order.id} - Hayiti\'s'
         html_content = render_to_string('emails/order_confirmation.html', context)
         text_content = (
             f'Commande #{order.id} confirmée. '
@@ -86,7 +86,7 @@ def send_order_status_update(order):
             'status_message': STATUS_MESSAGES.get(order.status, ''),
             'site_url': settings.SITE_URL,
         }
-        subject = f'Mise à jour de votre commande #{order.id} - MatStore Haiti'
+        subject = f'Mise à jour de votre commande #{order.id} - Hayiti\'s'
         html_content = render_to_string('emails/order_status_update.html', context)
         text_content = (
             f'Commande #{order.id} : {STATUS_LABELS.get(order.status, order.status)}. '
@@ -112,12 +112,12 @@ def send_offline_order_notification(order):
             'details': order.order_details.all(),
             'site_url': settings.SITE_URL,
         }
-        subject = f'Commande #{order.id} reçue — en attente de confirmation — MatStore Haiti'
+        subject = f'Commande #{order.id} reçue — en attente de confirmation — Hayiti\'s'
         html_content = render_to_string('emails/offline_order.html', context)
         text_content = (
             f'Commande #{order.id} bien reçue. '
             f'Paiement hors ligne en attente de vérification. '
-            f'MatStore Haiti vous contactera sous peu pour confirmer. '
+            f"Hayiti's vous contactera sous peu pour confirmer. "
             f'Total : {order.order_cost_ttc} HTG.'
         )
         msg = EmailMultiAlternatives(
@@ -169,11 +169,11 @@ def send_welcome_email(user):
             'site_url': settings.SITE_URL,
             'login_url': f'{settings.SITE_URL}/accounts/connexion/',
         }
-        subject = 'Bienvenue chez MatStore Haiti !'
+        subject = "Bienvenue chez Hayiti's !"
         html_content = render_to_string('emails/welcome.html', context)
         text_content = (
             f'Bienvenue {user.first_name or user.username} ! '
-            f'Votre compte MatStore Haiti est créé. '
+            f"Votre compte Hayiti's est créé. "
             f'Identifiant : {user.email}'
         )
         msg = EmailMultiAlternatives(
