@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "django_filters",
     "api",
     "notifications",
+    "community",
 ]
 # --- CONFIGURATION DU SITE ID ---
 SITE_ID = 1

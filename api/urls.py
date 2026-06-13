@@ -10,5 +10,6 @@ urlpatterns = [
     path("reviews/", include("api.reviews.urls")),
     path("wishlist/", include("api.wishlist.urls")),
     path("addresses/", include("api.addresses.urls")),
+    path("community/", include("api.community.urls")),
     path("admin/", include("api.admin_backoffice.urls")),
 ]

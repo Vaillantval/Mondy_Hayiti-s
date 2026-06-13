@@ -1,0 +1,608 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Communauté | {% if site_name %}{{ site_name }}{% else %}Hayiti's{% endif %}{% endblock %}
+
+{% block styles %}
+<style>
+:root { --cmty-red:#C62828; --cmty-red-soft:#FDECEC; --cmty-cream:#FFF8F0; --cmty-line:#EDE0D8; }
+.cmty-wrap { max-width:1200px; margin:24px auto 60px; padding:0 14px; }
+.cmty-shell { display:flex; gap:18px; align-items:flex-start; }
+
+/* ── Sidebar salons ── */
+.cmty-side { width:280px; flex-shrink:0; background:#fff; border:1px solid var(--cmty-line); border-radius:20px; overflow:hidden; position:sticky; top:18px; }
+.cmty-side-head { padding:18px 18px 12px; border-bottom:1px solid var(--cmty-line); }
+.cmty-side-head h2 { font-family:'Playfair Display',serif; font-size:22px; margin:0; color:#1A1A1A; }
+.cmty-side-head p { margin:4px 0 0; font-size:12.5px; color:#8a8a8a; }
+.cmty-chan-list { list-style:none; margin:0; padding:8px; }
+.cmty-chan { display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:14px; text-decoration:none; color:#1A1A1A; transition:background .15s; margin-bottom:2px; }
+.cmty-chan:hover { background:var(--cmty-cream); color:#1A1A1A; }
+.cmty-chan.active { background:var(--cmty-red-soft); }
+.cmty-chan .cm-emoji { width:38px; height:38px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:19px; border-radius:11px; background:#fff; border:1px solid var(--cmty-line); }
+.cmty-chan.active .cm-emoji { border-color:var(--cmty-red); }
+.cmty-chan .cm-meta { min-width:0; }
+.cmty-chan .cm-name { font-weight:800; font-size:14px; line-height:1.2; }
+.cmty-chan .cm-desc { font-size:11.5px; color:#9a9a9a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cmty-chan .cm-lock { margin-left:auto; font-size:12px; color:#bbb; }
+
+/* ── Panneau chat ── */
+.cmty-main { flex:1; min-width:0; background:#fff; border:1px solid var(--cmty-line); border-radius:20px; display:flex; flex-direction:column; height:calc(100vh - 120px); min-height:560px; overflow:hidden; }
+.cmty-head { padding:14px 20px; border-bottom:1px solid var(--cmty-line); display:flex; align-items:center; gap:13px; background:linear-gradient(180deg,#fff, #fffdfb); }
+.cmty-head .ch-emoji { width:46px; height:46px; display:flex; align-items:center; justify-content:center; font-size:24px; border-radius:13px; background:var(--cmty-red-soft); }
+.cmty-head h1 { font-family:'Playfair Display',serif; font-size:21px; margin:0; }
+.cmty-head p { margin:1px 0 0; font-size:12.5px; color:#8a8a8a; }
+.cmty-head .ch-live { margin-left:auto; font-size:10px; font-weight:800; letter-spacing:.5px; color:#fff; background:var(--cmty-red); padding:4px 10px; border-radius:20px; display:flex; align-items:center; gap:5px; }
+.cmty-head .ch-live::before { content:''; width:7px; height:7px; border-radius:50%; background:#fff; animation:cmtyPulse 1.4s infinite; }
+@keyframes cmtyPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── Liste messages ── */
+.cmty-feed { flex:1; overflow-y:auto; padding:18px 20px; background:var(--cmty-cream); display:flex; flex-direction:column; gap:14px; }
+.cmty-loadmore { text-align:center; }
+.cmty-loadmore button { background:#fff; border:1px solid var(--cmty-line); border-radius:20px; padding:6px 16px; font-size:12.5px; font-weight:700; color:#777; cursor:pointer; }
+.cmty-empty { margin:auto; text-align:center; color:#b0a89f; padding:40px; }
+.cmty-empty .em-ic { font-size:46px; }
+
+.msg { display:flex; gap:11px; max-width:78%; }
+.msg.own { margin-left:auto; flex-direction:row-reverse; }
+.msg .avatar { width:38px; height:38px; flex-shrink:0; border-radius:50%; background:var(--cmty-red); color:#fff; font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; }
+.msg.staff .avatar { background:#1A1A1A; }
+.msg .bubble-wrap { min-width:0; }
+.msg .b-top { display:flex; align-items:center; gap:7px; margin-bottom:3px; font-size:12px; }
+.msg.own .b-top { flex-direction:row-reverse; }
+.msg .b-name { font-weight:800; color:#1A1A1A; }
+.msg .b-staff { font-size:9px; font-weight:800; letter-spacing:.3px; color:#fff; background:var(--cmty-red); padding:1px 6px; border-radius:8px; }
+.msg .b-time { color:#b0a89f; font-size:11px; }
+.bubble { background:#fff; border:1px solid var(--cmty-line); border-radius:16px; padding:10px 13px; position:relative; }
+.msg.own .bubble { background:var(--cmty-red-soft); border-color:#F6D6D6; }
+.bubble .b-text { font-size:14px; line-height:1.5; color:#222; white-space:pre-wrap; word-break:break-word; }
+.bubble.deleted .b-text { font-style:italic; color:#aaa; }
+
+.b-reply { border-left:3px solid var(--cmty-red); background:#faf3ee; padding:5px 9px; border-radius:8px; margin-bottom:7px; font-size:12px; }
+.b-reply .r-name { font-weight:800; color:var(--cmty-red); }
+.b-reply .r-ex { color:#999; }
+
+/* image grid */
+.b-imgs { display:grid; gap:5px; margin-top:8px; grid-template-columns:repeat(2,1fr); border-radius:11px; overflow:hidden; }
+.b-imgs.one { grid-template-columns:1fr; }
+.b-imgs img { width:100%; height:140px; object-fit:cover; cursor:pointer; border-radius:8px; }
+
+/* product card */
+.b-prod { display:flex; gap:10px; align-items:center; margin-top:8px; background:#fff; border:1px solid var(--cmty-line); border-radius:13px; padding:8px; text-decoration:none; transition:border-color .15s; }
+.b-prod:hover { border-color:var(--cmty-red); }
+.b-prod img { width:52px; height:52px; border-radius:9px; object-fit:cover; flex-shrink:0; background:var(--cmty-cream); }
+.b-prod .p-name { font-weight:800; font-size:13px; color:#1A1A1A; line-height:1.2; }
+.b-prod .p-price { font-weight:800; font-size:13px; color:var(--cmty-red); margin-top:2px; }
+.b-prod .p-tag { font-size:10px; color:#aaa; text-transform:uppercase; letter-spacing:.4px; }
+
+/* actions sous bulle */
+.b-actions { display:flex; gap:6px; align-items:center; margin-top:5px; flex-wrap:wrap; }
+.msg.own .b-actions { justify-content:flex-end; }
+.react-chip { display:inline-flex; align-items:center; gap:4px; background:#fff; border:1px solid var(--cmty-line); border-radius:20px; padding:2px 9px; font-size:12.5px; cursor:pointer; transition:all .12s; }
+.react-chip:hover { border-color:var(--cmty-red); }
+.react-chip.mine { background:var(--cmty-red-soft); border-color:var(--cmty-red); font-weight:800; }
+.react-chip .rc-n { font-size:11px; color:#777; }
+.b-act-btn { background:none; border:none; color:#bbb; font-size:12px; cursor:pointer; padding:2px 5px; border-radius:6px; }
+.b-act-btn:hover { color:var(--cmty-red); background:var(--cmty-red-soft); }
+.pin-flag { font-size:10px; color:var(--cmty-red); font-weight:800; }
+
+.react-pop { position:relative; display:inline-block; }
+.react-menu { position:absolute; bottom:120%; left:0; background:#fff; border:1px solid var(--cmty-line); border-radius:30px; padding:5px 8px; display:none; gap:3px; box-shadow:0 8px 30px rgba(0,0,0,.12); z-index:5; }
+.msg.own .react-menu { left:auto; right:0; }
+.react-menu.open { display:flex; }
+.react-menu span { font-size:19px; cursor:pointer; padding:2px 4px; border-radius:8px; transition:transform .1s; }
+.react-menu span:hover { transform:scale(1.3); }
+
+/* ── Composer ── */
+.cmty-composer { border-top:1px solid var(--cmty-line); padding:12px 16px; background:#fff; }
+.cmty-reply-bar, .cmty-prod-bar { display:none; align-items:center; gap:9px; background:var(--cmty-cream); border-radius:11px; padding:7px 11px; margin-bottom:8px; font-size:12.5px; }
+.cmty-reply-bar.show, .cmty-prod-bar.show { display:flex; }
+.cmty-reply-bar .x, .cmty-prod-bar .x { margin-left:auto; cursor:pointer; color:#aaa; font-weight:800; border:none; background:none; font-size:15px; }
+.cmty-prod-bar img { width:30px; height:30px; border-radius:7px; object-fit:cover; }
+.cmty-previews { display:flex; gap:7px; margin-bottom:8px; flex-wrap:wrap; }
+.cmty-previews .pv { position:relative; }
+.cmty-previews img { width:58px; height:58px; object-fit:cover; border-radius:10px; border:1px solid var(--cmty-line); }
+.cmty-previews .pv button { position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; border:none; background:#1A1A1A; color:#fff; font-size:12px; cursor:pointer; line-height:1; }
+.cmty-input-row { display:flex; align-items:flex-end; gap:8px; }
+.cmty-icon-btn { width:42px; height:42px; flex-shrink:0; border:1px solid var(--cmty-line); background:#fff; border-radius:13px; font-size:18px; color:#777; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+.cmty-icon-btn:hover { color:var(--cmty-red); border-color:var(--cmty-red); }
+.cmty-textarea { flex:1; border:1px solid var(--cmty-line); border-radius:16px; padding:11px 15px; font-family:'Nunito',sans-serif; font-size:14px; resize:none; max-height:130px; outline:none; line-height:1.4; }
+.cmty-textarea:focus { border-color:var(--cmty-red); }
+.cmty-send { width:46px; height:46px; flex-shrink:0; border:none; border-radius:14px; background:var(--cmty-red); color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .12s, opacity .12s; }
+.cmty-send:hover { transform:scale(1.06); }
+.cmty-send:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+.cmty-locked { text-align:center; padding:14px; color:#9a8f86; font-size:13.5px; }
+.cmty-locked a { color:var(--cmty-red); font-weight:800; }
+
+/* product search popover */
+.cmty-prod-search { display:none; position:absolute; bottom:64px; left:16px; right:16px; max-width:420px; background:#fff; border:1px solid var(--cmty-line); border-radius:16px; box-shadow:0 14px 50px rgba(0,0,0,.16); padding:10px; z-index:30; }
+.cmty-prod-search.open { display:block; }
+.cmty-prod-search input { width:100%; border:1px solid var(--cmty-line); border-radius:11px; padding:9px 12px; font-size:13.5px; outline:none; margin-bottom:8px; }
+.cmty-prod-search input:focus { border-color:var(--cmty-red); }
+.cmty-ps-results { max-height:240px; overflow-y:auto; }
+.cmty-ps-item { display:flex; gap:10px; align-items:center; padding:7px; border-radius:10px; cursor:pointer; }
+.cmty-ps-item:hover { background:var(--cmty-cream); }
+.cmty-ps-item img { width:40px; height:40px; border-radius:8px; object-fit:cover; background:var(--cmty-cream); }
+.cmty-ps-item .n { font-weight:700; font-size:13px; }
+.cmty-ps-item .p { font-size:12px; color:var(--cmty-red); font-weight:800; }
+
+/* lightbox */
+.cmty-lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:9999; align-items:center; justify-content:center; padding:30px; }
+.cmty-lightbox.open { display:flex; }
+.cmty-lightbox img { max-width:100%; max-height:100%; border-radius:12px; }
+
+.cmty-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1A1A1A; color:#fff; padding:11px 20px; border-radius:30px; font-size:13.5px; z-index:9999; opacity:0; transition:opacity .2s; }
+.cmty-toast.show { opacity:1; }
+
+@media (max-width:860px) {
+  .cmty-shell { flex-direction:column; }
+  .cmty-side { width:100%; position:static; }
+  .cmty-chan-list { display:flex; overflow-x:auto; padding:10px; }
+  .cmty-chan { flex-direction:column; min-width:78px; text-align:center; gap:5px; padding:8px; }
+  .cmty-chan .cm-desc, .cmty-chan .cm-lock { display:none; }
+  .cmty-chan .cm-name { font-size:11px; }
+  .cmty-main { height:calc(100vh - 80px); }
+  .msg { max-width:90%; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cmty-wrap">
+  {% if no_access %}
+    <div style="text-align:center; padding:80px 20px;">
+      <div style="font-size:54px;">🔒</div>
+      <h1 style="font-family:'Playfair Display',serif;">Communauté privée</h1>
+      <p style="color:#8a8a8a;">Aucun salon n'est accessible pour le moment.</p>
+    </div>
+  {% else %}
+  <div class="cmty-shell">
+
+    <!-- Sidebar -->
+    <aside class="cmty-side">
+      <div class="cmty-side-head">
+        <h2>🍰 Communauté</h2>
+        <p>Échangez, partagez, taguez vos produits préférés.</p>
+      </div>
+      <ul class="cmty-chan-list">
+        {% for c in channels %}
+        <a class="cmty-chan {% if c.id == active_channel.id %}active{% endif %}" href="{% url 'community:channel' c.slug %}">
+          <span class="cm-emoji">{{ c.emoji }}</span>
+          <span class="cm-meta">
+            <span class="cm-name">{{ c.name }}</span>
+            <span class="cm-desc">{{ c.description|default:"Salon" }}</span>
+          </span>
+          {% if c.write_access != 'open' %}<span class="cm-lock">🔒</span>{% endif %}
+        </a>
+        {% endfor %}
+      </ul>
+    </aside>
+
+    <!-- Chat -->
+    <section class="cmty-main"
+             data-slug="{{ active_channel.slug }}"
+             data-last="{{ last_id }}"
+             data-canwrite="{% if can_write %}1{% else %}0{% endif %}"
+             data-auth="{% if user.is_authenticated %}1{% else %}0{% endif %}">
+      <header class="cmty-head">
+        <span class="ch-emoji">{{ active_channel.emoji }}</span>
+        <div>
+          <h1>{{ active_channel.name }}</h1>
+          <p>{{ active_channel.description|default:"Bienvenue dans le salon" }}</p>
+        </div>
+        <span class="ch-live">EN DIRECT</span>
+      </header>
+
+      <div class="cmty-feed" id="cmtyFeed">
+        <div class="cmty-loadmore" id="cmtyLoadMore" style="display:none;">
+          <button type="button" id="cmtyLoadBtn">↑ Charger les messages précédents</button>
+        </div>
+      </div>
+
+      {% if can_write %}
+      <div class="cmty-composer" style="position:relative;">
+        <!-- popover recherche produit -->
+        <div class="cmty-prod-search" id="cmtyProdSearch">
+          <input type="text" id="cmtyProdInput" placeholder="Rechercher un produit à taguer…" autocomplete="off">
+          <div class="cmty-ps-results" id="cmtyProdResults"></div>
+        </div>
+
+        <div class="cmty-reply-bar" id="cmtyReplyBar">
+          ↪ Réponse à <strong id="cmtyReplyName" style="margin-left:4px;"></strong>
+          <button class="x" type="button" id="cmtyReplyCancel">✕</button>
+        </div>
+        <div class="cmty-prod-bar" id="cmtyProdBar">
+          <img id="cmtyProdImg" src="" alt="">
+          <span>Produit tagué : <strong id="cmtyProdName"></strong></span>
+          <button class="x" type="button" id="cmtyProdCancel">✕</button>
+        </div>
+        <div class="cmty-previews" id="cmtyPreviews"></div>
+
+        <form id="cmtyForm">
+          {% csrf_token %}
+          <div class="cmty-input-row">
+            <button type="button" class="cmty-icon-btn" id="cmtyImgBtn" title="Ajouter des images">📷</button>
+            <button type="button" class="cmty-icon-btn" id="cmtyTagBtn" title="Taguer un produit">🏷️</button>
+            <input type="file" id="cmtyFiles" accept="image/*" multiple hidden>
+            <textarea class="cmty-textarea" id="cmtyText" rows="1" placeholder="Écrivez un message…" maxlength="2000"></textarea>
+            <button type="submit" class="cmty-send" id="cmtySend" disabled>➤</button>
+          </div>
+        </form>
+      </div>
+      {% else %}
+      <div class="cmty-composer">
+        <div class="cmty-locked">
+          {% if user.is_authenticated %}
+            🔒 {{ block_reason }}
+          {% else %}
+            <a href="{% url 'accounts:signin' %}?next={% url 'community:channel' active_channel.slug %}">Connectez-vous</a> pour participer à la discussion.
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </section>
+  </div>
+  {% endif %}
+</div>
+
+{% if user.is_authenticated and not can_write %}
+<form id="cmtyCsrf" style="display:none">{% csrf_token %}</form>
+{% endif %}
+
+<div class="cmty-lightbox" id="cmtyLightbox"><img src="" alt=""></div>
+<div class="cmty-toast" id="cmtyToast"></div>
+
+{{ initial_messages|json_script:"cmty-initial" }}
+{{ reaction_emojis|json_script:"cmty-emojis" }}
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const main = document.querySelector('.cmty-main');
+  if (!main) return;
+
+  const SLUG = main.dataset.slug;
+  const AUTH = main.dataset.auth === '1';
+  const CAN_WRITE = main.dataset.canwrite === '1';
+  let lastId = parseInt(main.dataset.last || '0', 10);
+  let oldestId = null;
+  let polling = null;
+  let loadingOlder = false;
+
+  const feed = document.getElementById('cmtyFeed');
+  const loadMoreWrap = document.getElementById('cmtyLoadMore');
+  const REACTIONS = JSON.parse(document.getElementById('cmty-emojis').textContent);
+
+  // URLs (community monté sur /community/)
+  const U = {
+    feed:  `/community/c/${SLUG}/feed/`,
+    post:  `/community/c/${SLUG}/post/`,
+    react: (id) => `/community/m/${id}/react/`,
+    del:   (id) => `/community/m/${id}/delete/`,
+    pin:   (id) => `/community/m/${id}/pin/`,
+    search:`/community/products/search/`,
+  };
+
+  function csrf() {
+    const el = document.querySelector('[name=csrfmiddlewaretoken]');
+    return el ? el.value : '';
+  }
+  function toast(msg) {
+    const t = document.getElementById('cmtyToast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2600);
+  }
+  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+  function fmtTime(iso) {
+    const d = new Date(iso), now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    const t = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    return sameDay ? t : d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) + ' ' + t;
+  }
+
+  function buildChips(counts, mineList) {
+    let chips = '';
+    for (const [emo, n] of Object.entries(counts)) {
+      if (!n) continue;
+      const mine = mineList.includes(emo) ? ' mine' : '';
+      chips += `<span class="react-chip${mine}" data-emo="${emo}">${emo}<span class="rc-n">${n}</span></span>`;
+    }
+    return chips;
+  }
+
+  // ── rendu d'un message ──
+  function renderMessage(m) {
+    const el = document.createElement('div');
+    el.className = 'msg' + (m.is_own ? ' own' : '') + (m.is_staff ? ' staff' : '');
+    el.dataset.id = m.id;
+    el.dataset.mine = JSON.stringify(m.my_reactions || []);
+
+    if (m.deleted) {
+      el.innerHTML = `<div class="avatar">—</div><div class="bubble-wrap"><div class="bubble deleted"><div class="b-text">${esc(m.content)}</div></div></div>`;
+      return el;
+    }
+
+    let reply = '';
+    if (m.reply_to) reply = `<div class="b-reply"><span class="r-name">${esc(m.reply_to.author)}</span> <span class="r-ex">${esc(m.reply_to.excerpt)}</span></div>`;
+
+    let imgs = '';
+    if (m.attachments && m.attachments.length) {
+      imgs = `<div class="b-imgs ${m.attachments.length === 1 ? 'one' : ''}">` +
+        m.attachments.map(u => `<img src="${u}" class="cmty-img" alt="image">`).join('') + `</div>`;
+    }
+
+    let prod = '';
+    if (m.product) {
+      prod = `<a class="b-prod" href="/product/${m.product.slug}/">
+        ${m.product.image ? `<img src="${m.product.image}" alt="">` : '<img alt="">'}
+        <span><span class="p-tag">Produit</span><div class="p-name">${esc(m.product.name)}</div><div class="p-price">${esc(m.product.price)}</div></span></a>`;
+    }
+
+    // réactions
+    const chips = buildChips(m.reactions || {}, m.my_reactions || []);
+
+    const reactMenu = AUTH ? `<div class="react-pop">
+        <button class="b-act-btn react-toggle" title="Réagir">😊</button>
+        <div class="react-menu">${REACTIONS.map(e => `<span data-emo="${e}">${e}</span>`).join('')}</div>
+      </div>` : '';
+    const replyBtn = CAN_WRITE ? `<button class="b-act-btn act-reply" title="Répondre">↪</button>` : '';
+    const delBtn = (m.is_own || m.can_moderate) ? `<button class="b-act-btn act-del" title="Supprimer">🗑</button>` : '';
+    const pinBtn = m.can_moderate ? `<button class="b-act-btn act-pin" title="Épingler">📌</button>` : '';
+    const pinFlag = m.is_pinned ? `<span class="pin-flag">📌 épinglé</span>` : '';
+
+    const text = m.content ? `<div class="b-text">${esc(m.content)}</div>` : '';
+
+    el.innerHTML = `
+      <div class="avatar">${esc(m.initial)}</div>
+      <div class="bubble-wrap">
+        <div class="b-top">
+          <span class="b-name">${esc(m.author)}</span>
+          ${m.is_staff ? '<span class="b-staff">ÉQUIPE</span>' : ''}
+          <span class="b-time">${fmtTime(m.created_at)}</span>
+          ${pinFlag}
+        </div>
+        <div class="bubble">${reply}${text}${imgs}${prod}</div>
+        <div class="b-actions"><span class="react-chips">${chips}</span>${reactMenu}${replyBtn}${delBtn}${pinBtn}</div>
+      </div>`;
+    return el;
+  }
+
+  function nearBottom() { return feed.scrollHeight - feed.scrollTop - feed.clientHeight < 120; }
+  function scrollBottom() { feed.scrollTop = feed.scrollHeight; }
+
+  function appendMessages(list, prepend) {
+    const stick = nearBottom();
+    list.forEach(m => {
+      const existing = feed.querySelector(`.msg[data-id="${m.id}"]`);
+      if (existing) { existing.replaceWith(renderMessage(m)); return; }
+      const node = renderMessage(m);
+      if (prepend) feed.insertBefore(node, loadMoreWrap.nextSibling);
+      else feed.appendChild(node);
+      if (m.id > lastId) lastId = m.id;
+      if (oldestId === null || m.id < oldestId) oldestId = m.id;
+    });
+    if (!prepend && stick) scrollBottom();
+  }
+
+  // ── chargement initial ──
+  const initial = JSON.parse(document.getElementById('cmty-initial').textContent);
+  if (initial.length === 0) {
+    feed.insertAdjacentHTML('beforeend', `<div class="cmty-empty"><div class="em-ic">💬</div><p>Aucun message pour l'instant.<br>Soyez le premier à lancer la discussion !</p></div>`);
+  } else {
+    appendMessages(initial, false);
+    scrollBottom();
+    if (initial.length >= 30) loadMoreWrap.style.display = 'block';
+  }
+
+  // ── polling ──
+  async function poll() {
+    try {
+      const r = await fetch(`${U.feed}?after=${lastId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+      if (!r.ok) return;
+      const data = await r.json();
+      if (data.messages && data.messages.length) {
+        const empty = feed.querySelector('.cmty-empty'); if (empty) empty.remove();
+        appendMessages(data.messages, false);
+      }
+    } catch (e) { /* silencieux */ }
+  }
+  function startPolling() { if (!polling) polling = setInterval(poll, 4000); }
+  function stopPolling() { clearInterval(polling); polling = null; }
+  startPolling();
+  document.addEventListener('visibilitychange', () => document.hidden ? stopPolling() : (poll(), startPolling()));
+
+  // charger plus anciens
+  const loadBtn = document.getElementById('cmtyLoadBtn');
+  if (loadBtn) loadBtn.addEventListener('click', async () => {
+    if (loadingOlder || oldestId === null) return;
+    loadingOlder = true;
+    const prevH = feed.scrollHeight;
+    try {
+      const r = await fetch(`${U.feed}?before=${oldestId}`);
+      const data = await r.json();
+      if (data.messages && data.messages.length) {
+        appendMessages(data.messages, true);
+        feed.scrollTop = feed.scrollHeight - prevH;
+        if (!data.has_more) loadMoreWrap.style.display = 'none';
+      } else loadMoreWrap.style.display = 'none';
+    } catch (e) {}
+    loadingOlder = false;
+  });
+
+  // ── interactions feed (délégation) ──
+  feed.addEventListener('click', async (e) => {
+    const msgEl = e.target.closest('.msg');
+    // lightbox
+    if (e.target.classList.contains('cmty-img')) {
+      const lb = document.getElementById('cmtyLightbox');
+      lb.querySelector('img').src = e.target.src; lb.classList.add('open'); return;
+    }
+    // ouvrir menu réactions
+    if (e.target.classList.contains('react-toggle')) {
+      const menu = e.target.parentNode.querySelector('.react-menu');
+      document.querySelectorAll('.react-menu.open').forEach(m => m !== menu && m.classList.remove('open'));
+      menu.classList.toggle('open'); return;
+    }
+    // choisir un emoji dans le menu OU cliquer une chip existante
+    const picked = e.target.closest('.react-menu span') || e.target.closest('.react-chip');
+    if (picked && msgEl) {
+      const emo = picked.dataset.emo;
+      const menu = picked.closest('.react-menu'); if (menu) menu.classList.remove('open');
+      await sendReaction(msgEl.dataset.id, emo); return;
+    }
+    // répondre
+    if (e.target.classList.contains('act-reply') && msgEl) {
+      const name = msgEl.querySelector('.b-name').textContent;
+      setReply(msgEl.dataset.id, name); return;
+    }
+    // supprimer
+    if (e.target.classList.contains('act-del') && msgEl) {
+      if (!confirm('Supprimer ce message ?')) return;
+      await fetch(U.del(msgEl.dataset.id), { method: 'POST', headers: { 'X-CSRFToken': csrf() } });
+      const m = { id: msgEl.dataset.id, deleted: true, content: 'Message supprimé par la modération.' };
+      msgEl.replaceWith(renderMessage(m)); return;
+    }
+    // épingler
+    if (e.target.classList.contains('act-pin') && msgEl) {
+      const r = await fetch(U.pin(msgEl.dataset.id), { method: 'POST', headers: { 'X-CSRFToken': csrf() } });
+      const d = await r.json(); toast(d.is_pinned ? 'Message épinglé' : 'Épingle retirée'); return;
+    }
+  });
+
+  document.getElementById('cmtyLightbox').addEventListener('click', function () { this.classList.remove('open'); });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.react-pop')) document.querySelectorAll('.react-menu.open').forEach(m => m.classList.remove('open'));
+  });
+
+  async function sendReaction(id, emo) {
+    if (!AUTH) { toast('Connectez-vous pour réagir'); return; }
+    const msgEl = feed.querySelector(`.msg[data-id="${id}"]`);
+    try {
+      const r = await fetch(U.react(id), {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrf(), 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'emoji=' + encodeURIComponent(emo),
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      if (!msgEl) return;
+      const mine = JSON.parse(msgEl.dataset.mine || '[]');
+      const i = mine.indexOf(d.emoji);
+      if (d.active && i === -1) mine.push(d.emoji);
+      else if (!d.active && i !== -1) mine.splice(i, 1);
+      msgEl.dataset.mine = JSON.stringify(mine);
+      const holder = msgEl.querySelector('.react-chips');
+      if (holder) holder.innerHTML = buildChips(d.reactions, mine);
+    } catch (e) {}
+  }
+
+  // ── composer ──
+  const form = document.getElementById('cmtyForm');
+  if (form) {
+    const ta = document.getElementById('cmtyText');
+    const sendBtn = document.getElementById('cmtySend');
+    const filesInput = document.getElementById('cmtyFiles');
+    const previews = document.getElementById('cmtyPreviews');
+    let files = [];
+    let replyTo = null, taggedProduct = null;
+
+    function refreshSend() {
+      sendBtn.disabled = !(ta.value.trim() || files.length);
+    }
+    ta.addEventListener('input', () => {
+      ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 130) + 'px'; refreshSend();
+    });
+    ta.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); }
+    });
+
+    document.getElementById('cmtyImgBtn').addEventListener('click', () => filesInput.click());
+    filesInput.addEventListener('change', () => {
+      for (const f of filesInput.files) { if (files.length < 4) files.push(f); }
+      filesInput.value = ''; renderPreviews();
+    });
+    function renderPreviews() {
+      previews.innerHTML = '';
+      files.forEach((f, i) => {
+        const url = URL.createObjectURL(f);
+        const d = document.createElement('div'); d.className = 'pv';
+        d.innerHTML = `<img src="${url}"><button type="button" data-i="${i}">✕</button>`;
+        previews.appendChild(d);
+      });
+      refreshSend();
+    }
+    previews.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON') { files.splice(+e.target.dataset.i, 1); renderPreviews(); }
+    });
+
+    // reply
+    window.setReply = function (id, name) {
+      replyTo = id;
+      document.getElementById('cmtyReplyName').textContent = name;
+      document.getElementById('cmtyReplyBar').classList.add('show');
+      ta.focus();
+    };
+    document.getElementById('cmtyReplyCancel').addEventListener('click', () => {
+      replyTo = null; document.getElementById('cmtyReplyBar').classList.remove('show');
+    });
+
+    // tag produit
+    const psBox = document.getElementById('cmtyProdSearch');
+    const psInput = document.getElementById('cmtyProdInput');
+    const psResults = document.getElementById('cmtyProdResults');
+    document.getElementById('cmtyTagBtn').addEventListener('click', () => {
+      psBox.classList.toggle('open');
+      if (psBox.classList.contains('open')) { psInput.focus(); runSearch(''); }
+    });
+    let searchTimer = null;
+    psInput.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => runSearch(psInput.value), 250); });
+    async function runSearch(q) {
+      try {
+        const r = await fetch(`${U.search}?q=${encodeURIComponent(q)}`);
+        const d = await r.json();
+        psResults.innerHTML = (d.results || []).map(p =>
+          `<div class="cmty-ps-item" data-id="${p.id}" data-name="${esc(p.name)}" data-img="${p.image || ''}">
+            ${p.image ? `<img src="${p.image}">` : '<img>'}
+            <span><div class="n">${esc(p.name)}</div><div class="p">${esc(p.price)}</div></span></div>`).join('')
+          || '<div style="padding:12px;color:#aaa;font-size:13px;">Aucun produit trouvé</div>';
+      } catch (e) {}
+    }
+    psResults.addEventListener('click', (e) => {
+      const it = e.target.closest('.cmty-ps-item'); if (!it) return;
+      taggedProduct = it.dataset.id;
+      document.getElementById('cmtyProdName').textContent = it.dataset.name;
+      document.getElementById('cmtyProdImg').src = it.dataset.img;
+      document.getElementById('cmtyProdBar').classList.add('show');
+      psBox.classList.remove('open');
+    });
+    document.getElementById('cmtyProdCancel').addEventListener('click', () => {
+      taggedProduct = null; document.getElementById('cmtyProdBar').classList.remove('show');
+    });
+
+    // envoi
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (sendBtn.disabled) return;
+      sendBtn.disabled = true;
+      const fd = new FormData();
+      fd.append('content', ta.value.trim());
+      if (replyTo) fd.append('reply_to', replyTo);
+      if (taggedProduct) fd.append('product_id', taggedProduct);
+      files.forEach(f => fd.append('images', f));
+      try {
+        const r = await fetch(U.post, { method: 'POST', headers: { 'X-CSRFToken': csrf() }, body: fd });
+        const d = await r.json();
+        if (!r.ok) { toast(d.error || 'Erreur'); sendBtn.disabled = false; return; }
+        const empty = feed.querySelector('.cmty-empty'); if (empty) empty.remove();
+        appendMessages([d.message], false); scrollBottom();
+        // reset
+        ta.value = ''; ta.style.height = 'auto'; files = []; renderPreviews();
+        replyTo = null; taggedProduct = null;
+        document.getElementById('cmtyReplyBar').classList.remove('show');
+        document.getElementById('cmtyProdBar').classList.remove('show');
+      } catch (e) { toast('Connexion impossible'); sendBtn.disabled = false; }
+    });
+  }
+})();
+</script>
+{% endblock %}

@@ -206,6 +206,129 @@ payment_proof: <fichier JPG ou PNG, max 5 MB>
 
 ---
 
+## Communauté — `/api/community/`
+
+Espace communautaire type « groupe » : plusieurs salons thématiques, lecture publique
+(selon le salon), écriture réservée aux membres connectés, modération admin, tag produit,
+images et réactions. La mise à jour temps réel se fait par **polling** (`?after=`).
+
+| Méthode | Endpoint | Auth | Description |
+|---------|----------|------|-------------|
+| GET | `/community/channels/` | Public* | Liste des salons lisibles par l'appelant |
+| GET | `/community/channels/{slug}/messages/` | Public* | Messages d'un salon (polling / historique) |
+| POST | `/community/channels/{slug}/messages/` | Requis + écriture | Publier un message (multipart) |
+| POST | `/community/messages/{id}/react/` | Requis | Réagir à un message (toggle) |
+| DELETE | `/community/messages/{id}/` | Propriétaire ou admin | Supprimer un message (suppression douce) |
+| POST | `/community/messages/{id}/` | Admin | Épingler / désépingler un message |
+
+> \* « Public » dépend de l'`read_access` du salon. Un salon `public` est lisible sans
+> token ; `authenticated` exige un token ; `closed` est réservé aux admins.
+
+### Récupérer les messages (polling)
+
+```
+GET /api/community/channels/general/messages/?after=1240
+
+→ {
+    "success": true,
+    "results": [ { ...message... } ],
+    "last_id": 1247
+  }
+```
+
+- `?after={id}` — renvoie les messages **plus récents** que `{id}` (boucle de polling).
+- `?before={id}` — renvoie la page de messages **plus anciens** (remontée d'historique).
+- Sans paramètre — renvoie les 30 derniers messages, ordre chronologique.
+
+Boucle conseillée : charger une première page, mémoriser `last_id`, puis interroger
+`?after=last_id` toutes les 3–5 s.
+
+### Publier un message
+
+```
+POST /api/community/channels/general/messages/
+Content-Type: multipart/form-data
+Authorization: Bearer <token>
+
+content      (string)   — texte du message (≤ 2000 caractères)
+product_id   (int)      — optionnel : produit tagué
+reply_to     (int)      — optionnel : ID du message auquel on répond
+images       (File[])   — optionnel : jusqu'à 4 images (JPG/PNG/WebP/GIF, ≤ 5 Mo chacune)
+```
+
+`content` **ou** au moins une image est obligatoire.
+
+### Objet `message` (réponse)
+
+```json
+{
+  "id": 1247,
+  "channel": 1,
+  "author": 12,
+  "author_name": "Marie L.",
+  "is_staff": false,
+  "content": "Ce gâteau était parfait 🎂",
+  "created_at": "2026-06-13T14:32:00Z",
+  "is_pinned": false,
+  "is_deleted": false,
+  "product": {
+    "id": 8, "name": "Gâteau au chocolat", "slug": "gateau-chocolat",
+    "image": "https://.../media/product_images/...jpg", "price": "1 500,00 HTG"
+  },
+  "reply_to": { "id": 1240, "author": "Jean P.", "excerpt": "Quel parfum ?" },
+  "attachments": ["https://.../media/community/attachments/...jpg"],
+  "reactions": { "❤️": 4, "🔥": 2 },
+  "my_reactions": ["❤️"],
+  "is_own": false,
+  "can_moderate": false
+}
+```
+
+Un message supprimé est renvoyé avec `is_deleted: true` et un `content` neutre
+(« Message supprimé par la modération. ») ; les autres champs sont vidés.
+
+### Réagir à un message
+
+```
+POST /api/community/messages/1247/react/
+{ "emoji": "❤️" }
+
+→ { "success": true, "reactions": { "❤️": 5 }, "active": true, "emoji": "❤️" }
+```
+
+L'action est un **toggle** : un second appel avec le même émoji retire la réaction.
+Émojis autorisés : `❤️` · `😋` · `🔥` · `👍` · `🎂` · `😮`.
+
+### Objet `channel` (réponse `/channels/`)
+
+```json
+{
+  "id": 1, "name": "Général", "slug": "general",
+  "description": "Discussions ouvertes de la communauté.",
+  "emoji": "💬", "color": "#C62828", "image": null,
+  "read_access": "public", "write_access": "open",
+  "can_write": true
+}
+```
+
+`can_write` est calculé pour l'appelant (false si non connecté, banni, mute, ou salon
+verrouillé). Utilise-le pour activer/désactiver le champ de saisie côté mobile.
+
+### Modération
+
+La modération est gérée côté admin (interface Django ou `is_staff`) :
+
+- **Bannissement global** d'un membre (écriture, et lecture si configuré).
+- **Mute par salon** : empêche un membre précis d'écrire dans un salon donné.
+- **Verrouillage de salon** (`write_access = locked`) : lecture seule pour tous.
+- **Salon admins** (`write_access = admins`) : seuls les admins publient.
+- **Suppression / épingle** de messages.
+
+Une tentative d'écriture refusée renvoie `403` avec `error.code = PERMISSION_DENIED`
+et un `message` explicite (« Vous avez été banni… », « Ce salon est en lecture seule… »).
+
+---
+
 ## Back Office Admin — `/api/admin/`
 
 > Tous ces endpoints requièrent `is_staff = True`

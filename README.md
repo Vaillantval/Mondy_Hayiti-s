@@ -38,6 +38,7 @@ dépôt) et internationales (Stripe / carte bancaire).
 - Calcul dynamique des taxes (TVA) et des frais de livraison par transporteur
 - Paiement en ligne via Stripe et MonCash
 - Paiement hors ligne avec envoi de preuve de paiement
+- Espace communautaire (chat multi-salons) avec modération, tag produit et réactions
 - Application mobile native Android (Flutter)
 - Interface d'administration Django enrichie (Jazzmin)
 - API REST complète documentée via OpenAPI / Swagger
@@ -96,6 +97,18 @@ dépôt) et internationales (Stripe / carte bancaire).
 - Inscription, connexion, réinitialisation du mot de passe
 - Gestion des adresses multiples avec adresse par défaut
 - Tableau de bord personnel (commandes, profil)
+
+### Communauté
+
+- Espace communautaire en plusieurs salons thématiques (type groupe WhatsApp / Discord)
+- Lecture publique configurable par salon, écriture réservée aux membres connectés
+- Messages avec images (jusqu'à 4), réponses, et **tag d'un produit** directement dans le fil
+- Réactions emoji et épinglage de messages
+- Mise à jour quasi temps réel par polling (sans WebSocket, compatible WSGI)
+- Modération admin : bannissement global d'un membre, mute par salon, verrouillage de
+  salon (lecture seule ou admins uniquement), suppression de messages
+- Notification push (FCM) des admins à chaque nouveau message de membre
+- Disponible côté web et via l'API REST (app mobile)
 
 ---
 
@@ -240,6 +253,7 @@ Mondy_Hayiti-s/
 │   ├── addresses/
 │   ├── reviews/
 │   ├── wishlist/
+│   ├── community/
 │   └── admin_backoffice/
 │
 ├── dashboard/                  # Espace client (commandes, adresses, profil)
@@ -256,6 +270,14 @@ Mondy_Hayiti-s/
 │   ├── fcm.py
 │   ├── firebase_config.py
 │   └── signals.py
+│
+├── community/                  # Espace communautaire (chat multi-salons)
+│   ├── models.py               # Channel, Message, MessageAttachment,
+│   │                           # MessageReaction, CommunityBan, ChannelMute
+│   ├── permissions.py          # Règles lecture/écriture partagées web + API
+│   ├── views.py                # Vues web (feed polling, post, réactions, modération)
+│   ├── signals.py              # Notification FCM des admins
+│   └── admin.py                # Modération (ban, mute, suppression, épingle)
 │
 ├── templates/                  # Templates HTML Django
 │   ├── base.html
@@ -390,6 +412,19 @@ Authorization: Bearer <access_token>
 | DELETE  | `/api/wishlist/{id}/`     | Retirer des favoris       |
 | GET     | `/api/reviews/`           | Avis sur les produits     |
 | POST    | `/api/reviews/`           | Laisser un avis           |
+
+### Communauté
+
+| Méthode | Endpoint                                      | Description                              |
+|---------|-----------------------------------------------|------------------------------------------|
+| GET     | `/api/community/channels/`                    | Salons lisibles par l'utilisateur        |
+| GET     | `/api/community/channels/{slug}/messages/`    | Messages d'un salon (polling `?after=`)  |
+| POST    | `/api/community/channels/{slug}/messages/`    | Publier un message (texte, image, tag produit) |
+| POST    | `/api/community/messages/{id}/react/`         | Réagir à un message (toggle emoji)       |
+| DELETE  | `/api/community/messages/{id}/`               | Supprimer un message (auteur ou admin)   |
+| POST    | `/api/community/messages/{id}/`               | Épingler / désépingler (admin)           |
+
+> Détails complets (payloads, polling, modération) dans [`API.md`](API.md#communauté--apicommunity).
 
 ---
 
@@ -530,6 +565,7 @@ L'interface d'administration Django (`/admin/`) permet de gérer l'ensemble de l
 | **Taux de change**       | Gestion des paires de devises (HTG, USD, EUR...)                      |
 | **Pages / FAQ**          | Contenu éditorial statique                                            |
 | **Messages contact**     | Messages reçus via le formulaire de contact                           |
+| **Communauté**           | Salons, messages, réactions ; modération : bannissement, mute par salon, verrouillage, suppression et épingle |
 
 ### Gestion des taux de change
 
