@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block title %}Communauté | {% if site_name %}{{ site_name }}{% else %}Hayiti's{% endif %}{% endblock %}
+{% block body_class %}chat-fullscreen{% endblock %}
 
 {% block styles %}
 <style>
@@ -207,6 +208,7 @@
              data-canwrite="{% if can_write %}1{% else %}0{% endif %}"
              data-auth="{% if user.is_authenticated %}1{% else %}0{% endif %}">
       <header class="cmty-head">
+        <a href="{% url 'home' %}" class="chat-back-btn" aria-label="Retour à l'accueil">‹</a>
         <span class="ch-emoji">{{ active_channel.emoji }}</span>
         <div>
           <h1>{{ active_channel.name }}</h1>

@@ -298,17 +298,37 @@
         display: flex; align-items: center; justify-content: center;
     }
     @media (max-width: 991px) { body { padding-bottom: 70px; } }
+
+    /* ── Mode chat plein écran (mobile) ── */
+    @media (max-width: 991px) {
+        body.chat-fullscreen #siteHeader,
+        body.chat-fullscreen #siteFooter,
+        body.chat-fullscreen .cmty-contact-fab { display: none !important; }
+        body.chat-fullscreen .cmty-wrap,
+        body.chat-fullscreen .cv-wrap { margin: 0 !important; padding: 0 !important; max-width: 100% !important; }
+        body.chat-fullscreen .cmty-shell { height: calc(100vh - 70px); }
+        body.chat-fullscreen .cmty-main { height: auto !important; flex: 1; min-height: 0 !important; border-radius: 0 !important; border-left: none; border-right: none; }
+        body.chat-fullscreen .cv-shell { height: calc(100vh - 70px) !important; min-height: 0 !important; border-radius: 0 !important; border-left: none; border-right: none; }
+    }
+    /* Boutons retour chat (mobile uniquement) */
+    .chat-back-btn { display: none; }
+    @media (max-width: 991px) {
+        .chat-back-btn { display: inline-flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; border: 1px solid #EDE0D8;
+            background: #fff; color: #1A1A1A; font-size: 22px; text-decoration: none; line-height: 1; margin-right: 4px; }
+        .chat-back-btn:hover { color: #C62828; border-color: #C62828; }
+    }
     </style>
     {% block styles %}{% endblock %}
 </head>
 
-<body>
-{% include "partials/header.html" %}
+<body class="{% block body_class %}{% endblock %}">
+<div id="siteHeader">{% include "partials/header.html" %}</div>
 
 
 {% block content %}{% endblock %}
 
-{% include "partials/footer.html" %}
+<div id="siteFooter">{% include "partials/footer.html" %}</div>
 
 <!-- script js  -->
 <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
