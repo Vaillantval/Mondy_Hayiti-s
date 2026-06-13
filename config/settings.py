@@ -93,6 +93,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "shop.context_processors.site_settings",
                 "shop.context_processors.cart_context",
+                "community.context_processors.web_push",
             ],
         },
     },
@@ -437,3 +438,23 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
 }
+
+
+# --- WEB PUSH (Firebase Cloud Messaging pour navigateur) ---
+# Config publique côté client (sans danger à exposer). Le Web Push ne s'active
+# que si toutes les valeurs sont présentes.
+FIREBASE_WEB_CONFIG = {
+    "apiKey": os.environ.get("FIREBASE_WEB_API_KEY", ""),
+    "authDomain": os.environ.get("FIREBASE_WEB_AUTH_DOMAIN", ""),
+    "projectId": os.environ.get("FIREBASE_WEB_PROJECT_ID", ""),
+    "messagingSenderId": os.environ.get("FIREBASE_WEB_SENDER_ID", ""),
+    "appId": os.environ.get("FIREBASE_WEB_APP_ID", ""),
+}
+FIREBASE_VAPID_KEY = os.environ.get("FIREBASE_VAPID_KEY", "")
+FIREBASE_WEB_PUSH_ENABLED = bool(
+    FIREBASE_WEB_CONFIG["apiKey"]
+    and FIREBASE_WEB_CONFIG["projectId"]
+    and FIREBASE_WEB_CONFIG["messagingSenderId"]
+    and FIREBASE_WEB_CONFIG["appId"]
+    and FIREBASE_VAPID_KEY
+)

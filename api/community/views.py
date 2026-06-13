@@ -9,10 +9,13 @@ from api.exceptions import ApiError
 from community import permissions as perm
 from community.models import (
     Channel,
+    ChannelSubscription,
     Message,
     MessageAttachment,
     MessageReaction,
+    Notification,
 )
+from community.views import serialize_notification
 from community.views import (
     ALLOWED_IMAGE_TYPES,
     FEED_LIMIT,
@@ -203,3 +206,44 @@ class MessageDeleteView(APIView):
         msg.is_pinned = not msg.is_pinned
         msg.save(update_fields=["is_pinned", "updated_at"])
         return Response({"success": True, "is_pinned": msg.is_pinned})
+
+
+class NotificationListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(tags=TAG, summary="Mes notifications communauté + nombre de non-lus")
+    def get(self, request):
+        qs = Notification.objects.filter(recipient=request.user).select_related("actor", "channel")
+        unread = qs.filter(is_read=False).count()
+        results = [serialize_notification(n) for n in qs[:30]]
+        return Response({"success": True, "unread": unread, "results": results})
+
+    @extend_schema(tags=TAG, summary="Marquer les notifications comme lues")
+    def post(self, request):
+        qs = Notification.objects.filter(recipient=request.user, is_read=False)
+        notif_id = request.data.get("id")
+        if notif_id:
+            qs = qs.filter(id=notif_id)
+        marked = qs.update(is_read=True)
+        return Response({"success": True, "marked": marked})
+
+
+class ChannelSubscribeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(tags=TAG, summary="Suivre / ne plus suivre un salon (toggle)")
+    def post(self, request, slug):
+        try:
+            channel = Channel.objects.get(slug=slug)
+        except Channel.DoesNotExist:
+            raise ApiError("NOT_FOUND", "Salon introuvable.", status_code=404)
+        if not perm.can_read_channel(request.user, channel):
+            raise ApiError("PERMISSION_DENIED", "Salon inaccessible.")
+        sub = ChannelSubscription.objects.filter(channel=channel, user=request.user).first()
+        if sub:
+            sub.delete()
+            following = False
+        else:
+            ChannelSubscription.objects.create(channel=channel, user=request.user)
+            following = True
+        return Response({"success": True, "following": following})

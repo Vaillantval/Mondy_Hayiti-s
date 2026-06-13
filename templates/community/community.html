@@ -32,6 +32,11 @@
 .cmty-head h1 { font-family:'Playfair Display',serif; font-size:21px; margin:0; }
 .cmty-head p { margin:1px 0 0; font-size:12.5px; color:#8a8a8a; }
 .cmty-head .ch-live { margin-left:auto; font-size:10px; font-weight:800; letter-spacing:.5px; color:#fff; background:var(--cmty-red); padding:4px 10px; border-radius:20px; display:flex; align-items:center; gap:5px; }
+.cmty-follow { margin-left:auto; border:1px solid var(--cmty-line); background:#fff; color:#888; border-radius:20px; padding:6px 13px; font-size:12.5px; font-weight:800; cursor:pointer; white-space:nowrap; }
+.cmty-follow + .ch-live { margin-left:8px; }
+.cmty-follow .f-on { display:none; } .cmty-follow .f-off { display:inline; }
+.cmty-follow.following { background:var(--cmty-red-soft); border-color:var(--cmty-red); color:var(--cmty-red); }
+.cmty-follow.following .f-on { display:inline; } .cmty-follow.following .f-off { display:none; }
 .cmty-head .ch-live::before { content:''; width:7px; height:7px; border-radius:50%; background:#fff; animation:cmtyPulse 1.4s infinite; }
 @keyframes cmtyPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
@@ -55,6 +60,7 @@
 .bubble { background:#fff; border:1px solid var(--cmty-line); border-radius:16px; padding:10px 13px; position:relative; }
 .msg.own .bubble { background:var(--cmty-red-soft); border-color:#F6D6D6; }
 .bubble .b-text { font-size:14px; line-height:1.5; color:#222; white-space:pre-wrap; word-break:break-word; }
+.bubble .b-text .mention { color:#C62828; font-weight:800; }
 .bubble.deleted .b-text { font-style:italic; color:#aaa; }
 
 .b-reply { border-left:3px solid var(--cmty-red); background:#faf3ee; padding:5px 9px; border-radius:8px; margin-bottom:7px; font-size:12px; }
@@ -189,6 +195,12 @@
           <h1>{{ active_channel.name }}</h1>
           <p>{{ active_channel.description|default:"Bienvenue dans le salon" }}</p>
         </div>
+        {% if user.is_authenticated %}
+        <button type="button" id="cmtyFollowBtn" class="cmty-follow {% if is_following %}following{% endif %}"
+                data-following="{% if is_following %}1{% else %}0{% endif %}">
+          <span class="f-on">🔔 Suivi</span><span class="f-off">🔕 Suivre</span>
+        </button>
+        {% endif %}
         <span class="ch-live">EN DIRECT</span>
       </header>
 
@@ -293,6 +305,7 @@
     setTimeout(() => t.classList.remove('show'), 2600);
   }
   function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+  function renderContent(s) { return esc(s).replace(/@([A-Za-z0-9_.+\-]+)/g, '<span class="mention">@$1</span>'); }
   function fmtTime(iso) {
     const d = new Date(iso), now = new Date();
     const sameDay = d.toDateString() === now.toDateString();
@@ -350,7 +363,7 @@
     const pinBtn = m.can_moderate ? `<button class="b-act-btn act-pin" title="Épingler">📌</button>` : '';
     const pinFlag = m.is_pinned ? `<span class="pin-flag">📌 épinglé</span>` : '';
 
-    const text = m.content ? `<div class="b-text">${esc(m.content)}</div>` : '';
+    const text = m.content ? `<div class="b-text">${renderContent(m.content)}</div>` : '';
 
     el.innerHTML = `
       <div class="avatar">${esc(m.initial)}</div>
@@ -467,6 +480,21 @@
       const r = await fetch(U.pin(msgEl.dataset.id), { method: 'POST', headers: { 'X-CSRFToken': csrf() } });
       const d = await r.json(); toast(d.is_pinned ? 'Message épinglé' : 'Épingle retirée'); return;
     }
+  });
+
+  // ── suivre / ne plus suivre le salon ──
+  const followBtn = document.getElementById('cmtyFollowBtn');
+  if (followBtn) followBtn.addEventListener('click', async () => {
+    followBtn.disabled = true;
+    try {
+      const r = await fetch(`/community/c/${SLUG}/subscribe/`, { method: 'POST', headers: { 'X-CSRFToken': csrf() } });
+      const d = await r.json();
+      if (r.ok) {
+        followBtn.classList.toggle('following', d.following);
+        toast(d.following ? 'Vous suivez ce salon 🔔' : 'Vous ne suivez plus ce salon');
+      }
+    } catch (e) {}
+    followBtn.disabled = false;
   });
 
   document.getElementById('cmtyLightbox').addEventListener('click', function () { this.classList.remove('open'); });

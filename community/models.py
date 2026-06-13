@@ -197,3 +197,90 @@ class ChannelMute(models.Model):
 
     def __str__(self):
         return f"Mute {self.user_id} on {self.channel.slug}"
+
+
+class ChannelSubscription(models.Model):
+    """Un membre suit un salon → reçoit une notif aux nouveaux messages.
+
+    Créée automatiquement quand l'utilisateur poste dans un salon, et pilotable
+    via un bouton « Suivre / Ne plus suivre ». `muted` coupe les notifs sans
+    perdre l'abonnement.
+    """
+
+    channel = models.ForeignKey(
+        Channel, on_delete=models.CASCADE, related_name="subscriptions"
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="channel_subscriptions"
+    )
+    muted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("channel", "user")
+        verbose_name = "Abonnement salon"
+        verbose_name_plural = "Abonnements salon"
+
+    def __str__(self):
+        return f"{self.user_id} suit {self.channel.slug}"
+
+
+class Notification(models.Model):
+    """Notification in-app (et trace de ce qui a été poussé en push)."""
+
+    TYPE_REPLY = "reply"
+    TYPE_MENTION = "mention"
+    TYPE_CHANNEL = "channel_message"
+    TYPE_CHOICES = [
+        (TYPE_REPLY, "Réponse à votre message"),
+        (TYPE_MENTION, "Mention"),
+        (TYPE_CHANNEL, "Nouveau message dans un salon suivi"),
+    ]
+
+    recipient = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="community_notifications"
+    )
+    actor = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    channel = models.ForeignKey(
+        Channel, on_delete=models.CASCADE, null=True, blank=True, related_name="+"
+    )
+    message = models.ForeignKey(
+        Message, on_delete=models.CASCADE, null=True, blank=True, related_name="+"
+    )
+    count = models.PositiveIntegerField(default=1)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+        indexes = [
+            models.Index(fields=["recipient", "is_read"]),
+        ]
+        verbose_name = "Notification"
+        verbose_name_plural = "Notifications"
+
+    def __str__(self):
+        return f"[{self.type}] → {self.recipient_id} (lu={self.is_read})"
+
+
+class WebPushToken(models.Model):
+    """Jeton d'enregistrement Web Push (Firebase Web) pour un navigateur."""
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="web_push_tokens"
+    )
+    token = models.CharField(max_length=512, unique=True)
+    user_agent = models.CharField(max_length=255, blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_seen = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Jeton Web Push"
+        verbose_name_plural = "Jetons Web Push"
+
+    def __str__(self):
+        return f"WebPush {self.user_id} ({self.token[:12]}…)"

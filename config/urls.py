@@ -22,6 +22,8 @@ from django.conf import settings
 from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
+from community.views import firebase_messaging_sw
+
 
 def health_check(request):
     return JsonResponse({"status": "ok"})
@@ -31,6 +33,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("ckeditor5/", include("django_ckeditor_5.urls")),
     path("", include("shop.urls")),
+    path("firebase-messaging-sw.js", firebase_messaging_sw),
     path("community/", include("community.urls")),
     path("dashboard/", include("dashboard.urls")),
     path("accounts/", include("accounts.urls")),

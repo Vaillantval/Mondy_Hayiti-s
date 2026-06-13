@@ -15,4 +15,15 @@ urlpatterns = [
     path("m/<int:message_id>/delete/", views.delete_message, name="delete"),
     path("m/<int:message_id>/pin/", views.pin_message, name="pin"),
     path("products/search/", views.product_search, name="product_search"),
+
+    # Abonnement salon
+    path("c/<slug:slug>/subscribe/", views.channel_subscribe, name="subscribe"),
+
+    # Notifications
+    path("notifications/feed/", views.notifications_feed, name="notifications_feed"),
+    path("notifications/read/", views.notifications_read, name="notifications_read"),
+
+    # Web Push
+    path("push/subscribe/", views.push_subscribe, name="push_subscribe"),
+    path("push/unsubscribe/", views.push_unsubscribe, name="push_unsubscribe"),
 ]

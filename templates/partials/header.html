@@ -721,6 +721,24 @@
                         <div class="hd-tb-sep"></div>
 
                         {% if user.is_authenticated %}
+                        <!-- Notifications communauté -->
+                        <div class="hd-tb-pill cmty-bell" id="cmtyBell" style="position:relative;cursor:pointer;">
+                            <i class="ti-bell"></i>
+                            <span>Notifs</span>
+                            <span id="cmtyBellBadge" class="hd-tb-badge" style="display:none;">0</span>
+                            <div class="cmty-notif-panel" id="cmtyNotifPanel" aria-hidden="true">
+                                <div class="cnp-head">
+                                    <strong>Notifications</strong>
+                                    <button type="button" id="cnpMarkAll">Tout marquer lu</button>
+                                </div>
+                                <div class="cnp-list" id="cnpList"></div>
+                                <div class="cnp-empty" id="cnpEmpty">Aucune notification pour l'instant.</div>
+                                <div class="cnp-pushrow" id="cnpPushRow" style="display:none;">
+                                    <button type="button" id="cnpEnablePush">🔔 Activer les notifications du navigateur</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hd-tb-sep"></div>
                         <!-- Utilisateur connecté : nom seulement (dropdown dans navbar) -->
                         <span class="hd-tb-pill active-pill" style="cursor:default;">
                             <i class="ti-user"></i>
@@ -1222,3 +1240,125 @@
     });
 })();
 </script>
+
+{% if user.is_authenticated %}
+<form id="cmtyHeaderCsrf" style="display:none">{% csrf_token %}</form>
+<style>
+.cmty-notif-panel { position:absolute; top:135%; right:0; width:340px; max-width:88vw; background:#fff; border:1px solid #EDE0D8; border-radius:14px; box-shadow:0 14px 50px rgba(0,0,0,.18); z-index:1200; display:none; overflow:hidden; cursor:default; color:#1A1A1A; text-align:left; }
+.cmty-notif-panel.open { display:block; }
+.cnp-head { display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid #EDE0D8; }
+.cnp-head strong { font-size:14px; font-family:'Nunito',sans-serif; }
+.cnp-head button { background:none; border:none; color:#C62828; font-weight:800; font-size:12px; cursor:pointer; }
+.cnp-list { max-height:360px; overflow-y:auto; }
+.cnp-item { display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-bottom:1px solid #F4ece6; text-decoration:none; color:#1A1A1A; }
+.cnp-item:hover { background:#FFF8F0; }
+.cnp-item.unread { background:#FDECEC; }
+.cnp-item .ic { font-size:18px; line-height:1.2; }
+.cnp-item .tx { font-size:13px; line-height:1.35; display:block; }
+.cnp-item .tm { font-size:11px; color:#b0a89f; margin-top:2px; display:block; }
+.cnp-empty { padding:26px 14px; text-align:center; color:#b0a89f; font-size:13px; }
+.cnp-pushrow { padding:10px 14px; border-top:1px solid #EDE0D8; }
+.cnp-pushrow button { width:100%; background:#FFF8F0; border:1px solid #EDE0D8; border-radius:10px; padding:9px; font-size:12.5px; font-weight:700; color:#C62828; cursor:pointer; }
+</style>
+<script>
+(function () {
+  const bell = document.getElementById('cmtyBell');
+  if (!bell) return;
+  const badge = document.getElementById('cmtyBellBadge');
+  const panel = document.getElementById('cmtyNotifPanel');
+  const list  = document.getElementById('cnpList');
+  const empty = document.getElementById('cnpEmpty');
+
+  function csrf() { const e = document.querySelector('[name=csrfmiddlewaretoken]'); return e ? e.value : ''; }
+  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+  function fmt(iso) {
+    const d = new Date(iso), now = new Date();
+    const t = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    return d.toDateString() === now.toDateString() ? t : d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) + ' ' + t;
+  }
+  function setBadge(n) {
+    if (n > 0) { badge.textContent = n > 99 ? '99+' : n; badge.style.display = ''; }
+    else { badge.style.display = 'none'; }
+  }
+  function markReadBeacon(id) {
+    const fd = new FormData(); fd.append('csrfmiddlewaretoken', csrf()); if (id) fd.append('id', id);
+    navigator.sendBeacon('/community/notifications/read/', fd);
+  }
+  function render(items) {
+    list.innerHTML = '';
+    if (!items || !items.length) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    items.forEach(n => {
+      const a = document.createElement('a');
+      a.className = 'cnp-item' + (n.is_read ? '' : ' unread');
+      a.href = n.url;
+      a.innerHTML = `<span class="ic">${esc(n.emoji || '🔔')}</span><span><span class="tx">${esc(n.text)}</span><span class="tm">${fmt(n.created_at)}</span></span>`;
+      a.addEventListener('click', () => markReadBeacon(n.id));
+      list.appendChild(a);
+    });
+  }
+  async function poll() {
+    try {
+      const r = await fetch('/community/notifications/feed/', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+      if (!r.ok) return;
+      const d = await r.json();
+      setBadge(d.unread);
+      if (panel.classList.contains('open')) render(d.results);
+    } catch (e) {}
+  }
+  bell.addEventListener('click', (e) => {
+    if (panel.contains(e.target)) return;
+    const open = panel.classList.toggle('open');
+    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+    if (open) poll();
+  });
+  document.addEventListener('click', (e) => { if (!bell.contains(e.target)) panel.classList.remove('open'); });
+  document.getElementById('cnpMarkAll').addEventListener('click', async () => {
+    try { await fetch('/community/notifications/read/', { method: 'POST', headers: { 'X-CSRFToken': csrf() } }); } catch (e) {}
+    setBadge(0); poll();
+  });
+
+  poll();
+  setInterval(() => { if (!document.hidden) poll(); }, 25000);
+  window.cmtyNotifPoll = poll;  // utilisé par le Web Push (réception en premier plan)
+})();
+</script>
+
+{% if web_push_enabled %}
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+<script>
+(function () {
+  const enableBtn = document.getElementById('cnpEnablePush');
+  const pushRow = document.getElementById('cnpPushRow');
+  if (!enableBtn || !('serviceWorker' in navigator) || typeof firebase === 'undefined') return;
+  function csrf() { const e = document.querySelector('[name=csrfmiddlewaretoken]'); return e ? e.value : ''; }
+  try { firebase.initializeApp({{ firebase_web_config|safe }}); } catch (e) { return; }
+  const messaging = firebase.messaging();
+  if (Notification.permission === 'default') pushRow.style.display = 'block';
+
+  async function registerToken() {
+    try {
+      const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      const token = await messaging.getToken({ vapidKey: '{{ firebase_vapid_key }}', serviceWorkerRegistration: reg });
+      if (token) {
+        const body = new URLSearchParams(); body.append('token', token);
+        await fetch('/community/push/subscribe/', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': csrf(), 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString(),
+        });
+        pushRow.style.display = 'none';
+      }
+    } catch (e) { console.warn('Web push:', e); }
+  }
+  enableBtn.addEventListener('click', async () => {
+    const p = await Notification.requestPermission();
+    if (p === 'granted') registerToken(); else pushRow.style.display = 'none';
+  });
+  if (Notification.permission === 'granted') registerToken();
+  messaging.onMessage(() => { if (window.cmtyNotifPoll) window.cmtyNotifPoll(); });
+})();
+</script>
+{% endif %}
+{% endif %}
