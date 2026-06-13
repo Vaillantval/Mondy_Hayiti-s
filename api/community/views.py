@@ -10,14 +10,17 @@ from api.permissions import IsAdminUser
 from community import permissions as perm
 from community.models import (
     Channel,
+    ChannelMute,
     ChannelSubscription,
+    CommunityBan,
+    Conversation,
+    DirectMessage,
     Message,
     MessageAttachment,
     MessageReaction,
     Notification,
 )
 from community.views import serialize_notification
-from community.models import Conversation, DirectMessage
 from community.support_views import _send_message
 from community.views import (
     ALLOWED_IMAGE_TYPES,
@@ -30,9 +33,10 @@ from community.views import (
 from shop.models.Product import Product
 from shop.templatetags.price_filters import _get_setting
 
-from .serializers import ChannelSerializer, MessageSerializer
+from .serializers import ChannelAdminSerializer, ChannelSerializer, MessageSerializer
 
 TAG = ["Communauté"]
+TAG_MOD = ["Communauté · modération"]
 
 
 def _feed_queryset(channel):
@@ -363,3 +367,118 @@ class SupportInboxMessagesView(APIView):
             raise ApiError("VALIDATION_ERROR", "Message vide.")
         dm = _send_message(conv, request.user, is_admin=True, content=content, images=images)
         return Response({"success": True, "data": _dm_payload(dm, request)}, status=status.HTTP_201_CREATED)
+
+
+# ── Modération (admin) ──────────────────────────────────────────────────────
+def _moderable_author(pk):
+    try:
+        msg = Message.objects.select_related("author", "channel").get(pk=pk)
+    except Message.DoesNotExist:
+        raise ApiError("NOT_FOUND", "Message introuvable.", status_code=404)
+    if not msg.author_id or msg.author.is_staff:
+        raise ApiError("VALIDATION_ERROR", "Action impossible sur cet utilisateur.")
+    return msg
+
+
+class BanAuthorView(APIView):
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=TAG_MOD, summary="Bannir / débannir l'auteur d'un message")
+    def post(self, request, pk):
+        msg = _moderable_author(pk)
+        ban, created = CommunityBan.objects.get_or_create(
+            user=msg.author,
+            defaults={"is_active": True, "created_by": request.user, "reason": "Banni depuis l'app"},
+        )
+        if not created:
+            ban.is_active = not ban.is_active
+            ban.save(update_fields=["is_active"])
+        return Response({"success": True, "banned": ban.is_active, "user": msg.author.username})
+
+
+class MuteAuthorView(APIView):
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=TAG_MOD, summary="Mute / unmute l'auteur dans ce salon")
+    def post(self, request, pk):
+        msg = _moderable_author(pk)
+        mute = ChannelMute.objects.filter(channel=msg.channel, user=msg.author).first()
+        if mute:
+            mute.delete()
+            muted = False
+        else:
+            ChannelMute.objects.create(channel=msg.channel, user=msg.author, created_by=request.user)
+            muted = True
+        return Response({"success": True, "muted": muted, "user": msg.author.username})
+
+
+class ChannelLockView(APIView):
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=TAG_MOD, summary="Cycle d'accès en écriture d'un salon")
+    def post(self, request, slug):
+        try:
+            ch = Channel.objects.get(slug=slug)
+        except Channel.DoesNotExist:
+            raise ApiError("NOT_FOUND", "Salon introuvable.", status_code=404)
+        order = [Channel.WRITE_OPEN, Channel.WRITE_LOCKED, Channel.WRITE_ADMINS]
+        i = order.index(ch.write_access) if ch.write_access in order else 0
+        ch.write_access = order[(i + 1) % len(order)]
+        ch.save(update_fields=["write_access", "updated_at"])
+        return Response({"success": True, "write_access": ch.write_access, "label": ch.get_write_access_display()})
+
+
+class ChannelAdminListCreateView(APIView):
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=TAG_MOD, summary="Tous les salons (gestion) / créer un salon", responses=ChannelAdminSerializer)
+    def get(self, request):
+        data = ChannelAdminSerializer(Channel.objects.all(), many=True).data
+        return Response({"success": True, "results": data})
+
+    @extend_schema(tags=TAG_MOD, request=ChannelAdminSerializer, summary="Créer un salon")
+    def post(self, request):
+        serializer = ChannelAdminSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        ch = serializer.save()
+        return Response({"success": True, "data": ChannelAdminSerializer(ch).data}, status=status.HTTP_201_CREATED)
+
+
+class ChannelAdminUpdateView(APIView):
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=TAG_MOD, request=ChannelAdminSerializer, summary="Modifier un salon")
+    def patch(self, request, slug):
+        try:
+            ch = Channel.objects.get(slug=slug)
+        except Channel.DoesNotExist:
+            raise ApiError("NOT_FOUND", "Salon introuvable.", status_code=404)
+        serializer = ChannelAdminSerializer(ch, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"success": True, "data": serializer.data})
+
+
+class UserSearchView(APIView):
+    """Recherche d'utilisateurs pour l'autocomplete @mention."""
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=TAG,
+        parameters=[OpenApiParameter("q", str, description="Texte recherché")],
+        summary="Rechercher des utilisateurs à mentionner",
+    )
+    def get(self, request):
+        from django.contrib.auth import get_user_model
+        from django.db.models import Q
+
+        q = (request.query_params.get("q") or "").strip()
+        User = get_user_model()
+        qs = User.objects.filter(is_active=True)
+        if q:
+            qs = qs.filter(Q(username__icontains=q) | Q(first_name__icontains=q) | Q(last_name__icontains=q))
+        results = []
+        for u in qs[:10]:
+            full = f"{u.first_name} {u.last_name}".strip()
+            results.append({"id": u.id, "username": u.username, "name": full or u.username})
+        return Response({"success": True, "results": results})

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from community.models import Channel, Message
+from community.models import Channel, ChannelSubscription, Message
 from shop.templatetags.price_filters import _format, _get_rate, _get_setting
 
 
@@ -12,13 +12,14 @@ def _abs(request, url):
 
 class ChannelSerializer(serializers.ModelSerializer):
     can_write = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
 
     class Meta:
         model = Channel
         fields = [
             "id", "name", "slug", "description", "emoji", "color", "image",
-            "read_access", "write_access", "can_write",
+            "read_access", "write_access", "can_write", "is_following",
         ]
 
     def get_image(self, obj):
@@ -28,6 +29,24 @@ class ChannelSerializer(serializers.ModelSerializer):
         from community import permissions as perm
         request = self.context.get("request")
         return perm.can_write_channel(request.user, obj) if request else False
+
+    def get_is_following(self, obj):
+        request = self.context.get("request")
+        if not (request and request.user.is_authenticated):
+            return False
+        return ChannelSubscription.objects.filter(channel=obj, user=request.user).exists()
+
+
+class ChannelAdminSerializer(serializers.ModelSerializer):
+    """Vue complète pour la gestion des salons (admin)."""
+
+    class Meta:
+        model = Channel
+        fields = [
+            "id", "name", "slug", "description", "emoji", "color", "order",
+            "is_active", "read_access", "write_access", "notify_admins",
+        ]
+        read_only_fields = ["id", "slug"]
 
 
 class MessageSerializer(serializers.ModelSerializer):
