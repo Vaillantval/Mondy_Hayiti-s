@@ -77,8 +77,9 @@ def _feed_response(request, conversation):
 
 
 # ── Côté CLIENT ─────────────────────────────────────────────────────────────
-@login_required
 def support_home(request):
+    if not request.user.is_authenticated:
+        return render(request, "community/support_login_prompt.html")
     if request.user.is_staff:
         return redirect("community:inbox")
     conv, _ = Conversation.objects.get_or_create(client=request.user)
