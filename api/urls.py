@@ -4,6 +4,7 @@ urlpatterns = [
     path("auth/", include("api.auth.urls")),
     path("products/", include("api.products.urls")),
     path("categories/", include("api.categories.urls")),
+    path("sliders/", include("api.sliders.urls")),
     path("cart/", include("api.cart.urls")),
     path("orders/", include("api.orders.urls")),
     path("payments/", include("api.payments.urls")),

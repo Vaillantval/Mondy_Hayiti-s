@@ -61,6 +61,33 @@
 
 ---
 
+## Accueil — `/api/sliders/`
+
+| Méthode | Endpoint | Auth | Description |
+|---------|----------|------|-------------|
+| GET | `/sliders/` | Public | Hero slides du carrousel d'accueil |
+
+```json
+{
+  "success": true,
+  "count": 2,
+  "results": [
+    {
+      "id": 1,
+      "title": "Vos pâtisseries livrées en Haïti",
+      "description": "Commandez en quelques clics",
+      "button_text": "Voir la boutique",
+      "button_link": "/shop/",
+      "image": "https://hayitis.com/media/sliders/2026/06/13/hero.jpg"
+    }
+  ]
+}
+```
+
+`image` est une URL absolue. Les slides sont triés par date de création.
+
+---
+
 ## Panier — `/api/cart/`
 
 | Méthode | Endpoint | Auth | Description |

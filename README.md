@@ -352,6 +352,7 @@ Authorization: Bearer <access_token>
 | GET     | `/api/products/{slug}/`          | Détail d'un produit                                 |
 | GET     | `/api/categories/`               | Liste des catégories                                |
 | GET     | `/api/categories/{id}/products/` | Produits par catégorie                              |
+| GET     | `/api/sliders/`                  | Hero slides du carrousel d'accueil                  |
 
 ### Panier et Commandes
 
