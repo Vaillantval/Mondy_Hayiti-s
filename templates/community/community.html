@@ -143,6 +143,10 @@
 .cmty-lightbox.open { display:flex; }
 .cmty-lightbox img { max-width:100%; max-height:100%; border-radius:12px; }
 
+.emoji-pan { position:absolute; bottom:62px; left:14px; width:316px; max-width:90vw; background:#fff; border:1px solid var(--cmty-line); border-radius:14px; box-shadow:0 12px 40px rgba(0,0,0,.16); padding:8px; display:none; grid-template-columns:repeat(8,1fr); gap:2px; z-index:40; max-height:230px; overflow-y:auto; }
+.emoji-pan.open { display:grid; }
+.emoji-i { border:none; background:none; font-size:21px; cursor:pointer; padding:4px; border-radius:7px; line-height:1; }
+.emoji-i:hover { background:var(--cmty-cream); }
 .cmty-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1A1A1A; color:#fff; padding:11px 20px; border-radius:30px; font-size:13.5px; z-index:9999; opacity:0; transition:opacity .2s; }
 .cmty-toast.show { opacity:1; }
 
@@ -253,6 +257,7 @@
           <div class="cmty-input-row">
             <button type="button" class="cmty-icon-btn" id="cmtyImgBtn" title="Ajouter des images">📷</button>
             <button type="button" class="cmty-icon-btn" id="cmtyTagBtn" title="Taguer un produit">🏷️</button>
+            <button type="button" class="cmty-icon-btn" id="cmtyEmojiBtn" title="Émojis">😊</button>
             <input type="file" id="cmtyFiles" accept="image/*" multiple hidden>
             <textarea class="cmty-textarea" id="cmtyText" rows="1" placeholder="Écrivez un message…" maxlength="2000"></textarea>
             <button type="submit" class="cmty-send" id="cmtySend" disabled>➤</button>
@@ -327,6 +332,25 @@
   }
   function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
   function renderContent(s) { return esc(s).replace(/@([A-Za-z0-9_.+\-]+)/g, '<span class="mention">@$1</span>'); }
+
+  const EMOJIS = "😀 😁 😂 🤣 😊 😍 😘 😎 🤩 🥳 😇 🙂 😉 😋 😛 😜 🤔 🤗 😅 😭 😢 😮 😱 😴 🥰 😏 🙄 😬 🤫 🤝 👋 👍 👎 👏 🙌 🙏 💪 🔥 ✨ 🎉 💯 ❤️ 🧡 💛 💚 💙 💜 🖤 💔 ✅ ❌ ⭐ 🎂 🧁 🍰 🍪 🍩 🥐 🥖 🍫 🍬 🍓 🍒 ☕".split(' ');
+  function setupEmoji(btnId, taId, host) {
+    const btn = document.getElementById(btnId), ta = document.getElementById(taId);
+    if (!btn || !ta || !host) return;
+    const pan = document.createElement('div');
+    pan.className = 'emoji-pan';
+    pan.innerHTML = EMOJIS.map(e => `<button type="button" class="emoji-i">${e}</button>`).join('');
+    host.appendChild(pan);
+    btn.addEventListener('click', (e) => { e.stopPropagation(); pan.classList.toggle('open'); });
+    pan.addEventListener('click', (e) => {
+      const t = e.target.closest('.emoji-i'); if (!t) return;
+      const s = ta.selectionStart, en = ta.selectionEnd, em = t.textContent;
+      ta.value = ta.value.slice(0, s) + em + ta.value.slice(en);
+      ta.selectionStart = ta.selectionEnd = s + em.length;
+      ta.focus(); ta.dispatchEvent(new Event('input'));
+    });
+    document.addEventListener('click', (e) => { if (!pan.contains(e.target) && e.target !== btn) pan.classList.remove('open'); });
+  }
   function fmtTime(iso) {
     const d = new Date(iso), now = new Date();
     const sameDay = d.toDateString() === now.toDateString();
@@ -687,6 +711,8 @@
         document.getElementById('cmtyProdBar').classList.remove('show');
       } catch (e) { toast('Connexion impossible'); sendBtn.disabled = false; }
     });
+
+    setupEmoji('cmtyEmojiBtn', 'cmtyText', document.querySelector('.cmty-composer'));
   }
 })();
 </script>
