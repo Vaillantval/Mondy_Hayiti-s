@@ -14,6 +14,9 @@
 .cmty-side-head { padding:18px 18px 12px; border-bottom:1px solid var(--cmty-line); }
 .cmty-side-head h2 { font-family:'Playfair Display',serif; font-size:22px; margin:0; color:#1A1A1A; }
 .cmty-side-head p { margin:4px 0 0; font-size:12.5px; color:#8a8a8a; }
+.cmty-staff-box { padding:10px 12px; border-bottom:1px solid var(--cmty-line); display:flex; flex-direction:column; gap:6px; }
+.cmty-staff-box a { font-size:12.5px; font-weight:800; color:#1A1A1A; background:var(--cmty-cream); border:1px solid var(--cmty-line); border-radius:10px; padding:8px 11px; text-decoration:none; }
+.cmty-staff-box a:hover { border-color:var(--cmty-red); color:var(--cmty-red); }
 .cmty-chan-list { list-style:none; margin:0; padding:8px; }
 .cmty-chan { display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:14px; text-decoration:none; color:#1A1A1A; transition:background .15s; margin-bottom:2px; }
 .cmty-chan:hover { background:var(--cmty-cream); color:#1A1A1A; }
@@ -37,6 +40,10 @@
 .cmty-follow .f-on { display:none; } .cmty-follow .f-off { display:inline; }
 .cmty-follow.following { background:var(--cmty-red-soft); border-color:var(--cmty-red); color:var(--cmty-red); }
 .cmty-follow.following .f-on { display:inline; } .cmty-follow.following .f-off { display:none; }
+.cmty-head-right { margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+.cmty-head-right .cmty-follow, .cmty-head-right .ch-live { margin-left:0; }
+.cmty-admin-pill { border:1px solid var(--cmty-line); background:#fff; color:#555; border-radius:20px; padding:6px 12px; font-size:12px; font-weight:800; cursor:pointer; text-decoration:none; white-space:nowrap; }
+.cmty-admin-pill:hover { border-color:var(--cmty-red); color:var(--cmty-red); }
 .cmty-head .ch-live::before { content:''; width:7px; height:7px; border-radius:50%; background:#fff; animation:cmtyPulse 1.4s infinite; }
 @keyframes cmtyPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
@@ -169,6 +176,12 @@
         <h2>🍰 Communauté</h2>
         <p>Échangez, partagez, taguez vos produits préférés.</p>
       </div>
+      {% if user.is_staff %}
+      <div class="cmty-staff-box">
+        <a href="{% url 'community:inbox' %}">📨 Messagerie clients</a>
+        <a href="{% url 'community:manage_channels' %}">⚙️ Gérer les salons</a>
+      </div>
+      {% endif %}
       <ul class="cmty-chan-list">
         {% for c in channels %}
         <a class="cmty-chan {% if c.id == active_channel.id %}active{% endif %}" href="{% url 'community:channel' c.slug %}">
@@ -195,13 +208,19 @@
           <h1>{{ active_channel.name }}</h1>
           <p>{{ active_channel.description|default:"Bienvenue dans le salon" }}</p>
         </div>
-        {% if user.is_authenticated %}
-        <button type="button" id="cmtyFollowBtn" class="cmty-follow {% if is_following %}following{% endif %}"
-                data-following="{% if is_following %}1{% else %}0{% endif %}">
-          <span class="f-on">🔔 Suivi</span><span class="f-off">🔕 Suivre</span>
-        </button>
-        {% endif %}
-        <span class="ch-live">EN DIRECT</span>
+        <div class="cmty-head-right">
+          {% if user.is_authenticated %}
+          <button type="button" id="cmtyFollowBtn" class="cmty-follow {% if is_following %}following{% endif %}"
+                  data-following="{% if is_following %}1{% else %}0{% endif %}">
+            <span class="f-on">🔔 Suivi</span><span class="f-off">🔕 Suivre</span>
+          </button>
+          {% endif %}
+          {% if user.is_staff %}
+          <button type="button" id="cmtyLockBtn" class="cmty-admin-pill" title="Changer l'accès en écriture">🔒 {{ active_channel.get_write_access_display }}</button>
+          <a href="{% url 'community:manage_channels' %}" class="cmty-admin-pill" title="Gérer les salons">⚙️</a>
+          {% endif %}
+          <span class="ch-live">EN DIRECT</span>
+        </div>
       </header>
 
       <div class="cmty-feed" id="cmtyFeed">
@@ -292,6 +311,8 @@
     react: (id) => `/community/m/${id}/react/`,
     del:   (id) => `/community/m/${id}/delete/`,
     pin:   (id) => `/community/m/${id}/pin/`,
+    ban:   (id) => `/community/m/${id}/ban-author/`,
+    mute:  (id) => `/community/m/${id}/mute-author/`,
     search:`/community/products/search/`,
   };
 
@@ -361,6 +382,9 @@
     const replyBtn = CAN_WRITE ? `<button class="b-act-btn act-reply" title="Répondre">↪</button>` : '';
     const delBtn = (m.is_own || m.can_moderate) ? `<button class="b-act-btn act-del" title="Supprimer">🗑</button>` : '';
     const pinBtn = m.can_moderate ? `<button class="b-act-btn act-pin" title="Épingler">📌</button>` : '';
+    const modBtns = (m.can_moderate && !m.is_staff && !m.is_own)
+      ? `<button class="b-act-btn act-mute" title="Mute dans ce salon">🔇</button><button class="b-act-btn act-ban" title="Bannir l'auteur">🚫</button>`
+      : '';
     const pinFlag = m.is_pinned ? `<span class="pin-flag">📌 épinglé</span>` : '';
 
     const text = m.content ? `<div class="b-text">${renderContent(m.content)}</div>` : '';
@@ -375,7 +399,7 @@
           ${pinFlag}
         </div>
         <div class="bubble">${reply}${text}${imgs}${prod}</div>
-        <div class="b-actions"><span class="react-chips">${chips}</span>${reactMenu}${replyBtn}${delBtn}${pinBtn}</div>
+        <div class="b-actions"><span class="react-chips">${chips}</span>${reactMenu}${replyBtn}${delBtn}${pinBtn}${modBtns}</div>
       </div>`;
     return el;
   }
@@ -480,6 +504,21 @@
       const r = await fetch(U.pin(msgEl.dataset.id), { method: 'POST', headers: { 'X-CSRFToken': csrf() } });
       const d = await r.json(); toast(d.is_pinned ? 'Message épinglé' : 'Épingle retirée'); return;
     }
+    // bannir l'auteur
+    if (e.target.classList.contains('act-ban') && msgEl) {
+      if (!confirm("Bannir cet utilisateur de toute la communauté ?")) return;
+      const r = await fetch(U.ban(msgEl.dataset.id), { method: 'POST', headers: { 'X-CSRFToken': csrf() } });
+      const d = await r.json();
+      if (r.ok) toast(d.banned ? `${d.user} a été banni 🚫` : `${d.user} débanni`); else toast(d.error || 'Erreur');
+      return;
+    }
+    // mute l'auteur dans ce salon
+    if (e.target.classList.contains('act-mute') && msgEl) {
+      const r = await fetch(U.mute(msgEl.dataset.id), { method: 'POST', headers: { 'X-CSRFToken': csrf() } });
+      const d = await r.json();
+      if (r.ok) toast(d.muted ? `${d.user} ne peut plus écrire ici 🔇` : `${d.user} peut de nouveau écrire`); else toast(d.error || 'Erreur');
+      return;
+    }
   });
 
   // ── suivre / ne plus suivre le salon ──
@@ -495,6 +534,18 @@
       }
     } catch (e) {}
     followBtn.disabled = false;
+  });
+
+  // ── admin : cycle de verrouillage du salon ──
+  const lockBtn = document.getElementById('cmtyLockBtn');
+  if (lockBtn) lockBtn.addEventListener('click', async () => {
+    lockBtn.disabled = true;
+    try {
+      const r = await fetch(`/community/c/${SLUG}/lock/`, { method: 'POST', headers: { 'X-CSRFToken': csrf() } });
+      const d = await r.json();
+      if (r.ok) { lockBtn.textContent = '🔒 ' + d.label; toast('Accès écriture : ' + d.label); }
+    } catch (e) {}
+    lockBtn.disabled = false;
   });
 
   document.getElementById('cmtyLightbox').addEventListener('click', function () { this.classList.remove('open'); });

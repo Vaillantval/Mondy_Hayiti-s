@@ -141,3 +141,43 @@ def notify_for_message(message):
                 u, f"💬 {channel.name}", f"{actor_name} : {excerpt}",
                 {"type": "community_message", "channel": channel.slug, "message_id": str(message.id)},
             )
+
+
+# ── Support privé (client ↔ équipe admin) ──────────────────────────────────
+def _create_support_notif(recipient, actor, conversation):
+    notif, created = Notification.objects.get_or_create(
+        recipient=recipient, conversation=conversation,
+        type=Notification.TYPE_SUPPORT, is_read=False,
+        defaults={"actor": actor},
+    )
+    if not created:
+        notif.count += 1
+        notif.actor = actor
+        notif.save(update_fields=["count", "actor", "updated_at"])
+    return notif
+
+
+def notify_support_message(dm):
+    """Notifie le destinataire d'un message support (best-effort)."""
+    conv = dm.conversation
+    excerpt = dm.content[:80] or "📷 image"
+
+    if dm.is_admin:
+        # Réponse de l'équipe → notifier le client
+        client = conv.client
+        if client and dm.sender_id != client.id:
+            _create_support_notif(client, dm.sender, conv)
+            push_to_user(
+                client, "💬 Réponse du support Hayiti's", excerpt,
+                {"type": "support", "conversation": str(conv.id)},
+            )
+    else:
+        # Message du client → notifier toute l'équipe
+        admins = User.objects.filter(is_staff=True, is_active=True).exclude(id=dm.sender_id or 0)
+        sender_name = _name(dm.sender) if dm.sender else "Un client"
+        for a in admins:
+            _create_support_notif(a, dm.sender, conv)
+            push_to_user(
+                a, f"📨 {sender_name} · support", excerpt,
+                {"type": "support", "conversation": str(conv.id)},
+            )

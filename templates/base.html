@@ -474,12 +474,33 @@
 {% block scripts %}{% endblock %}
 
 <!-- ── Mobile bottom navigation ── -->
+{% if not user.is_staff %}
+<style>
+.cmty-contact-fab { position:fixed; right:22px; bottom:26px; z-index:1031; display:flex; align-items:center; gap:9px; background:linear-gradient(135deg,#C62828,#E53935); color:#fff; padding:13px 20px 13px 16px; border-radius:40px; box-shadow:0 10px 32px rgba(198,40,40,.45); text-decoration:none; font-weight:800; font-size:14px; font-family:'Nunito',sans-serif; transition:transform .15s; }
+.cmty-contact-fab:hover { color:#fff; transform:translateY(-2px); }
+.cmty-contact-fab .ccf-ic { font-size:20px; line-height:1; animation:ccfWiggle 2.6s ease-in-out infinite; }
+.cmty-contact-fab .ccf-pulse { position:absolute; inset:0; border-radius:40px; animation:ccfPulse 2.1s infinite; pointer-events:none; }
+@keyframes ccfPulse { 0%{box-shadow:0 0 0 0 rgba(198,40,40,.55);} 70%{box-shadow:0 0 0 16px rgba(198,40,40,0);} 100%{box-shadow:0 0 0 0 rgba(198,40,40,0);} }
+@keyframes ccfWiggle { 0%,88%,100%{transform:rotate(0);} 91%{transform:rotate(-16deg);} 94%{transform:rotate(14deg);} 97%{transform:rotate(-8deg);} }
+@media (max-width:991px){ .cmty-contact-fab { bottom:80px; right:14px; padding:13px; } .cmty-contact-fab .ccf-label { display:none; } }
+</style>
+<a href="{% url 'community:support' %}" class="cmty-contact-fab" aria-label="Contacter un admin">
+    <span class="ccf-ic">💬</span><span class="ccf-label">Contacter un admin</span>
+    <span class="ccf-pulse"></span>
+</a>
+{% endif %}
+
 <nav class="mob-bottom-nav d-lg-none" aria-label="Navigation principale mobile">
     <a href="{% url 'home' %}" class="mob-nav-item {% if request.path == '/' %}active{% endif %}">
         <i class="ti-home"></i><span>Accueil</span>
     </a>
     <a href="{% url 'shop_list' %}" class="mob-nav-item {% if 'shop' in request.path and 'checkout' not in request.path %}active{% endif %}">
         <i class="ti-search"></i><span>Boutique</span>
+    </a>
+    <a href="{% url 'community:home' %}" class="mob-nav-item {% if 'community' in request.path %}active{% endif %}" style="position:relative;">
+        <i class="ti-comments"></i>
+        <span id="mobCmtyBadge" class="mob-nav-badge" style="display:none;">0</span>
+        <span>Communauté</span>
     </a>
     <a href="{% url 'cart' %}" class="mob-nav-item {% if 'cart' in request.path %}active{% endif %}" style="position:relative;">
         <i class="ti-shopping-cart"></i>

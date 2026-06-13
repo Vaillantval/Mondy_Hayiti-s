@@ -1277,8 +1277,11 @@
     return d.toDateString() === now.toDateString() ? t : d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) + ' ' + t;
   }
   function setBadge(n) {
-    if (n > 0) { badge.textContent = n > 99 ? '99+' : n; badge.style.display = ''; }
+    const txt = n > 99 ? '99+' : n;
+    if (n > 0) { badge.textContent = txt; badge.style.display = ''; }
     else { badge.style.display = 'none'; }
+    const mob = document.getElementById('mobCmtyBadge');
+    if (mob) { if (n > 0) { mob.textContent = txt; mob.style.display = ''; } else { mob.style.display = 'none'; } }
   }
   function markReadBeacon(id) {
     const fd = new FormData(); fd.append('csrfmiddlewaretoken', csrf()); if (id) fd.append('id', id);

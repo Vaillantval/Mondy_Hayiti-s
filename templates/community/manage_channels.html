@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Gérer les salons · Communauté{% endblock %}
+
+{% block styles %}
+<style>
+.mc-wrap { max-width:860px; margin:24px auto 60px; padding:0 14px; }
+.mc-card { background:#fff; border:1px solid #EDE0D8; border-radius:18px; padding:18px 20px; margin-bottom:16px; }
+.mc-card h2 { font-family:'Playfair Display',serif; font-size:18px; margin:0 0 12px; }
+.mc-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.mc-top a { font-size:13px; font-weight:800; color:#C62828; text-decoration:none; }
+.mc-grid { display:grid; grid-template-columns:70px 1fr 1fr; gap:10px; align-items:end; }
+.mc-grid.full { grid-template-columns:70px 1fr; }
+.mc-f label { display:block; font-size:11px; font-weight:800; color:#888; margin-bottom:3px; text-transform:uppercase; letter-spacing:.3px; }
+.mc-f input, .mc-f select, .mc-f textarea { width:100%; border:1px solid #EDE0D8; border-radius:9px; padding:8px 10px; font-size:13.5px; outline:none; font-family:'Nunito',sans-serif; }
+.mc-f input:focus, .mc-f select:focus, .mc-f textarea:focus { border-color:#C62828; }
+.mc-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+.mc-chk { display:flex; align-items:center; gap:6px; font-size:13px; }
+.mc-btn { border:none; background:#C62828; color:#fff; border-radius:10px; padding:9px 18px; font-weight:800; cursor:pointer; font-size:13.5px; }
+.mc-btn.ghost { background:#fff; color:#C62828; border:1px solid #C62828; }
+.mc-item { border-top:1px solid #F0E6DE; padding-top:14px; margin-top:14px; }
+.mc-item-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.mc-item-head .e { font-size:20px; } .mc-item-head .n { font-weight:800; }
+.mc-tag { font-size:10px; font-weight:800; padding:2px 8px; border-radius:9px; background:#FDECEC; color:#C62828; }
+.mc-tag.off { background:#eee; color:#999; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mc-wrap">
+  <div class="mc-top">
+    <h1 style="font-family:'Playfair Display',serif;font-size:26px;margin:0;">⚙️ Gérer les salons</h1>
+    <a href="{% url 'community:home' %}">← Retour à la communauté</a>
+  </div>
+
+  <!-- Créer -->
+  <div class="mc-card">
+    <h2>➕ Nouveau salon</h2>
+    <form method="post" action="{% url 'community:channel_save' %}">
+      {% csrf_token %}
+      <div class="mc-grid">
+        <div class="mc-f"><label>Émoji</label><input type="text" name="emoji" value="💬" maxlength="8"></div>
+        <div class="mc-f"><label>Nom</label><input type="text" name="name" required placeholder="Ex : Recettes"></div>
+        <div class="mc-f"><label>Description</label><input type="text" name="description" maxlength="160"></div>
+      </div>
+      <div class="mc-row" style="margin-top:10px;">
+        <div class="mc-f" style="flex:1;"><label>Lecture</label>
+          <select name="read_access">{% for v,l in read_choices %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select>
+        </div>
+        <div class="mc-f" style="flex:1;"><label>Écriture</label>
+          <select name="write_access">{% for v,l in write_choices %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select>
+        </div>
+        <label class="mc-chk"><input type="checkbox" name="is_active" value="1" checked> Actif</label>
+        <button class="mc-btn" type="submit">Créer</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Liste / édition -->
+  <div class="mc-card">
+    <h2>Salons existants</h2>
+    {% for c in channels %}
+    <div class="mc-item">
+      <div class="mc-item-head">
+        <span class="e">{{ c.emoji }}</span><span class="n">{{ c.name }}</span>
+        <span class="mc-tag {% if not c.is_active %}off{% endif %}">{% if c.is_active %}actif{% else %}inactif{% endif %}</span>
+        <span class="mc-tag">{{ c.get_read_access_display }}</span>
+        <span class="mc-tag">{{ c.get_write_access_display }}</span>
+      </div>
+      <form method="post" action="{% url 'community:channel_save' %}">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ c.id }}">
+        <div class="mc-grid">
+          <div class="mc-f"><label>Émoji</label><input type="text" name="emoji" value="{{ c.emoji }}" maxlength="8"></div>
+          <div class="mc-f"><label>Nom</label><input type="text" name="name" value="{{ c.name }}" required></div>
+          <div class="mc-f"><label>Description</label><input type="text" name="description" value="{{ c.description }}" maxlength="160"></div>
+        </div>
+        <div class="mc-row" style="margin-top:10px;">
+          <div class="mc-f" style="flex:1;"><label>Lecture</label>
+            <select name="read_access">{% for v,l in read_choices %}<option value="{{ v }}" {% if c.read_access == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+          </div>
+          <div class="mc-f" style="flex:1;"><label>Écriture</label>
+            <select name="write_access">{% for v,l in write_choices %}<option value="{{ v }}" {% if c.write_access == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+          </div>
+          <label class="mc-chk"><input type="checkbox" name="is_active" value="1" {% if c.is_active %}checked{% endif %}> Actif</label>
+          <button class="mc-btn ghost" type="submit">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

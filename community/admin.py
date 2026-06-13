@@ -4,10 +4,16 @@ from django.utils.html import format_html
 from .models import (
     Channel,
     ChannelMute,
+    ChannelSubscription,
     CommunityBan,
+    Conversation,
+    DirectMessage,
+    DirectMessageAttachment,
     Message,
     MessageAttachment,
     MessageReaction,
+    Notification,
+    WebPushToken,
 )
 
 
@@ -88,3 +94,58 @@ class ChannelMuteAdmin(admin.ModelAdmin):
 class MessageReactionAdmin(admin.ModelAdmin):
     list_display = ("emoji", "user", "message", "created_at")
     search_fields = ("user__username",)
+
+
+class DirectMessageInline(admin.TabularInline):
+    model = DirectMessage
+    extra = 0
+    fields = ("is_admin", "sender", "content", "read_by_admin", "read_by_client", "created_at")
+    readonly_fields = ("created_at",)
+    raw_id_fields = ("sender",)
+
+
+@admin.register(Conversation)
+class ConversationAdmin(admin.ModelAdmin):
+    list_display = ("client", "last_message_at", "is_archived", "created_at")
+    list_filter = ("is_archived",)
+    search_fields = ("client__username",)
+    raw_id_fields = ("client",)
+    inlines = [DirectMessageInline]
+
+
+@admin.register(DirectMessage)
+class DirectMessageAdmin(admin.ModelAdmin):
+    list_display = ("id", "conversation", "is_admin", "sender", "short", "created_at")
+    list_filter = ("is_admin", "created_at")
+    search_fields = ("content", "sender__username")
+    raw_id_fields = ("conversation", "sender")
+
+    @admin.display(description="Contenu")
+    def short(self, obj):
+        return (obj.content[:50] + "…") if len(obj.content) > 50 else obj.content
+
+
+@admin.register(ChannelSubscription)
+class ChannelSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ("user", "channel", "muted", "created_at")
+    list_filter = ("channel", "muted")
+    search_fields = ("user__username",)
+    raw_id_fields = ("user", "channel")
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ("recipient", "type", "actor", "channel", "count", "is_read", "updated_at")
+    list_filter = ("type", "is_read")
+    search_fields = ("recipient__username",)
+    raw_id_fields = ("recipient", "actor", "channel", "message", "conversation")
+
+
+@admin.register(WebPushToken)
+class WebPushTokenAdmin(admin.ModelAdmin):
+    list_display = ("user", "user_agent", "created_at", "last_seen")
+    search_fields = ("user__username",)
+    raw_id_fields = ("user",)
+
+
+admin.site.register(DirectMessageAttachment)

@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.exceptions import ApiError
+from api.permissions import IsAdminUser
 from community import permissions as perm
 from community.models import (
     Channel,
@@ -16,12 +17,15 @@ from community.models import (
     Notification,
 )
 from community.views import serialize_notification
+from community.models import Conversation, DirectMessage
+from community.support_views import _send_message
 from community.views import (
     ALLOWED_IMAGE_TYPES,
     FEED_LIMIT,
     MAX_IMAGE_SIZE,
     MAX_IMAGES,
     REACTION_EMOJIS,
+    _author_label,
 )
 from shop.models.Product import Product
 from shop.templatetags.price_filters import _get_setting
@@ -247,3 +251,115 @@ class ChannelSubscribeView(APIView):
             ChannelSubscription.objects.create(channel=channel, user=request.user)
             following = True
         return Response({"success": True, "following": following})
+
+
+# ── Support privé (API) ─────────────────────────────────────────────────────
+def _dm_payload(dm, request):
+    return {
+        "id": dm.id,
+        "is_admin": dm.is_admin,
+        "sender": "Équipe Hayiti's" if dm.is_admin else (_author_label(dm.sender) if dm.sender else "Client"),
+        "content": dm.content,
+        "attachments": [request.build_absolute_uri(a.image.url) for a in dm.attachments.all()],
+        "created_at": dm.created_at.isoformat(),
+        "is_own": bool(dm.sender_id == request.user.id),
+    }
+
+
+def _support_feed(request, conversation):
+    qs = conversation.messages.select_related("sender").prefetch_related("attachments")
+    after = request.query_params.get("after")
+    before = request.query_params.get("before")
+    if after:
+        msgs = list(qs.filter(id__gt=after).order_by("created_at")[:100])
+    elif before:
+        msgs = list(qs.filter(id__lt=before).order_by("-created_at")[:FEED_LIMIT]); msgs.reverse()
+    else:
+        msgs = list(qs.order_by("-created_at")[:FEED_LIMIT]); msgs.reverse()
+    data = [_dm_payload(m, request) for m in msgs]
+    return Response({"success": True, "results": data, "last_id": data[-1]["id"] if data else (after or 0)})
+
+
+def _check_images(request):
+    images = request.FILES.getlist("images")[:MAX_IMAGES]
+    for f in images:
+        if f.size == 0:
+            raise ApiError("VALIDATION_ERROR", "Image vide (0 octet).")
+        if f.size > MAX_IMAGE_SIZE:
+            raise ApiError("VALIDATION_ERROR", "Image trop lourde (5 Mo max).")
+        if f.content_type not in ALLOWED_IMAGE_TYPES:
+            raise ApiError("VALIDATION_ERROR", "Format d'image non supporté.")
+    return images
+
+
+class SupportMessagesView(APIView):
+    """Conversation support du client connecté."""
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(tags=TAG, summary="Mes messages avec le support (polling)")
+    def get(self, request):
+        conv, _ = Conversation.objects.get_or_create(client=request.user)
+        conv.messages.filter(is_admin=True, read_by_client=False).update(read_by_client=True)
+        return _support_feed(request, conv)
+
+    @extend_schema(tags=TAG, summary="Envoyer un message au support")
+    def post(self, request):
+        if request.user.is_staff:
+            raise ApiError("VALIDATION_ERROR", "Les admins répondent via l'inbox.")
+        conv, _ = Conversation.objects.get_or_create(client=request.user)
+        content = (request.data.get("content") or "").strip()
+        images = _check_images(request)
+        if not content and not images:
+            raise ApiError("VALIDATION_ERROR", "Message vide.")
+        dm = _send_message(conv, request.user, is_admin=False, content=content, images=images)
+        return Response({"success": True, "data": _dm_payload(dm, request)}, status=status.HTTP_201_CREATED)
+
+
+class SupportInboxView(APIView):
+    """Liste des conversations (admins)."""
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=TAG, summary="Inbox support — liste des conversations (admin)")
+    def get(self, request):
+        from django.db.models import Count, Q
+        convs = (
+            Conversation.objects.select_related("client")
+            .annotate(unread=Count("messages", filter=Q(messages__is_admin=False, messages__read_by_admin=False)))
+            .filter(last_message_at__isnull=False)
+        )
+        results = []
+        for c in convs:
+            last = c.messages.order_by("-created_at").first()
+            results.append({
+                "id": c.id, "client": _author_label(c.client), "unread": c.unread,
+                "last": (last.content[:60] if last and last.content else ("📷 image" if last else "")),
+                "last_at": c.last_message_at.isoformat() if c.last_message_at else None,
+            })
+        return Response({"success": True, "results": results})
+
+
+class SupportInboxMessagesView(APIView):
+    """Messages d'une conversation côté admin."""
+    permission_classes = [IsAdminUser]
+
+    def _conv(self, conv_id):
+        try:
+            return Conversation.objects.get(id=conv_id)
+        except Conversation.DoesNotExist:
+            raise ApiError("NOT_FOUND", "Conversation introuvable.", status_code=404)
+
+    @extend_schema(tags=TAG, summary="Messages d'une conversation (admin)")
+    def get(self, request, conv_id):
+        conv = self._conv(conv_id)
+        conv.messages.filter(is_admin=False, read_by_admin=False).update(read_by_admin=True)
+        return _support_feed(request, conv)
+
+    @extend_schema(tags=TAG, summary="Répondre à un client (admin)")
+    def post(self, request, conv_id):
+        conv = self._conv(conv_id)
+        content = (request.data.get("content") or "").strip()
+        images = _check_images(request)
+        if not content and not images:
+            raise ApiError("VALIDATION_ERROR", "Message vide.")
+        dm = _send_message(conv, request.user, is_admin=True, content=content, images=images)
+        return Response({"success": True, "data": _dm_payload(dm, request)}, status=status.HTTP_201_CREATED)

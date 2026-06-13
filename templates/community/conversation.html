@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if is_admin_view %}Conversation · {{ peer_name }}{% else %}Support Hayiti's{% endif %}{% endblock %}
+
+{% block styles %}
+<style>
+:root { --cmty-red:#C62828; --cmty-red-soft:#FDECEC; --cmty-cream:#FFF8F0; --cmty-line:#EDE0D8; }
+.cv-wrap { max-width:820px; margin:24px auto 60px; padding:0 14px; }
+.cv-shell { background:#fff; border:1px solid var(--cmty-line); border-radius:20px; display:flex; flex-direction:column; height:calc(100vh - 150px); min-height:520px; overflow:hidden; }
+.cv-head { display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--cmty-line); background:linear-gradient(180deg,#fff,#fffdfb); }
+.cv-head .cv-back { color:#888; font-size:20px; text-decoration:none; }
+.cv-head .cv-av { width:44px; height:44px; border-radius:50%; background:var(--cmty-red); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:17px; }
+.cv-head h1 { font-family:'Playfair Display',serif; font-size:19px; margin:0; }
+.cv-head p { margin:1px 0 0; font-size:12px; color:#8a8a8a; }
+.cv-feed { flex:1; overflow-y:auto; padding:18px; background:var(--cmty-cream); display:flex; flex-direction:column; gap:10px; }
+.cv-intro { margin:auto; text-align:center; color:#b0a89f; max-width:340px; }
+.cv-intro .ic { font-size:46px; }
+.dm { display:flex; max-width:78%; }
+.dm.own { margin-left:auto; flex-direction:row-reverse; }
+.dm .bub { background:#fff; border:1px solid var(--cmty-line); border-radius:16px; padding:9px 13px; }
+.dm.own .bub { background:var(--cmty-red-soft); border-color:#F6D6D6; }
+.dm .nm { font-size:11px; font-weight:800; color:var(--cmty-red); margin-bottom:2px; }
+.dm .tx { font-size:14px; line-height:1.5; color:#222; white-space:pre-wrap; word-break:break-word; }
+.dm .tm { font-size:10.5px; color:#b0a89f; margin-top:3px; text-align:right; }
+.dm .ims { display:grid; gap:5px; margin-top:7px; grid-template-columns:repeat(2,1fr); }
+.dm .ims.one { grid-template-columns:1fr; }
+.dm .ims img { width:100%; height:130px; object-fit:cover; border-radius:9px; cursor:pointer; }
+.cv-composer { border-top:1px solid var(--cmty-line); padding:12px 16px; background:#fff; }
+.cv-prev { display:flex; gap:7px; margin-bottom:8px; flex-wrap:wrap; }
+.cv-prev .pv { position:relative; }
+.cv-prev img { width:56px; height:56px; object-fit:cover; border-radius:10px; border:1px solid var(--cmty-line); }
+.cv-prev .pv button { position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; border:none; background:#1A1A1A; color:#fff; font-size:12px; cursor:pointer; }
+.cv-row { display:flex; align-items:flex-end; gap:8px; }
+.cv-ic { width:42px; height:42px; flex-shrink:0; border:1px solid var(--cmty-line); background:#fff; border-radius:13px; font-size:18px; color:#777; cursor:pointer; }
+.cv-ta { flex:1; border:1px solid var(--cmty-line); border-radius:16px; padding:11px 15px; font-family:'Nunito',sans-serif; font-size:14px; resize:none; max-height:130px; outline:none; }
+.cv-ta:focus { border-color:var(--cmty-red); }
+.cv-send { width:46px; height:46px; flex-shrink:0; border:none; border-radius:14px; background:var(--cmty-red); color:#fff; font-size:18px; cursor:pointer; }
+.cv-send:disabled { opacity:.45; cursor:not-allowed; }
+.cv-lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:9999; align-items:center; justify-content:center; padding:30px; }
+.cv-lightbox.open { display:flex; }
+.cv-lightbox img { max-width:100%; max-height:100%; border-radius:12px; }
+@media (max-width:680px){ .cv-shell { height:calc(100vh - 90px); } .dm { max-width:90%; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cv-wrap">
+  <div class="cv-shell"
+       data-feed="{{ feed_url }}" data-post="{{ post_url }}" data-last="{{ last_id }}">
+    <header class="cv-head">
+      {% if back_url %}<a href="{{ back_url }}" class="cv-back" title="Retour">‹</a>{% endif %}
+      <span class="cv-av">{% if is_admin_view %}{{ peer_name|slice:":1"|upper }}{% else %}H{% endif %}</span>
+      <div>
+        <h1>{{ peer_name }}</h1>
+        <p>{% if is_admin_view %}Conversation client{% else %}Nous répondons au plus vite 💬{% endif %}</p>
+      </div>
+    </header>
+
+    <div class="cv-feed" id="cvFeed">
+      <div class="cv-intro" id="cvIntro" style="display:none;">
+        <div class="ic">📨</div>
+        <p>{% if is_admin_view %}Aucun message dans cette conversation.{% else %}Bonjour&nbsp;! Posez votre question, l'équipe Hayiti's vous répondra ici.{% endif %}</p>
+      </div>
+    </div>
+
+    <div class="cv-composer">
+      {% csrf_token %}
+      <div class="cv-prev" id="cvPrev"></div>
+      <form id="cvForm">
+        <div class="cv-row">
+          <button type="button" class="cv-ic" id="cvImgBtn" title="Joindre une image">📷</button>
+          <input type="file" id="cvFiles" accept="image/*" multiple hidden>
+          <textarea class="cv-ta" id="cvText" rows="1" placeholder="Écrivez votre message…" maxlength="2000"></textarea>
+          <button type="submit" class="cv-send" id="cvSend" disabled>➤</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="cv-lightbox" id="cvLightbox"><img src="" alt=""></div>
+{{ initial_messages|json_script:"cv-initial" }}
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const shell = document.querySelector('.cv-shell');
+  if (!shell) return;
+  const FEED = shell.dataset.feed, POST = shell.dataset.post;
+  let lastId = parseInt(shell.dataset.last || '0', 10);
+  const feed = document.getElementById('cvFeed');
+  const intro = document.getElementById('cvIntro');
+
+  function csrf() { const e = document.querySelector('[name=csrfmiddlewaretoken]'); return e ? e.value : ''; }
+  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+  function fmt(iso) { const d = new Date(iso); return d.toLocaleString('fr-FR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }); }
+  function nearBottom() { return feed.scrollHeight - feed.scrollTop - feed.clientHeight < 120; }
+  function toBottom() { feed.scrollTop = feed.scrollHeight; }
+
+  function render(m) {
+    const el = document.createElement('div');
+    el.className = 'dm' + (m.is_own ? ' own' : '');
+    el.dataset.id = m.id;
+    let imgs = '';
+    if (m.attachments && m.attachments.length) {
+      imgs = `<div class="ims ${m.attachments.length === 1 ? 'one' : ''}">` + m.attachments.map(u => `<img src="${u}" class="cv-img">`).join('') + `</div>`;
+    }
+    const nm = m.is_own ? '' : `<div class="nm">${esc(m.sender)}</div>`;
+    const tx = m.content ? `<div class="tx">${esc(m.content)}</div>` : '';
+    el.innerHTML = `<div class="bub">${nm}${tx}${imgs}<div class="tm">${fmt(m.created_at)}</div></div>`;
+    return el;
+  }
+  function append(list) {
+    const stick = nearBottom();
+    list.forEach(m => {
+      if (feed.querySelector(`.dm[data-id="${m.id}"]`)) return;
+      feed.appendChild(render(m));
+      if (m.id > lastId) lastId = m.id;
+    });
+    if (stick) toBottom();
+  }
+
+  const initial = JSON.parse(document.getElementById('cv-initial').textContent);
+  if (!initial.length) intro.style.display = 'block'; else { append(initial); toBottom(); }
+
+  async function poll() {
+    try {
+      const r = await fetch(`${FEED}?after=${lastId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+      if (!r.ok) return;
+      const d = await r.json();
+      if (d.messages && d.messages.length) { intro.style.display = 'none'; append(d.messages); }
+    } catch (e) {}
+  }
+  let timer = setInterval(() => { if (!document.hidden) poll(); }, 4000);
+
+  feed.addEventListener('click', (e) => {
+    if (e.target.classList.contains('cv-img')) {
+      const lb = document.getElementById('cvLightbox'); lb.querySelector('img').src = e.target.src; lb.classList.add('open');
+    }
+  });
+  document.getElementById('cvLightbox').addEventListener('click', function () { this.classList.remove('open'); });
+
+  // composer
+  const form = document.getElementById('cvForm');
+  const ta = document.getElementById('cvText');
+  const sendBtn = document.getElementById('cvSend');
+  const filesInput = document.getElementById('cvFiles');
+  const prev = document.getElementById('cvPrev');
+  let files = [];
+  function refresh() { sendBtn.disabled = !(ta.value.trim() || files.length); }
+  ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 130) + 'px'; refresh(); });
+  ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
+  document.getElementById('cvImgBtn').addEventListener('click', () => filesInput.click());
+  filesInput.addEventListener('change', () => {
+    for (const f of filesInput.files) {
+      if (files.length >= 4) break;
+      if (!f.type.startsWith('image/') || f.size === 0 || f.size > 5*1024*1024) continue;
+      files.push(f);
+    }
+    filesInput.value = ''; renderPrev();
+  });
+  function renderPrev() {
+    prev.innerHTML = '';
+    files.forEach((f, i) => {
+      const d = document.createElement('div'); d.className = 'pv';
+      d.innerHTML = `<img src="${URL.createObjectURL(f)}"><button type="button" data-i="${i}">✕</button>`;
+      prev.appendChild(d);
+    });
+    refresh();
+  }
+  prev.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { files.splice(+e.target.dataset.i, 1); renderPrev(); } });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (sendBtn.disabled) return;
+    sendBtn.disabled = true;
+    const fd = new FormData();
+    fd.append('content', ta.value.trim());
+    files.forEach(f => fd.append('images', f));
+    try {
+      const r = await fetch(POST, { method: 'POST', headers: { 'X-CSRFToken': csrf() }, body: fd });
+      const d = await r.json();
+      if (!r.ok) { alert(d.error || 'Erreur'); sendBtn.disabled = false; return; }
+      intro.style.display = 'none';
+      append([d.message]); toBottom();
+      ta.value = ''; ta.style.height = 'auto'; files = []; renderPrev();
+    } catch (e) { sendBtn.disabled = false; }
+  });
+})();
+</script>
+{% endblock %}

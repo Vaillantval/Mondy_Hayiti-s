@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Messagerie clients · Hayiti's{% endblock %}
+
+{% block styles %}
+<style>
+.ib-wrap { max-width:820px; margin:24px auto 60px; padding:0 14px; }
+.ib-card { background:#fff; border:1px solid #EDE0D8; border-radius:20px; overflow:hidden; }
+.ib-head { padding:18px 20px 14px; border-bottom:1px solid #EDE0D8; }
+.ib-head h1 { font-family:'Playfair Display',serif; font-size:24px; margin:0; }
+.ib-head p { margin:3px 0 0; color:#8a8a8a; font-size:13px; }
+.ib-search { margin-top:12px; display:flex; gap:8px; }
+.ib-search input { flex:1; border:1px solid #EDE0D8; border-radius:11px; padding:9px 13px; font-size:13.5px; outline:none; }
+.ib-search input:focus { border-color:#C62828; }
+.ib-search button { border:none; background:#C62828; color:#fff; border-radius:11px; padding:0 16px; font-weight:800; cursor:pointer; }
+.ib-row { display:flex; align-items:center; gap:13px; padding:14px 20px; border-bottom:1px solid #F4ece6; text-decoration:none; color:#1A1A1A; }
+.ib-row:hover { background:#FFF8F0; color:#1A1A1A; }
+.ib-av { width:46px; height:46px; flex-shrink:0; border-radius:50%; background:#1A1A1A; color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:17px; }
+.ib-row.unread .ib-av { background:#C62828; }
+.ib-meta { flex:1; min-width:0; }
+.ib-name { font-weight:800; font-size:14.5px; }
+.ib-last { font-size:12.5px; color:#9a9a9a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ib-row.unread .ib-last { color:#444; font-weight:600; }
+.ib-right { text-align:right; flex-shrink:0; }
+.ib-time { font-size:11px; color:#b0a89f; }
+.ib-badge { display:inline-block; margin-top:5px; background:#C62828; color:#fff; font-size:11px; font-weight:800; padding:1px 8px; border-radius:11px; }
+.ib-empty { padding:50px 20px; text-align:center; color:#b0a89f; }
+.ib-empty .ic { font-size:46px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ib-wrap">
+  <div class="ib-card">
+    <div class="ib-head">
+      <h1>📨 Messagerie clients</h1>
+      <p>Toutes les conversations privées avec vos clients.</p>
+      <form class="ib-search" method="get">
+        <input type="text" name="q" value="{{ q }}" placeholder="Rechercher un client…">
+        <button type="submit">Rechercher</button>
+      </form>
+    </div>
+
+    {% for c in conversations %}
+    <a class="ib-row {% if c.unread %}unread{% endif %}" href="{% url 'community:inbox_conversation' c.id %}">
+      <span class="ib-av">{{ c.client|slice:":1"|upper }}</span>
+      <span class="ib-meta">
+        <div class="ib-name">{{ c.client }}</div>
+        <div class="ib-last">{% if c.from_admin %}<span style="color:#C62828;">Vous :</span> {% endif %}{{ c.last }}</div>
+      </span>
+      <span class="ib-right">
+        <div class="ib-time">{{ c.last_at|date:"d M · H:i" }}</div>
+        {% if c.unread %}<span class="ib-badge">{{ c.unread }}</span>{% endif %}
+      </span>
+    </a>
+    {% empty %}
+    <div class="ib-empty"><div class="ic">📭</div><p>Aucune conversation pour le moment.</p></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

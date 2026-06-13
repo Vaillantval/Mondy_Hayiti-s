@@ -231,10 +231,12 @@ class Notification(models.Model):
     TYPE_REPLY = "reply"
     TYPE_MENTION = "mention"
     TYPE_CHANNEL = "channel_message"
+    TYPE_SUPPORT = "support"
     TYPE_CHOICES = [
         (TYPE_REPLY, "Réponse à votre message"),
         (TYPE_MENTION, "Mention"),
         (TYPE_CHANNEL, "Nouveau message dans un salon suivi"),
+        (TYPE_SUPPORT, "Message du support"),
     ]
 
     recipient = models.ForeignKey(
@@ -249,6 +251,9 @@ class Notification(models.Model):
     )
     message = models.ForeignKey(
         Message, on_delete=models.CASCADE, null=True, blank=True, related_name="+"
+    )
+    conversation = models.ForeignKey(
+        "Conversation", on_delete=models.CASCADE, null=True, blank=True, related_name="+"
     )
     count = models.PositiveIntegerField(default=1)
     is_read = models.BooleanField(default=False)
@@ -284,3 +289,65 @@ class WebPushToken(models.Model):
 
     def __str__(self):
         return f"WebPush {self.user_id} ({self.token[:12]}…)"
+
+
+class Conversation(models.Model):
+    """Fil de support privé entre un client et l'équipe admin (inbox partagée).
+
+    Un seul fil par client : n'importe quel admin le voit et y répond au nom de
+    l'équipe.
+    """
+
+    client = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="support_conversation"
+    )
+    is_archived = models.BooleanField(default=False)
+    last_message_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-last_message_at", "-created_at"]
+        verbose_name = "Conversation support"
+        verbose_name_plural = "Conversations support"
+
+    def __str__(self):
+        return f"Support · {self.client.username}"
+
+
+class DirectMessage(models.Model):
+    conversation = models.ForeignKey(
+        Conversation, on_delete=models.CASCADE, related_name="messages"
+    )
+    sender = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="support_messages",
+    )
+    is_admin = models.BooleanField(
+        default=False, help_text="Message envoyé par l'équipe (admin) plutôt que le client."
+    )
+    content = models.TextField(blank=True, default="")
+    read_by_client = models.BooleanField(default=False)
+    read_by_admin = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        indexes = [models.Index(fields=["conversation", "created_at"])]
+        verbose_name = "Message support"
+        verbose_name_plural = "Messages support"
+
+    def __str__(self):
+        who = "Équipe" if self.is_admin else "Client"
+        return f"[{self.conversation_id}] {who}: {self.content[:30]}"
+
+
+class DirectMessageAttachment(models.Model):
+    message = models.ForeignKey(
+        DirectMessage, on_delete=models.CASCADE, related_name="attachments"
+    )
+    image = models.ImageField(upload_to="community/support/%Y/%m/%d/")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"SupportAttachment #{self.id} (message {self.message_id})"

@@ -13,7 +13,9 @@ from shop.templatetags.price_filters import _format, _get_rate, _get_setting
 from . import permissions as perm
 from .models import (
     Channel,
+    ChannelMute,
     ChannelSubscription,
+    CommunityBan,
     Message,
     MessageAttachment,
     MessageReaction,
@@ -296,10 +298,21 @@ def product_search(request):
 # ── Notifications ───────────────────────────────────────────────────────────
 def serialize_notification(n):
     actor = _author_label(n.actor) if n.actor else "Quelqu'un"
+    emoji = n.channel.emoji if n.channel else "🔔"
+    url = f"/community/c/{n.channel.slug}/" if n.channel else "/community/"
+
     if n.type == Notification.TYPE_REPLY:
         text = f"{actor} a répondu à votre message"
     elif n.type == Notification.TYPE_MENTION:
         text = f"{actor} vous a mentionné"
+    elif n.type == Notification.TYPE_SUPPORT:
+        emoji = "📨"
+        if n.recipient.is_staff:
+            text = f"{actor} vous a écrit (support)"
+            url = f"/community/inbox/{n.conversation_id}/" if n.conversation_id else "/community/inbox/"
+        else:
+            text = "L'équipe Hayiti's vous a répondu"
+            url = "/community/support/"
     else:
         plural = "s" if n.count > 1 else ""
         text = f"{n.count} nouveau{plural} message{plural} dans {n.channel.name if n.channel else 'un salon'}"
@@ -309,12 +322,10 @@ def serialize_notification(n):
         "text": text,
         "channel": n.channel.slug if n.channel else None,
         "channel_name": n.channel.name if n.channel else None,
-        "emoji": n.channel.emoji if n.channel else "🔔",
+        "emoji": emoji,
         "count": n.count,
         "is_read": n.is_read,
-        "url": (
-            f"/community/c/{n.channel.slug}/" if n.channel else "/community/"
-        ),
+        "url": url,
         "created_at": n.updated_at.isoformat(),
     }
 
@@ -375,6 +386,93 @@ def push_unsubscribe(request):
     if token:
         WebPushToken.objects.filter(token=token, user=request.user).delete()
     return JsonResponse({"ok": True})
+
+
+# ── Modération in-UI (staff) ────────────────────────────────────────────────
+@login_required
+@require_POST
+def ban_author(request, message_id):
+    if not request.user.is_staff:
+        return JsonResponse({"error": "forbidden"}, status=403)
+    msg = get_object_or_404(Message, id=message_id)
+    if not msg.author_id or msg.author.is_staff:
+        return JsonResponse({"error": "Action impossible sur cet utilisateur."}, status=400)
+    ban, created = CommunityBan.objects.get_or_create(
+        user=msg.author,
+        defaults={"is_active": True, "created_by": request.user, "reason": "Banni depuis la communauté"},
+    )
+    if not created:
+        ban.is_active = not ban.is_active
+        ban.save(update_fields=["is_active"])
+    return JsonResponse({"ok": True, "banned": ban.is_active, "user": msg.author.username})
+
+
+@login_required
+@require_POST
+def mute_author(request, message_id):
+    if not request.user.is_staff:
+        return JsonResponse({"error": "forbidden"}, status=403)
+    msg = get_object_or_404(Message, id=message_id)
+    if not msg.author_id or msg.author.is_staff:
+        return JsonResponse({"error": "Action impossible sur cet utilisateur."}, status=400)
+    mute = ChannelMute.objects.filter(channel=msg.channel, user=msg.author).first()
+    if mute:
+        mute.delete()
+        muted = False
+    else:
+        ChannelMute.objects.create(channel=msg.channel, user=msg.author, created_by=request.user)
+        muted = True
+    return JsonResponse({"ok": True, "muted": muted, "user": msg.author.username})
+
+
+@login_required
+@require_POST
+def lock_channel(request, slug):
+    if not request.user.is_staff:
+        return JsonResponse({"error": "forbidden"}, status=403)
+    ch = get_object_or_404(Channel, slug=slug)
+    order = [Channel.WRITE_OPEN, Channel.WRITE_LOCKED, Channel.WRITE_ADMINS]
+    i = order.index(ch.write_access) if ch.write_access in order else 0
+    ch.write_access = order[(i + 1) % len(order)]
+    ch.save(update_fields=["write_access", "updated_at"])
+    return JsonResponse({"ok": True, "write_access": ch.write_access, "label": ch.get_write_access_display()})
+
+
+@login_required
+def manage_channels(request):
+    if not request.user.is_staff:
+        return redirect("community:home")
+    return render(request, "community/manage_channels.html", {
+        "channels": Channel.objects.all(),
+        "read_choices": Channel.READ_CHOICES,
+        "write_choices": Channel.WRITE_CHOICES,
+    })
+
+
+@login_required
+@require_POST
+def channel_save(request):
+    if not request.user.is_staff:
+        return redirect("community:home")
+    name = (request.POST.get("name") or "").strip()
+    if not name:
+        return redirect("community:manage_channels")
+    read_vals = {c[0] for c in Channel.READ_CHOICES}
+    write_vals = {c[0] for c in Channel.WRITE_CHOICES}
+    fields = {
+        "name": name,
+        "emoji": (request.POST.get("emoji") or "💬")[:8],
+        "description": (request.POST.get("description") or "")[:160],
+        "read_access": request.POST.get("read_access") if request.POST.get("read_access") in read_vals else Channel.READ_PUBLIC,
+        "write_access": request.POST.get("write_access") if request.POST.get("write_access") in write_vals else Channel.WRITE_OPEN,
+        "is_active": request.POST.get("is_active") == "1",
+    }
+    cid = request.POST.get("id")
+    if cid:
+        Channel.objects.filter(id=cid).update(**fields)
+    else:
+        Channel.objects.create(**fields)
+    return redirect("community:manage_channels")
 
 
 @require_GET
