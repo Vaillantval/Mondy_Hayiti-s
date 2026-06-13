@@ -102,13 +102,15 @@ dépôt) et internationales (Stripe / carte bancaire).
 
 - Espace communautaire en plusieurs salons thématiques (type groupe WhatsApp / Discord)
 - Lecture publique configurable par salon, écriture réservée aux membres connectés
-- Messages avec images (jusqu'à 4), réponses, et **tag d'un produit** directement dans le fil
+- Messages avec images (jusqu'à 4), réponses, **tag d'un produit**, **mentions @** et sélecteur d'emojis
 - Réactions emoji et épinglage de messages
+- Suivi de salon (auto-abonnement) et **notifications** in-app (cloche) + **push** (mobile FCM / Web Push)
 - Mise à jour quasi temps réel par polling (sans WebSocket, compatible WSGI)
-- Modération admin : bannissement global d'un membre, mute par salon, verrouillage de
-  salon (lecture seule ou admins uniquement), suppression de messages
-- Notification push (FCM) des admins à chaque nouveau message de membre
-- Disponible côté web et via l'API REST (app mobile)
+- **Messagerie privée « Contacter un admin »** : conversation 1-to-1 client ↔ équipe
+  (inbox partagée côté admin, bouton flottant animé côté client)
+- Modération directement dans l'UI (pas seulement l'admin Django) : bannissement global,
+  mute par salon, verrouillage de salon, suppression / épingle, gestion des salons
+- Expérience mobile dédiée (chat plein écran) et **API REST complète** pour l'app Android
 
 ---
 
@@ -417,14 +419,22 @@ Authorization: Bearer <access_token>
 
 | Méthode | Endpoint                                      | Description                              |
 |---------|-----------------------------------------------|------------------------------------------|
-| GET     | `/api/community/channels/`                    | Salons lisibles par l'utilisateur        |
-| GET     | `/api/community/channels/{slug}/messages/`    | Messages d'un salon (polling `?after=`)  |
-| POST    | `/api/community/channels/{slug}/messages/`    | Publier un message (texte, image, tag produit) |
+| GET     | `/api/community/channels/`                    | Salons lisibles (+ `can_write`, `is_following`) |
+| GET/POST| `/api/community/channels/{slug}/messages/`    | Lire (polling `?after=`) / publier (texte, image, tag produit, réponse) |
+| POST    | `/api/community/channels/{slug}/subscribe/`   | Suivre / ne plus suivre un salon         |
 | POST    | `/api/community/messages/{id}/react/`         | Réagir à un message (toggle emoji)       |
 | DELETE  | `/api/community/messages/{id}/`               | Supprimer un message (auteur ou admin)   |
-| POST    | `/api/community/messages/{id}/`               | Épingler / désépingler (admin)           |
+| GET     | `/api/community/users/search/?q=`             | Recherche d'utilisateurs (@mention)      |
+| GET/POST| `/api/community/notifications/`               | Notifications + non-lus / marquer lu     |
+| GET/POST| `/api/community/support/messages/`            | Ma conversation avec le support          |
+| GET     | `/api/community/support/inbox/`               | Inbox des conversations clients (admin)  |
+| GET/POST| `/api/community/support/inbox/{id}/messages/` | Conversation d'un client (admin)         |
+| POST    | `/api/community/messages/{id}/ban-author/`    | Bannir l'auteur (admin)                  |
+| POST    | `/api/community/messages/{id}/mute-author/`   | Mute l'auteur dans ce salon (admin)      |
+| POST    | `/api/community/channels/{slug}/lock/`        | Verrouiller / cycler l'accès (admin)     |
+| GET/POST/PATCH | `/api/community/manage/channels/`      | Gérer les salons (admin)                 |
 
-> Détails complets (payloads, polling, modération) dans [`API.md`](API.md#communauté--apicommunity).
+> Détails complets (payloads, polling, modération, support, notifications) dans [`API.md`](API.md#communauté--apicommunity).
 
 ---
 
@@ -566,6 +576,7 @@ L'interface d'administration Django (`/admin/`) permet de gérer l'ensemble de l
 | **Pages / FAQ**          | Contenu éditorial statique                                            |
 | **Messages contact**     | Messages reçus via le formulaire de contact                           |
 | **Communauté**           | Salons, messages, réactions ; modération : bannissement, mute par salon, verrouillage, suppression et épingle |
+| **Messagerie support**   | Inbox partagée des conversations privées clients ↔ équipe (web `/community/inbox/` ou API) |
 
 ### Gestion des taux de change
 

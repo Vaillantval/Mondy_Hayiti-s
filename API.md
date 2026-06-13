@@ -212,14 +212,45 @@ Espace communautaire type « groupe » : plusieurs salons thématiques, lecture 
 (selon le salon), écriture réservée aux membres connectés, modération admin, tag produit,
 images et réactions. La mise à jour temps réel se fait par **polling** (`?after=`).
 
+**Salons & messages**
+
 | Méthode | Endpoint | Auth | Description |
 |---------|----------|------|-------------|
-| GET | `/community/channels/` | Public* | Liste des salons lisibles par l'appelant |
+| GET | `/community/channels/` | Public* | Liste des salons lisibles (+ `can_write`, `is_following`) |
 | GET | `/community/channels/{slug}/messages/` | Public* | Messages d'un salon (polling / historique) |
 | POST | `/community/channels/{slug}/messages/` | Requis + écriture | Publier un message (multipart) |
+| POST | `/community/channels/{slug}/subscribe/` | Requis | Suivre / ne plus suivre un salon (toggle) |
 | POST | `/community/messages/{id}/react/` | Requis | Réagir à un message (toggle) |
 | DELETE | `/community/messages/{id}/` | Propriétaire ou admin | Supprimer un message (suppression douce) |
 | POST | `/community/messages/{id}/` | Admin | Épingler / désépingler un message |
+| GET | `/community/users/search/?q=` | Requis | Rechercher des utilisateurs (autocomplete @mention) |
+
+**Notifications**
+
+| Méthode | Endpoint | Auth | Description |
+|---------|----------|------|-------------|
+| GET | `/community/notifications/` | Requis | Mes notifications + nombre de non-lus |
+| POST | `/community/notifications/` | Requis | Marquer comme lues (toutes, ou `id` précis) |
+
+**Support privé (client ↔ équipe admin)**
+
+| Méthode | Endpoint | Auth | Description |
+|---------|----------|------|-------------|
+| GET | `/community/support/messages/` | Requis | Ma conversation avec le support (polling) |
+| POST | `/community/support/messages/` | Requis (client) | Envoyer un message au support (multipart) |
+| GET | `/community/support/inbox/` | Admin | Liste des conversations clients |
+| GET | `/community/support/inbox/{id}/messages/` | Admin | Messages d'une conversation |
+| POST | `/community/support/inbox/{id}/messages/` | Admin | Répondre au client (multipart) |
+
+**Modération (admin — `is_staff`)**
+
+| Méthode | Endpoint | Auth | Description |
+|---------|----------|------|-------------|
+| POST | `/community/messages/{id}/ban-author/` | Admin | Bannir / débannir l'auteur (toggle) |
+| POST | `/community/messages/{id}/mute-author/` | Admin | Mute / unmute l'auteur dans ce salon (toggle) |
+| POST | `/community/channels/{slug}/lock/` | Admin | Cycle d'accès écriture (ouvert → verrouillé → admins) |
+| GET / POST | `/community/manage/channels/` | Admin | Lister tous les salons / créer un salon |
+| PATCH | `/community/manage/channels/{slug}/` | Admin | Modifier un salon |
 
 > \* « Public » dépend de l'`read_access` du salon. Un salon `public` est lisible sans
 > token ; `authenticated` exige un token ; `closed` est réservé aux admins.
@@ -307,25 +338,92 @@ L'action est un **toggle** : un second appel avec le même émoji retire la réa
   "description": "Discussions ouvertes de la communauté.",
   "emoji": "💬", "color": "#C62828", "image": null,
   "read_access": "public", "write_access": "open",
-  "can_write": true
+  "can_write": true, "is_following": false
 }
 ```
 
-`can_write` est calculé pour l'appelant (false si non connecté, banni, mute, ou salon
-verrouillé). Utilise-le pour activer/désactiver le champ de saisie côté mobile.
+- `can_write` — false si non connecté, banni, mute, ou salon verrouillé. À utiliser pour activer/désactiver le champ de saisie.
+- `is_following` — l'appelant suit-il ce salon (état du bouton 🔔). Bascule via `subscribe/`.
 
-### Modération
+### Suivre un salon & mentions
 
-La modération est gérée côté admin (interface Django ou `is_staff`) :
+```
+POST /api/community/channels/general/subscribe/
+→ { "success": true, "following": true }   // toggle
 
-- **Bannissement global** d'un membre (écriture, et lecture si configuré).
-- **Mute par salon** : empêche un membre précis d'écrire dans un salon donné.
-- **Verrouillage de salon** (`write_access = locked`) : lecture seule pour tous.
-- **Salon admins** (`write_access = admins`) : seuls les admins publient.
-- **Suppression / épingle** de messages.
+GET /api/community/users/search/?q=mar
+→ { "success": true, "results": [ { "id": 12, "username": "marie", "name": "Marie L." } ] }
+```
 
-Une tentative d'écriture refusée renvoie `403` avec `error.code = PERMISSION_DENIED`
-et un `message` explicite (« Vous avez été banni… », « Ce salon est en lecture seule… »).
+On suit automatiquement un salon dès qu'on y poste. Mentionner quelqu'un = écrire
+`@username` dans le `content` (résolu côté serveur, déclenche une notification).
+
+### Notifications
+
+```
+GET /api/community/notifications/
+→ {
+    "success": true,
+    "unread": 3,
+    "results": [
+      { "id": 90, "type": "mention", "text": "Marie L. vous a mentionné",
+        "url": "/community/c/general/", "emoji": "🔔", "count": 1,
+        "is_read": false, "created_at": "..." },
+      { "id": 88, "type": "support", "text": "L'équipe Hayiti's vous a répondu", ... }
+    ]
+  }
+
+POST /api/community/notifications/          // marquer tout lu
+POST /api/community/notifications/ { "id": 90 }   // marquer une seule
+```
+
+`type` ∈ `reply` · `mention` · `channel_message` · `support`. Utile pour router
+l'utilisateur (deep-link) à l'ouverture.
+
+### Support privé
+
+Conversation 1-to-1 entre un client et **l'équipe** (inbox partagée : n'importe quel
+admin répond). Même moteur que le chat (polling `?after=`, images multipart).
+
+```
+# Client
+GET  /api/community/support/messages/                 → { success, results:[…], last_id }
+POST /api/community/support/messages/  (multipart)    content, images[]
+
+# Admin
+GET  /api/community/support/inbox/
+  → { success, results:[ { id, client, unread, last, last_at } ] }
+GET  /api/community/support/inbox/42/messages/        → messages de la conversation 42
+POST /api/community/support/inbox/42/messages/  (multipart)   → répond au client
+```
+
+Objet message support : `{ id, is_admin, sender, content, attachments[], created_at, is_own }`.
+
+### Modération (admin)
+
+```
+POST /api/community/messages/1247/ban-author/   → { success, banned: true,  user: "bob" }
+POST /api/community/messages/1247/mute-author/  → { success, muted: true,   user: "bob" }
+POST /api/community/channels/general/lock/      → { success, write_access: "locked", label: "Verrouillé — lecture seule" }
+
+GET  /api/community/manage/channels/            → liste complète (salons inactifs inclus)
+POST /api/community/manage/channels/            { name, emoji, description, read_access, write_access, is_active }
+PATCH /api/community/manage/channels/general/   { write_access: "admins" }
+```
+
+Tous ces endpoints exigent `is_staff` (sinon `403 PERMISSION_DENIED`). `ban` et `mute`
+sont des **toggles**. Une écriture refusée pour un membre renvoie `403` avec un
+`message` explicite (« Vous avez été banni… », « Ce salon est en lecture seule… »).
+
+### Notifications push (FCM)
+
+L'app enregistre son token via `POST /api/auth/fcm-token/`. Les notifications
+communauté/support sont envoyées avec un `data` exploitable pour le deep-linking :
+
+```json
+{ "type": "mention", "channel": "general", "message_id": "1247" }
+{ "type": "support", "conversation": "42" }
+```
 
 ---
 
