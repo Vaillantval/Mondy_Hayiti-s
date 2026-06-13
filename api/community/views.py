@@ -115,6 +115,8 @@ class ChannelMessagesView(APIView):
         if len(content) > 2000:
             raise ApiError("VALIDATION_ERROR", "Message trop long (2000 caractères max).")
         for f in images:
+            if f.size == 0:
+                raise ApiError("VALIDATION_ERROR", "Image vide (0 octet). Choisissez un fichier valide.")
             if f.size > MAX_IMAGE_SIZE:
                 raise ApiError("VALIDATION_ERROR", "Image trop lourde (5 Mo max).")
             if f.content_type not in ALLOWED_IMAGE_TYPES:

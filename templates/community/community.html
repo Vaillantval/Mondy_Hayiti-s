@@ -518,7 +518,13 @@
 
     document.getElementById('cmtyImgBtn').addEventListener('click', () => filesInput.click());
     filesInput.addEventListener('change', () => {
-      for (const f of filesInput.files) { if (files.length < 4) files.push(f); }
+      for (const f of filesInput.files) {
+        if (files.length >= 4) { toast('4 images maximum.'); break; }
+        if (!f.type.startsWith('image/')) { toast(`« ${f.name} » n'est pas une image.`); continue; }
+        if (f.size === 0) { toast(`« ${f.name} » est vide (0 octet) et a été ignorée.`); continue; }
+        if (f.size > 5 * 1024 * 1024) { toast(`« ${f.name} » dépasse 5 Mo.`); continue; }
+        files.push(f);
+      }
       filesInput.value = ''; renderPreviews();
     });
     function renderPreviews() {

@@ -188,6 +188,8 @@ def post_message(request, slug):
         return JsonResponse({"error": "Message trop long (2000 caractères max)."}, status=400)
 
     for f in images:
+        if f.size == 0:
+            return JsonResponse({"error": "Image vide (0 octet). Choisissez un fichier valide."}, status=400)
         if f.size > MAX_IMAGE_SIZE:
             return JsonResponse({"error": "Image trop lourde (5 Mo max)."}, status=400)
         if f.content_type not in ALLOWED_IMAGE_TYPES:
