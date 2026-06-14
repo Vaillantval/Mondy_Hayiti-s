@@ -323,20 +323,34 @@ class SupportInboxView(APIView):
     """Liste des conversations (admins)."""
     permission_classes = [IsAdminUser]
 
-    @extend_schema(tags=TAG, summary="Inbox support — liste des conversations (admin)")
+    @extend_schema(
+        tags=TAG,
+        parameters=[OpenApiParameter("q", str, description="Recherche par nom de client")],
+        summary="Inbox support — liste des conversations (admin)",
+    )
     def get(self, request):
         from django.db.models import Count, Q
+        q = (request.query_params.get("q") or "").strip()
         convs = (
             Conversation.objects.select_related("client")
             .annotate(unread=Count("messages", filter=Q(messages__is_admin=False, messages__read_by_admin=False)))
             .filter(last_message_at__isnull=False)
+            .order_by("-last_message_at")
         )
+        if q:
+            convs = convs.filter(
+                Q(client__username__icontains=q)
+                | Q(client__first_name__icontains=q)
+                | Q(client__last_name__icontains=q)
+            )
         results = []
         for c in convs:
             last = c.messages.order_by("-created_at").first()
             results.append({
-                "id": c.id, "client": _author_label(c.client), "unread": c.unread,
-                "last": (last.content[:60] if last and last.content else ("📷 image" if last else "")),
+                "id": c.id,
+                "client_name": _author_label(c.client),
+                "unread_count": c.unread,
+                "last_message": (last.content[:60] if last and last.content else ("📷 image" if last else "")),
                 "last_at": c.last_message_at.isoformat() if c.last_message_at else None,
             })
         return Response({"success": True, "results": results})

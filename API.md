@@ -418,8 +418,8 @@ GET  /api/community/support/messages/                 → { success, results:[�
 POST /api/community/support/messages/  (multipart)    content, images[]
 
 # Admin
-GET  /api/community/support/inbox/
-  → { success, results:[ { id, client, unread, last, last_at } ] }
+GET  /api/community/support/inbox/?q=marie
+  → { success, results:[ { id, client_name, unread_count, last_message, last_at } ] }
 GET  /api/community/support/inbox/42/messages/        → messages de la conversation 42
 POST /api/community/support/inbox/42/messages/  (multipart)   → répond au client
 ```
