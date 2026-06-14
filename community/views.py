@@ -320,6 +320,8 @@ def serialize_notification(n):
         "id": n.id,
         "type": n.type,
         "text": text,
+        "message": text,           # alias attendu par l'app mobile
+        "actor_name": actor,       # nom de l'acteur (sous-titre mobile)
         "channel": n.channel.slug if n.channel else None,
         "channel_name": n.channel.name if n.channel else None,
         "emoji": emoji,
