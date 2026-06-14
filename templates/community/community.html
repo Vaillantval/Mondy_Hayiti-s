@@ -151,15 +151,56 @@
 .cmty-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1A1A1A; color:#fff; padding:11px 20px; border-radius:30px; font-size:13.5px; z-index:9999; opacity:0; transition:opacity .2s; }
 .cmty-toast.show { opacity:1; }
 
+/* Bouton "Voir les salons" (mobile uniquement) */
+.cmty-salons-toggle { display:none; align-items:center; gap:7px; border:1px solid var(--cmty-line); background:#fff; border-radius:20px; padding:6px 12px; font-weight:800; font-size:13px; color:#1A1A1A; cursor:pointer; max-width:64%; min-width:0; position:relative; }
+.cmty-salons-toggle .cst-emoji { font-size:16px; line-height:1; }
+.cmty-salons-toggle .cst-name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cmty-salons-toggle .cst-caret { color:var(--cmty-red); transition:transform .25s; }
+.cmty-shell.salons-open .cmty-salons-toggle .cst-caret { transform:rotate(180deg); }
+@keyframes salonsNudge { 0%,86%,100%{box-shadow:0 0 0 0 rgba(198,40,40,0);} 43%{box-shadow:0 0 0 6px rgba(198,40,40,.13);} }
+
 @media (max-width:860px) {
-  .cmty-shell { flex-direction:column; }
-  .cmty-side { width:100%; position:static; }
-  .cmty-chan-list { display:flex; overflow-x:auto; padding:10px; }
+  .cmty-wrap { max-width:100%; overflow-x:hidden; }
+  .cmty-shell { flex-direction:column; gap:0; }
+
+  /* Liste des salons → drawer déroulant (caché par défaut) */
+  .cmty-side { width:100%; position:static; border:none; border-bottom:1px solid var(--cmty-line); border-radius:0;
+               max-height:0; overflow:hidden; transition:max-height .32s ease; }
+  .cmty-shell.salons-open .cmty-side { max-height:210px; }
+  .cmty-side-head { display:none; }
+  .cmty-staff-box { flex-direction:row; overflow-x:auto; border-bottom:none; }
+  .cmty-staff-box a { white-space:nowrap; }
+  .cmty-chan-list { display:flex; overflow-x:auto; padding:10px; -webkit-overflow-scrolling:touch; }
   .cmty-chan { flex-direction:column; min-width:78px; text-align:center; gap:5px; padding:8px; }
   .cmty-chan .cm-desc, .cmty-chan .cm-lock { display:none; }
   .cmty-chan .cm-name { font-size:11px; }
-  .cmty-main { height:calc(100vh - 80px); }
-  .msg { max-width:90%; }
+
+  /* Le chat occupe tout l'espace restant */
+  .cmty-main { height:auto; flex:1; min-height:0; }
+
+  /* En-tête slim : bouton salons (animé) + EN DIRECT seulement */
+  .cmty-head { padding:8px 10px; gap:8px; }
+  .cmty-head .ch-emoji, .cmty-head > div:not(.cmty-head-right) { display:none; }
+  .cmty-salons-toggle { display:flex; animation:salonsNudge 2.8s ease-in-out infinite; }
+  .cmty-head-right { gap:6px; }
+  .cmty-head .ch-live { padding:4px 8px; }
+  .cmty-follow, .cmty-admin-pill { display:none; }  /* on épure : géré via le drawer / desktop */
+
+  /* Fil & messages */
+  .cmty-feed { padding:14px 12px; gap:12px; }
+  .msg { max-width:88%; }
+  .b-imgs img { height:120px; }
+
+  /* Composer */
+  .cmty-composer { padding:10px; }
+  .cmty-input-row { gap:6px; }
+  .cmty-icon-btn { width:38px; height:38px; font-size:16px; }
+  .cmty-textarea { min-width:0; padding:10px 12px; }
+  .cmty-send { width:42px; height:42px; }
+}
+
+@media (max-width:380px) {
+  .cmty-input-row #cmtyTagBtn { display:none; }
 }
 </style>
 {% endblock %}
@@ -209,6 +250,11 @@
              data-auth="{% if user.is_authenticated %}1{% else %}0{% endif %}">
       <header class="cmty-head">
         <a href="{% url 'home' %}" class="chat-back-btn" aria-label="Retour à l'accueil">‹</a>
+        <button type="button" class="cmty-salons-toggle" id="cmtySalonsToggle" aria-label="Voir les salons">
+          <span class="cst-emoji">{{ active_channel.emoji }}</span>
+          <span class="cst-name">{{ active_channel.name }}</span>
+          <span class="cst-caret">▾</span>
+        </button>
         <span class="ch-emoji">{{ active_channel.emoji }}</span>
         <div>
           <h1>{{ active_channel.name }}</h1>
@@ -561,6 +607,22 @@
     } catch (e) {}
     followBtn.disabled = false;
   });
+
+  // ── mobile : drawer des salons ──
+  const salonsToggle = document.getElementById('cmtySalonsToggle');
+  const shellEl = document.querySelector('.cmty-shell');
+  if (salonsToggle && shellEl) {
+    salonsToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      shellEl.classList.toggle('salons-open');
+    });
+    document.addEventListener('click', (e) => {
+      if (shellEl.classList.contains('salons-open') &&
+          !e.target.closest('.cmty-side') && e.target !== salonsToggle && !salonsToggle.contains(e.target)) {
+        shellEl.classList.remove('salons-open');
+      }
+    });
+  }
 
   // ── admin : cycle de verrouillage du salon ──
   const lockBtn = document.getElementById('cmtyLockBtn');
