@@ -133,14 +133,19 @@ def notify_for_message(message):
                     {"type": "channel_message", "channel": channel.slug, "message_id": str(message.id)},
                 )
 
-    # 4) Alerte admins (push only — conserve le comportement existant)
+    # 4) Alerte admins non déjà notifiés : notif in-app (cloche) + push throttlé
     if channel.notify_admins and not author.is_staff:
         staff = User.objects.filter(is_staff=True, is_active=True).exclude(id__in=notified)
         for u in staff:
-            push_to_user(
-                u, f"💬 {channel.name}", f"{actor_name} : {excerpt}",
-                {"type": "community_message", "channel": channel.slug, "message_id": str(message.id)},
-            )
+            if _create(u, author, Notification.TYPE_CHANNEL, channel, message, coalesce=True):
+                notified.add(u.id)
+                ck = f"cmpush:{u.id}:{channel.id}"
+                if not cache.get(ck):
+                    cache.set(ck, 1, PUSH_THROTTLE_SECONDS)
+                    push_to_user(
+                        u, f"💬 {channel.name}", f"{actor_name} : {excerpt}",
+                        {"type": "channel_message", "channel": channel.slug, "message_id": str(message.id)},
+                    )
 
 
 # ── Support privé (client ↔ équipe admin) ──────────────────────────────────
