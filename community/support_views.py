@@ -20,13 +20,23 @@ staff_required = user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 
 
 # ── Sérialisation ───────────────────────────────────────────────────────────
+def _dm_label(dm):
+    if dm.is_admin:
+        return "Équipe Hayiti's"
+    return _author_label(dm.sender) if dm.sender else "Client"
+
+
 def serialize_dm(dm, request):
-    sender = _author_label(dm.sender) if dm.sender else ("Équipe Hayiti's" if dm.is_admin else "Client")
+    reply = None
+    if dm.reply_to_id and dm.reply_to:
+        rt = dm.reply_to
+        reply = {"id": rt.id, "sender": _dm_label(rt), "excerpt": (rt.content[:80] or "📷 image")}
     return {
         "id": dm.id,
         "is_admin": dm.is_admin,
-        "sender": "Équipe Hayiti's" if dm.is_admin else sender,
+        "sender": _dm_label(dm),
         "content": dm.content,
+        "reply_to": reply,
         "attachments": [a.image.url for a in dm.attachments.all()],
         "created_at": dm.created_at.isoformat(),
         "is_own": bool(request.user.is_authenticated and dm.sender_id == request.user.id),
@@ -34,7 +44,11 @@ def serialize_dm(dm, request):
 
 
 def _feed_qs(conversation):
-    return conversation.messages.select_related("sender").prefetch_related("attachments")
+    return (
+        conversation.messages
+        .select_related("sender", "reply_to", "reply_to__sender")
+        .prefetch_related("attachments")
+    )
 
 
 def _validate_images(request):
@@ -49,10 +63,10 @@ def _validate_images(request):
     return images, None
 
 
-def _send_message(conversation, sender, is_admin, content, images):
+def _send_message(conversation, sender, is_admin, content, images, reply_to=None):
     dm = DirectMessage.objects.create(
         conversation=conversation, sender=sender, is_admin=is_admin, content=content,
-        read_by_admin=is_admin, read_by_client=not is_admin,
+        reply_to=reply_to, read_by_admin=is_admin, read_by_client=not is_admin,
     )
     for f in images:
         DirectMessageAttachment.objects.create(message=dm, image=f)
@@ -118,7 +132,11 @@ def support_post(request):
         return JsonResponse({"error": err}, status=400)
     if not content and not images:
         return JsonResponse({"error": "Message vide."}, status=400)
-    dm = _send_message(conv, request.user, is_admin=False, content=content, images=images)
+    reply_to = None
+    rid = request.POST.get("reply_to")
+    if rid:
+        reply_to = DirectMessage.objects.filter(id=rid, conversation=conv).first()
+    dm = _send_message(conv, request.user, is_admin=False, content=content, images=images, reply_to=reply_to)
     return JsonResponse({"message": serialize_dm(_feed_qs(conv).get(id=dm.id), request)}, status=201)
 
 
@@ -182,5 +200,9 @@ def inbox_post(request, conv_id):
         return JsonResponse({"error": err}, status=400)
     if not content and not images:
         return JsonResponse({"error": "Message vide."}, status=400)
-    dm = _send_message(conv, request.user, is_admin=True, content=content, images=images)
+    reply_to = None
+    rid = request.POST.get("reply_to")
+    if rid:
+        reply_to = DirectMessage.objects.filter(id=rid, conversation=conv).first()
+    dm = _send_message(conv, request.user, is_admin=True, content=content, images=images, reply_to=reply_to)
     return JsonResponse({"message": serialize_dm(_feed_qs(conv).get(id=dm.id), request)}, status=201)

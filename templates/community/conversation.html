@@ -29,6 +29,18 @@
 .dm .ims { display:grid; gap:5px; margin-top:7px; grid-template-columns:repeat(2,1fr); }
 .dm .ims.one { grid-template-columns:1fr; }
 .dm .ims img { width:100%; height:130px; object-fit:cover; border-radius:9px; cursor:pointer; }
+.dm .bw { min-width:0; display:flex; flex-direction:column; }
+.dm.own .bw { align-items:flex-end; }
+.dm .dm-reply { border-left:3px solid var(--cmty-red); background:#faf3ee; padding:4px 8px; border-radius:7px; margin-bottom:6px; font-size:12px; }
+.dm .dm-reply .r-s { font-weight:800; color:var(--cmty-red); }
+.dm .dm-reply .r-e { color:#999; }
+.dm-actions { margin-top:2px; }
+.dm.own .dm-actions { text-align:right; }
+.dm-reply-btn { background:none; border:none; color:#c3bbb3; cursor:pointer; font-size:14px; padding:1px 7px; border-radius:6px; }
+.dm-reply-btn:hover { color:var(--cmty-red); background:var(--cmty-cream); }
+.cv-reply-bar { display:none; align-items:center; gap:9px; background:var(--cmty-cream); border-radius:11px; padding:7px 11px; margin-bottom:8px; font-size:12.5px; }
+.cv-reply-bar.show { display:flex; }
+.cv-reply-bar .x { margin-left:auto; cursor:pointer; color:#aaa; border:none; background:none; font-size:15px; font-weight:800; }
 .cv-composer { border-top:1px solid var(--cmty-line); padding:12px 16px; background:#fff; position:relative; }
 .emoji-pan { position:absolute; bottom:62px; left:16px; width:316px; max-width:90vw; background:#fff; border:1px solid var(--cmty-line); border-radius:14px; box-shadow:0 12px 40px rgba(0,0,0,.16); padding:8px; display:none; grid-template-columns:repeat(8,1fr); gap:2px; z-index:40; max-height:230px; overflow-y:auto; }
 .emoji-pan.open { display:grid; }
@@ -85,6 +97,7 @@
 
     <div class="cv-composer">
       {% csrf_token %}
+      <div class="cv-reply-bar" id="cvReplyBar">↪ Réponse à <strong id="cvReplyName"></strong><button type="button" class="x" id="cvReplyCancel">✕</button></div>
       <div class="cv-prev" id="cvPrev"></div>
       <form id="cvForm">
         <div class="cv-row">
@@ -122,13 +135,18 @@
     const el = document.createElement('div');
     el.className = 'dm' + (m.is_own ? ' own' : '');
     el.dataset.id = m.id;
+    el.dataset.sender = m.sender || '';
     let imgs = '';
     if (m.attachments && m.attachments.length) {
       imgs = `<div class="ims ${m.attachments.length === 1 ? 'one' : ''}">` + m.attachments.map(u => `<img src="${u}" class="cv-img">`).join('') + `</div>`;
     }
     const nm = m.is_own ? '' : `<div class="nm">${esc(m.sender)}</div>`;
     const tx = m.content ? `<div class="tx">${esc(m.content)}</div>` : '';
-    el.innerHTML = `<div class="bub">${nm}${tx}${imgs}<div class="tm">${fmt(m.created_at)}</div></div>`;
+    const reply = m.reply_to ? `<div class="dm-reply"><span class="r-s">${esc(m.reply_to.sender)}</span> <span class="r-e">${esc(m.reply_to.excerpt)}</span></div>` : '';
+    el.innerHTML = `<div class="bw">
+      <div class="bub">${reply}${nm}${tx}${imgs}<div class="tm">${fmt(m.created_at)}</div></div>
+      <div class="dm-actions"><button type="button" class="dm-reply-btn" title="Répondre">↪</button></div>
+    </div>`;
     return el;
   }
   function append(list) {
@@ -156,8 +174,10 @@
 
   feed.addEventListener('click', (e) => {
     if (e.target.classList.contains('cv-img')) {
-      const lb = document.getElementById('cvLightbox'); lb.querySelector('img').src = e.target.src; lb.classList.add('open');
+      const lb = document.getElementById('cvLightbox'); lb.querySelector('img').src = e.target.src; lb.classList.add('open'); return;
     }
+    const rb = e.target.closest('.dm-reply-btn');
+    if (rb) { const dm = rb.closest('.dm'); setReply(dm.dataset.id, dm.dataset.sender || 'ce message'); }
   });
   document.getElementById('cvLightbox').addEventListener('click', function () { this.classList.remove('open'); });
 
@@ -168,6 +188,16 @@
   const filesInput = document.getElementById('cvFiles');
   const prev = document.getElementById('cvPrev');
   let files = [];
+  let replyTo = null;
+  function setReply(id, name) {
+    replyTo = id;
+    document.getElementById('cvReplyName').textContent = name;
+    document.getElementById('cvReplyBar').classList.add('show');
+    ta.focus();
+  }
+  document.getElementById('cvReplyCancel').addEventListener('click', () => {
+    replyTo = null; document.getElementById('cvReplyBar').classList.remove('show');
+  });
   function refresh() { sendBtn.disabled = !(ta.value.trim() || files.length); }
   ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 130) + 'px'; refresh(); });
   ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
@@ -197,6 +227,7 @@
     sendBtn.disabled = true;
     const fd = new FormData();
     fd.append('content', ta.value.trim());
+    if (replyTo) fd.append('reply_to', replyTo);
     files.forEach(f => fd.append('images', f));
     try {
       const r = await fetch(POST, { method: 'POST', headers: { 'X-CSRFToken': csrf() }, body: fd });
@@ -205,6 +236,7 @@
       intro.style.display = 'none';
       append([d.message]); toBottom();
       ta.value = ''; ta.style.height = 'auto'; files = []; renderPrev();
+      replyTo = null; document.getElementById('cvReplyBar').classList.remove('show');
     } catch (e) { sendBtn.disabled = false; }
   });
 

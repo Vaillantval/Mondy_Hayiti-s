@@ -258,20 +258,36 @@ class ChannelSubscribeView(APIView):
 
 
 # ── Support privé (API) ─────────────────────────────────────────────────────
+def _dm_label(dm):
+    return "Équipe Hayiti's" if dm.is_admin else (_author_label(dm.sender) if dm.sender else "Client")
+
+
 def _dm_payload(dm, request):
+    reply = None
+    if dm.reply_to_id and dm.reply_to:
+        rt = dm.reply_to
+        reply = {"id": rt.id, "sender": _dm_label(rt), "excerpt": (rt.content[:80] or "📷 image")}
     return {
         "id": dm.id,
         "is_admin": dm.is_admin,
-        "sender": "Équipe Hayiti's" if dm.is_admin else (_author_label(dm.sender) if dm.sender else "Client"),
+        "sender": _dm_label(dm),
         "content": dm.content,
+        "reply_to": reply,
         "attachments": [request.build_absolute_uri(a.image.url) for a in dm.attachments.all()],
         "created_at": dm.created_at.isoformat(),
         "is_own": bool(dm.sender_id == request.user.id),
     }
 
 
+def _resolve_dm_reply(request, conversation):
+    rid = request.data.get("reply_to")
+    if rid:
+        return DirectMessage.objects.filter(id=rid, conversation=conversation).first()
+    return None
+
+
 def _support_feed(request, conversation):
-    qs = conversation.messages.select_related("sender").prefetch_related("attachments")
+    qs = conversation.messages.select_related("sender", "reply_to", "reply_to__sender").prefetch_related("attachments")
     after = request.query_params.get("after")
     before = request.query_params.get("before")
     if after:
@@ -315,7 +331,8 @@ class SupportMessagesView(APIView):
         images = _check_images(request)
         if not content and not images:
             raise ApiError("VALIDATION_ERROR", "Message vide.")
-        dm = _send_message(conv, request.user, is_admin=False, content=content, images=images)
+        dm = _send_message(conv, request.user, is_admin=False, content=content, images=images,
+                           reply_to=_resolve_dm_reply(request, conv))
         return Response({"success": True, "data": _dm_payload(dm, request)}, status=status.HTTP_201_CREATED)
 
 
@@ -379,7 +396,8 @@ class SupportInboxMessagesView(APIView):
         images = _check_images(request)
         if not content and not images:
             raise ApiError("VALIDATION_ERROR", "Message vide.")
-        dm = _send_message(conv, request.user, is_admin=True, content=content, images=images)
+        dm = _send_message(conv, request.user, is_admin=True, content=content, images=images,
+                           reply_to=_resolve_dm_reply(request, conv))
         return Response({"success": True, "data": _dm_payload(dm, request)}, status=status.HTTP_201_CREATED)
 
 

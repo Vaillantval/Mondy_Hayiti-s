@@ -424,7 +424,11 @@ GET  /api/community/support/inbox/42/messages/        → messages de la convers
 POST /api/community/support/inbox/42/messages/  (multipart)   → répond au client
 ```
 
-Objet message support : `{ id, is_admin, sender, content, attachments[], created_at, is_own }`.
+Objet message support : `{ id, is_admin, sender, content, reply_to, attachments[], created_at, is_own }`
+où `reply_to` = `null` ou `{ id, sender, excerpt }`.
+
+Pour **répondre** à un message, ajouter le champ `reply_to` (ID du message) au POST
+(client ou admin) — même conversation uniquement.
 
 ### Modération (admin)
 

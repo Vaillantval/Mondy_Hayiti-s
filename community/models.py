@@ -327,6 +327,9 @@ class DirectMessage(models.Model):
         default=False, help_text="Message envoyé par l'équipe (admin) plutôt que le client."
     )
     content = models.TextField(blank=True, default="")
+    reply_to = models.ForeignKey(
+        "self", on_delete=models.SET_NULL, null=True, blank=True, related_name="replies"
+    )
     read_by_client = models.BooleanField(default=False)
     read_by_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
