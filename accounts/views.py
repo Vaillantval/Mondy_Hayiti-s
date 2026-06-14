@@ -16,9 +16,15 @@ def signin(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            # Rediriger vers la page demandée ou le dashboard
-            next_url = request.GET.get('next', 'dashboard:overview')
-            return redirect(next_url)
+            # Rediriger vers la page demandée si fournie
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            # Sinon : les admins ne sont PAS envoyés au dashboard (→ accueil),
+            # les clients vont sur leur tableau de bord
+            if user.is_staff:
+                return redirect('home')
+            return redirect('dashboard:overview')
         # Les erreurs du formulaire sont affichées dans le template
     else:
         form = CustomLoginForm(request)
