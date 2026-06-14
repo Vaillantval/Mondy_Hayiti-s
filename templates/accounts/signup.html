@@ -331,10 +331,7 @@
                     <!-- Exigences mot de passe -->
                     <div class="auth-full">
                         <div class="pw-reqs" id="signupPwReqs">
-                            <div class="pw-req" data-rule="len"><i class="ti-close"></i> 8 caractères min.</div>
-                            <div class="pw-req" data-rule="upper"><i class="ti-close"></i> Une majuscule</div>
-                            <div class="pw-req" data-rule="digit"><i class="ti-close"></i> Un chiffre</div>
-                            <div class="pw-req" data-rule="special"><i class="ti-close"></i> Caractère spécial</div>
+                            <div class="pw-req" data-rule="len"><i class="ti-close"></i> 8 caractères minimum</div>
                         </div>
                     </div>
 
@@ -395,10 +392,7 @@
     /* ── Password requirements ── */
     var pwd = document.getElementById('{{ form.password1.id_for_label }}');
     var rules = {
-        len:     function (v) { return v.length >= 8; },
-        upper:   function (v) { return /[A-Z]/.test(v); },
-        digit:   function (v) { return /[0-9]/.test(v); },
-        special: function (v) { return /[^A-Za-z0-9]/.test(v); }
+        len: function (v) { return v.length >= 8; }
     };
     if (pwd) {
         pwd.addEventListener('input', function () {
