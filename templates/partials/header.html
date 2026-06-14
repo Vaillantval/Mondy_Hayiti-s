@@ -1338,8 +1338,6 @@
   function csrf() { const e = document.querySelector('[name=csrfmiddlewaretoken]'); return e ? e.value : ''; }
   try { firebase.initializeApp({{ firebase_web_config|safe }}); } catch (e) { return; }
   const messaging = firebase.messaging();
-  if (Notification.permission === 'default') pushRow.style.display = 'block';
-
   async function registerToken() {
     try {
       const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
@@ -1355,11 +1353,34 @@
       }
     } catch (e) { console.warn('Web push:', e); }
   }
-  enableBtn.addEventListener('click', async () => {
-    const p = await Notification.requestPermission();
-    if (p === 'granted') registerToken(); else pushRow.style.display = 'none';
-  });
-  if (Notification.permission === 'granted') registerToken();
+
+  async function askPermission() {
+    try {
+      const p = await Notification.requestPermission();
+      if (p === 'granted') { registerToken(); pushRow.style.display = 'none'; }
+      else if (p === 'denied') { pushRow.style.display = 'none'; }
+      return p;
+    } catch (e) { return 'default'; }
+  }
+
+  // Bouton manuel (toujours disponible)
+  enableBtn.addEventListener('click', askPermission);
+
+  if (Notification.permission === 'granted') {
+    registerToken();
+  } else if (Notification.permission === 'default') {
+    pushRow.style.display = 'block';            // on garde l'option visible
+    askPermission().then((p) => {              // demande automatique dès l'arrivée
+      if (p === 'default') {
+        // Certains navigateurs (Firefox/Safari) exigent un geste → on retente au 1er clic
+        const onGesture = () => askPermission();
+        document.addEventListener('click', onGesture, { once: true });
+        document.addEventListener('keydown', onGesture, { once: true });
+        document.addEventListener('touchstart', onGesture, { once: true });
+      }
+    });
+  }
+
   messaging.onMessage(() => { if (window.cmtyNotifPoll) window.cmtyNotifPoll(); });
 })();
 </script>
