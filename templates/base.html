@@ -307,9 +307,9 @@
         body.chat-fullscreen .cmty-contact-fab { display: none !important; }
         body.chat-fullscreen .cmty-wrap,
         body.chat-fullscreen .cv-wrap { margin: 0 !important; padding: 0 !important; max-width: 100% !important; }
-        body.chat-fullscreen .cmty-shell { height: calc(100vh - 70px); }
+        body.chat-fullscreen .cmty-shell { height: calc(100vh - 70px - env(safe-area-inset-bottom)); height: calc(100dvh - 70px - env(safe-area-inset-bottom)); }
         body.chat-fullscreen .cmty-main { height: auto !important; flex: 1; min-height: 0 !important; border-radius: 0 !important; border-left: none; border-right: none; }
-        body.chat-fullscreen .cv-shell { height: calc(100vh - 70px) !important; min-height: 0 !important; border-radius: 0 !important; border-left: none; border-right: none; }
+        body.chat-fullscreen .cv-shell { height: calc(100vh - 70px - env(safe-area-inset-bottom)) !important; height: calc(100dvh - 70px - env(safe-area-inset-bottom)) !important; min-height: 0 !important; border-radius: 0 !important; border-left: none; border-right: none; }
     }
     /* Boutons retour chat (mobile uniquement) */
     .chat-back-btn { display: none; }
