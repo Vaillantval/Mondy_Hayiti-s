@@ -30,6 +30,38 @@ ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 REACTION_EMOJIS = ["❤️", "😋", "🔥", "👍", "🎂", "😮"]
 FEED_LIMIT = 30
 
+# ── Notes vocales ───────────────────────────────────────────────────────────
+MAX_AUDIO_SIZE = 8 * 1024 * 1024  # 8 Mo
+MAX_AUDIO_DURATION = 120  # 2 min
+ALLOWED_AUDIO_TYPES = {
+    "audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg", "audio/mp3",
+    "audio/wav", "audio/x-wav", "audio/aac", "audio/x-m4a", "audio/m4a",
+    "audio/3gpp", "application/octet-stream",
+}
+
+
+def parse_duration(val):
+    try:
+        return max(0, int(float(val or 0)))
+    except (TypeError, ValueError):
+        return 0
+
+
+def validate_audio(f, duration):
+    """Retourne un message d'erreur ou None. `f` = fichier audio (ou None)."""
+    if f is None:
+        return None
+    if f.size == 0:
+        return "Note vocale vide."
+    if f.size > MAX_AUDIO_SIZE:
+        return "Note vocale trop lourde (8 Mo max)."
+    ct = f.content_type or ""
+    if not (ct.startswith("audio/") or ct in ALLOWED_AUDIO_TYPES):
+        return "Format audio non supporté."
+    if duration and duration > MAX_AUDIO_DURATION + 5:
+        return "Note vocale trop longue (2 min max)."
+    return None
+
 
 # ── Helpers de sérialisation ────────────────────────────────────────────────
 def _product_payload(product, setting):
@@ -102,6 +134,8 @@ def serialize_message(msg, request, setting):
         "product": _product_payload(msg.product, setting),
         "reply_to": reply,
         "attachments": [a.image.url for a in msg.attachments.all()],
+        "audio": msg.audio.url if msg.audio else None,
+        "audio_duration": msg.audio_duration,
         "reactions": counts,
         "my_reactions": mine,
     }
@@ -199,8 +233,10 @@ def post_message(request, slug):
 
     content = (request.POST.get("content") or "").strip()
     images = request.FILES.getlist("images")[:MAX_IMAGES]
+    audio = request.FILES.get("audio")
+    audio_duration = parse_duration(request.POST.get("audio_duration"))
 
-    if not content and not images:
+    if not content and not images and not audio:
         return JsonResponse({"error": "Message vide."}, status=400)
     if len(content) > 2000:
         return JsonResponse({"error": "Message trop long (2000 caractères max)."}, status=400)
@@ -212,6 +248,10 @@ def post_message(request, slug):
             return JsonResponse({"error": "Image trop lourde (5 Mo max)."}, status=400)
         if f.content_type not in ALLOWED_IMAGE_TYPES:
             return JsonResponse({"error": "Format d'image non supporté."}, status=400)
+
+    audio_err = validate_audio(audio, audio_duration)
+    if audio_err:
+        return JsonResponse({"error": audio_err}, status=400)
 
     product = None
     product_id = request.POST.get("product_id")
@@ -226,6 +266,7 @@ def post_message(request, slug):
     msg = Message.objects.create(
         channel=channel, author=request.user, content=content,
         product=product, reply_to=reply_to,
+        audio=audio, audio_duration=audio_duration if audio else 0,
     )
     for f in images:
         MessageAttachment.objects.create(message=msg, image=f)

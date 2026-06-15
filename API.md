@@ -308,13 +308,15 @@ POST /api/community/channels/general/messages/
 Content-Type: multipart/form-data
 Authorization: Bearer <token>
 
-content      (string)   — texte du message (≤ 2000 caractères)
-product_id   (int)      — optionnel : produit tagué
-reply_to     (int)      — optionnel : ID du message auquel on répond
-images       (File[])   — optionnel : jusqu'à 4 images (JPG/PNG/WebP/GIF, ≤ 5 Mo chacune)
+content        (string) — texte du message (≤ 2000 caractères)
+product_id     (int)    — optionnel : produit tagué
+reply_to       (int)    — optionnel : ID du message auquel on répond
+images         (File[]) — optionnel : jusqu'à 4 images (JPG/PNG/WebP/GIF, ≤ 5 Mo chacune)
+audio          (File)   — optionnel : note vocale (m4a/webm/ogg/mp3/wav, ≤ 8 Mo, ≤ 2 min)
+audio_duration (int)    — durée de la note vocale en secondes (envoyée avec audio)
 ```
 
-`content` **ou** au moins une image est obligatoire.
+`content` **ou** au moins une image **ou** une note vocale est obligatoire.
 
 ### Objet `message` (réponse)
 
@@ -335,6 +337,8 @@ images       (File[])   — optionnel : jusqu'à 4 images (JPG/PNG/WebP/GIF, ≤
   },
   "reply_to": { "id": 1240, "author": "Jean P.", "excerpt": "Quel parfum ?" },
   "attachments": ["https://.../media/community/attachments/...jpg"],
+  "audio": "https://.../media/community/audio/...webm",
+  "audio_duration": 12,
   "reactions": { "❤️": 4, "🔥": 2 },
   "my_reactions": ["❤️"],
   "is_own": false,
@@ -424,7 +428,11 @@ GET  /api/community/support/inbox/42/messages/        → messages de la convers
 POST /api/community/support/inbox/42/messages/  (multipart)   → répond au client
 ```
 
-Objet message support : `{ id, is_admin, sender, content, reply_to, attachments[], created_at, is_own }`
+Objet message support : `{ id, is_admin, sender, content, reply_to, attachments[], audio, audio_duration, created_at, is_own }`
+
+> **Notes vocales** : envoie le champ `audio` (multipart) + `audio_duration` (secondes), idem
+> communauté et support. Réponse : `audio` (URL absolue, `null` si absent) + `audio_duration`.
+> Pas de transcodage serveur — l'app enregistre en `m4a/aac` (à privilégier pour l'interop iOS).
 où `reply_to` = `null` ou `{ id, sender, excerpt }`.
 
 Pour **répondre** à un message, ajouter le champ `reply_to` (ID du message) au POST

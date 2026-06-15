@@ -55,6 +55,7 @@ class MessageSerializer(serializers.ModelSerializer):
     product = serializers.SerializerMethodField()
     reply_to = serializers.SerializerMethodField()
     attachments = serializers.SerializerMethodField()
+    audio = serializers.SerializerMethodField()
     reactions = serializers.SerializerMethodField()
     my_reactions = serializers.SerializerMethodField()
     is_own = serializers.SerializerMethodField()
@@ -65,8 +66,14 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = [
             "id", "channel", "author", "author_name", "is_staff", "content",
             "created_at", "is_pinned", "is_deleted", "product", "reply_to",
-            "attachments", "reactions", "my_reactions", "is_own", "can_moderate",
+            "attachments", "audio", "audio_duration", "reactions", "my_reactions",
+            "is_own", "can_moderate",
         ]
+
+    def get_audio(self, obj):
+        if obj.is_deleted or not obj.audio:
+            return None
+        return _abs(self.context.get("request"), obj.audio.url)
 
     def _label(self, author):
         if not author:

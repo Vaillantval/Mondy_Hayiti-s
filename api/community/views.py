@@ -29,6 +29,8 @@ from community.views import (
     MAX_IMAGES,
     REACTION_EMOJIS,
     _author_label,
+    parse_duration,
+    validate_audio,
 )
 from shop.models.Product import Product
 from shop.templatetags.price_filters import _get_setting
@@ -121,7 +123,9 @@ class ChannelMessagesView(APIView):
 
         content = (request.data.get("content") or "").strip()
         images = request.FILES.getlist("images")[:MAX_IMAGES]
-        if not content and not images:
+        audio = request.FILES.get("audio")
+        audio_duration = parse_duration(request.data.get("audio_duration"))
+        if not content and not images and not audio:
             raise ApiError("VALIDATION_ERROR", "Message vide.")
         if len(content) > 2000:
             raise ApiError("VALIDATION_ERROR", "Message trop long (2000 caractères max).")
@@ -132,6 +136,9 @@ class ChannelMessagesView(APIView):
                 raise ApiError("VALIDATION_ERROR", "Image trop lourde (5 Mo max).")
             if f.content_type not in ALLOWED_IMAGE_TYPES:
                 raise ApiError("VALIDATION_ERROR", "Format d'image non supporté.")
+        audio_err = validate_audio(audio, audio_duration)
+        if audio_err:
+            raise ApiError("VALIDATION_ERROR", audio_err)
 
         product = None
         if request.data.get("product_id"):
@@ -145,6 +152,7 @@ class ChannelMessagesView(APIView):
         msg = Message.objects.create(
             channel=channel, author=request.user, content=content,
             product=product, reply_to=reply_to,
+            audio=audio, audio_duration=audio_duration if audio else 0,
         )
         for f in images:
             MessageAttachment.objects.create(message=msg, image=f)
@@ -262,11 +270,17 @@ def _dm_label(dm):
     return "Équipe Hayiti's" if dm.is_admin else (_author_label(dm.sender) if dm.sender else "Client")
 
 
+def _dm_excerpt(dm):
+    if dm.content:
+        return dm.content[:80]
+    return "🎤 note vocale" if dm.audio else "📷 image"
+
+
 def _dm_payload(dm, request):
     reply = None
     if dm.reply_to_id and dm.reply_to:
         rt = dm.reply_to
-        reply = {"id": rt.id, "sender": _dm_label(rt), "excerpt": (rt.content[:80] or "📷 image")}
+        reply = {"id": rt.id, "sender": _dm_label(rt), "excerpt": _dm_excerpt(rt)}
     return {
         "id": dm.id,
         "is_admin": dm.is_admin,
@@ -274,6 +288,8 @@ def _dm_payload(dm, request):
         "content": dm.content,
         "reply_to": reply,
         "attachments": [request.build_absolute_uri(a.image.url) for a in dm.attachments.all()],
+        "audio": request.build_absolute_uri(dm.audio.url) if dm.audio else None,
+        "audio_duration": dm.audio_duration,
         "created_at": dm.created_at.isoformat(),
         "is_own": bool(dm.sender_id == request.user.id),
     }
@@ -312,6 +328,15 @@ def _check_images(request):
     return images
 
 
+def _check_audio(request):
+    audio = request.FILES.get("audio")
+    duration = parse_duration(request.data.get("audio_duration"))
+    err = validate_audio(audio, duration)
+    if err:
+        raise ApiError("VALIDATION_ERROR", err)
+    return audio, (duration if audio else 0)
+
+
 class SupportMessagesView(APIView):
     """Conversation support du client connecté."""
     permission_classes = [IsAuthenticated]
@@ -329,10 +354,12 @@ class SupportMessagesView(APIView):
         conv, _ = Conversation.objects.get_or_create(client=request.user)
         content = (request.data.get("content") or "").strip()
         images = _check_images(request)
-        if not content and not images:
+        audio, audio_duration = _check_audio(request)
+        if not content and not images and not audio:
             raise ApiError("VALIDATION_ERROR", "Message vide.")
         dm = _send_message(conv, request.user, is_admin=False, content=content, images=images,
-                           reply_to=_resolve_dm_reply(request, conv))
+                           reply_to=_resolve_dm_reply(request, conv),
+                           audio=audio, audio_duration=audio_duration)
         return Response({"success": True, "data": _dm_payload(dm, request)}, status=status.HTTP_201_CREATED)
 
 
@@ -394,10 +421,12 @@ class SupportInboxMessagesView(APIView):
         conv = self._conv(conv_id)
         content = (request.data.get("content") or "").strip()
         images = _check_images(request)
-        if not content and not images:
+        audio, audio_duration = _check_audio(request)
+        if not content and not images and not audio:
             raise ApiError("VALIDATION_ERROR", "Message vide.")
         dm = _send_message(conv, request.user, is_admin=True, content=content, images=images,
-                           reply_to=_resolve_dm_reply(request, conv))
+                           reply_to=_resolve_dm_reply(request, conv),
+                           audio=audio, audio_duration=audio_duration)
         return Response({"success": True, "data": _dm_payload(dm, request)}, status=status.HTTP_201_CREATED)
 
 

@@ -14,6 +14,8 @@ from .views import (
     MAX_IMAGES,
     MAX_IMAGE_SIZE,
     _author_label,
+    parse_duration,
+    validate_audio,
 )
 
 staff_required = user_passes_test(lambda u: u.is_authenticated and u.is_staff)
@@ -26,11 +28,19 @@ def _dm_label(dm):
     return _author_label(dm.sender) if dm.sender else "Client"
 
 
+def _excerpt(dm):
+    if dm.content:
+        return dm.content[:80]
+    if dm.audio:
+        return "🎤 note vocale"
+    return "📷 image"
+
+
 def serialize_dm(dm, request):
     reply = None
     if dm.reply_to_id and dm.reply_to:
         rt = dm.reply_to
-        reply = {"id": rt.id, "sender": _dm_label(rt), "excerpt": (rt.content[:80] or "📷 image")}
+        reply = {"id": rt.id, "sender": _dm_label(rt), "excerpt": _excerpt(rt)}
     return {
         "id": dm.id,
         "is_admin": dm.is_admin,
@@ -38,6 +48,8 @@ def serialize_dm(dm, request):
         "content": dm.content,
         "reply_to": reply,
         "attachments": [a.image.url for a in dm.attachments.all()],
+        "audio": dm.audio.url if dm.audio else None,
+        "audio_duration": dm.audio_duration,
         "created_at": dm.created_at.isoformat(),
         "is_own": bool(request.user.is_authenticated and dm.sender_id == request.user.id),
     }
@@ -63,10 +75,12 @@ def _validate_images(request):
     return images, None
 
 
-def _send_message(conversation, sender, is_admin, content, images, reply_to=None):
+def _send_message(conversation, sender, is_admin, content, images, reply_to=None,
+                  audio=None, audio_duration=0):
     dm = DirectMessage.objects.create(
         conversation=conversation, sender=sender, is_admin=is_admin, content=content,
         reply_to=reply_to, read_by_admin=is_admin, read_by_client=not is_admin,
+        audio=audio, audio_duration=audio_duration if audio else 0,
     )
     for f in images:
         DirectMessageAttachment.objects.create(message=dm, image=f)
@@ -130,13 +144,19 @@ def support_post(request):
     images, err = _validate_images(request)
     if err:
         return JsonResponse({"error": err}, status=400)
-    if not content and not images:
+    audio = request.FILES.get("audio")
+    audio_duration = parse_duration(request.POST.get("audio_duration"))
+    audio_err = validate_audio(audio, audio_duration)
+    if audio_err:
+        return JsonResponse({"error": audio_err}, status=400)
+    if not content and not images and not audio:
         return JsonResponse({"error": "Message vide."}, status=400)
     reply_to = None
     rid = request.POST.get("reply_to")
     if rid:
         reply_to = DirectMessage.objects.filter(id=rid, conversation=conv).first()
-    dm = _send_message(conv, request.user, is_admin=False, content=content, images=images, reply_to=reply_to)
+    dm = _send_message(conv, request.user, is_admin=False, content=content, images=images,
+                       reply_to=reply_to, audio=audio, audio_duration=audio_duration)
     return JsonResponse({"message": serialize_dm(_feed_qs(conv).get(id=dm.id), request)}, status=201)
 
 
@@ -198,11 +218,17 @@ def inbox_post(request, conv_id):
     images, err = _validate_images(request)
     if err:
         return JsonResponse({"error": err}, status=400)
-    if not content and not images:
+    audio = request.FILES.get("audio")
+    audio_duration = parse_duration(request.POST.get("audio_duration"))
+    audio_err = validate_audio(audio, audio_duration)
+    if audio_err:
+        return JsonResponse({"error": audio_err}, status=400)
+    if not content and not images and not audio:
         return JsonResponse({"error": "Message vide."}, status=400)
     reply_to = None
     rid = request.POST.get("reply_to")
     if rid:
         reply_to = DirectMessage.objects.filter(id=rid, conversation=conv).first()
-    dm = _send_message(conv, request.user, is_admin=True, content=content, images=images, reply_to=reply_to)
+    dm = _send_message(conv, request.user, is_admin=True, content=content, images=images,
+                       reply_to=reply_to, audio=audio, audio_duration=audio_duration)
     return JsonResponse({"message": serialize_dm(_feed_qs(conv).get(id=dm.id), request)}, status=201)

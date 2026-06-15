@@ -41,6 +41,20 @@
 .cv-reply-bar { display:none; align-items:center; gap:9px; background:var(--cmty-cream); border-radius:11px; padding:7px 11px; margin-bottom:8px; font-size:12.5px; }
 .cv-reply-bar.show { display:flex; }
 .cv-reply-bar .x { margin-left:auto; cursor:pointer; color:#aaa; border:none; background:none; font-size:15px; font-weight:800; }
+.dm-audio { display:flex; align-items:center; gap:9px; margin-top:6px; background:#fff; border:1px solid var(--cmty-line); border-radius:20px; padding:6px 12px 6px 8px; min-width:170px; max-width:240px; }
+.dm-audio .vn-play { width:30px; height:30px; flex-shrink:0; border:none; border-radius:50%; background:var(--cmty-red); color:#fff; cursor:pointer; font-size:12px; }
+.dm-audio .vn-bar { flex:1; height:4px; background:var(--cmty-line); border-radius:3px; overflow:hidden; }
+.dm-audio .vn-prog { height:100%; width:0; background:var(--cmty-red); }
+.dm-audio .vn-time { font-size:11.5px; color:#888; min-width:32px; text-align:right; }
+.cv-recbar { display:none; position:absolute; inset:12px 16px; align-items:center; gap:10px; background:#fff; border:1px solid var(--cmty-red); border-radius:16px; padding:0 10px; z-index:25; }
+.cv-recbar.rec-on { display:flex; }
+.cv-recbar .rec-dot { width:11px; height:11px; border-radius:50%; background:var(--cmty-red); animation:cvPulse 1.1s infinite; }
+@keyframes cvPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.cv-recbar .rec-timer { font-weight:800; font-size:14px; color:var(--cmty-red); }
+.cv-recbar .rec-label { color:#999; font-size:13px; }
+.cv-recbar .rec-cancel, .cv-recbar .rec-send { margin-left:auto; width:40px; height:40px; border:none; border-radius:12px; cursor:pointer; font-size:16px; }
+.cv-recbar .rec-cancel { background:#f1f1f1; color:#555; }
+.cv-recbar .rec-send { background:var(--cmty-red); color:#fff; margin-left:6px; }
 .cv-composer { border-top:1px solid var(--cmty-line); padding:12px 16px; background:#fff; position:relative; }
 .emoji-pan { position:absolute; bottom:62px; left:16px; width:316px; max-width:90vw; background:#fff; border:1px solid var(--cmty-line); border-radius:14px; box-shadow:0 12px 40px rgba(0,0,0,.16); padding:8px; display:none; grid-template-columns:repeat(8,1fr); gap:2px; z-index:40; max-height:230px; overflow-y:auto; }
 .emoji-pan.open { display:grid; }
@@ -99,10 +113,18 @@
       {% csrf_token %}
       <div class="cv-reply-bar" id="cvReplyBar">↪ Réponse à <strong id="cvReplyName"></strong><button type="button" class="x" id="cvReplyCancel">✕</button></div>
       <div class="cv-prev" id="cvPrev"></div>
+      <div class="cv-recbar" id="cvRecBar">
+        <span class="rec-dot"></span>
+        <span class="rec-timer" id="cvRecTimer">0:00</span>
+        <span class="rec-label">Enregistrement…</span>
+        <button type="button" class="rec-cancel" id="cvRecCancel" title="Annuler">✕</button>
+        <button type="button" class="rec-send" id="cvRecSend" title="Envoyer">➤</button>
+      </div>
       <form id="cvForm">
         <div class="cv-row">
           <button type="button" class="cv-ic" id="cvImgBtn" title="Joindre une image">📷</button>
           <button type="button" class="cv-ic" id="cvEmojiBtn" title="Émojis">😊</button>
+          <button type="button" class="cv-ic" id="cvMicBtn" title="Note vocale">🎤</button>
           <input type="file" id="cvFiles" accept="image/*" multiple hidden>
           <textarea class="cv-ta" id="cvText" rows="1" placeholder="Écrivez votre message…" maxlength="2000"></textarea>
           <button type="submit" class="cv-send" id="cvSend" disabled>➤</button>
@@ -116,6 +138,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{% static 'assets/js/voicenote.js' %}"></script>
 <script>
 (function () {
   const shell = document.querySelector('.cv-shell');
@@ -143,8 +166,16 @@
     const nm = m.is_own ? '' : `<div class="nm">${esc(m.sender)}</div>`;
     const tx = m.content ? `<div class="tx">${esc(m.content)}</div>` : '';
     const reply = m.reply_to ? `<div class="dm-reply"><span class="r-s">${esc(m.reply_to.sender)}</span> <span class="r-e">${esc(m.reply_to.excerpt)}</span></div>` : '';
+    let audioHtml = '';
+    if (m.audio) {
+      audioHtml = `<div class="dm-audio" data-src="${m.audio}" data-dur="${m.audio_duration || 0}">
+        <button type="button" class="vn-play">▶</button>
+        <div class="vn-bar"><div class="vn-prog"></div></div>
+        <span class="vn-time">${window.VoiceNote ? VoiceNote.fmtDur(m.audio_duration || 0) : ''}</span>
+      </div>`;
+    }
     el.innerHTML = `<div class="bw">
-      <div class="bub">${reply}${nm}${tx}${imgs}<div class="tm">${fmt(m.created_at)}</div></div>
+      <div class="bub">${reply}${nm}${tx}${audioHtml}${imgs}<div class="tm">${fmt(m.created_at)}</div></div>
       <div class="dm-actions"><button type="button" class="dm-reply-btn" title="Répondre">↪</button></div>
     </div>`;
     return el;
@@ -259,6 +290,32 @@
     });
     document.addEventListener('click', (e) => { if (!pan.contains(e.target) && e.target !== btn) pan.classList.remove('open'); });
   })();
+
+  // ── notes vocales ──
+  if (window.VoiceNote) {
+    VoiceNote.initPlayers(feed, '.dm-audio');
+    VoiceNote.attachRecorder({
+      micBtn: document.getElementById('cvMicBtn'),
+      bar: document.getElementById('cvRecBar'),
+      timer: document.getElementById('cvRecTimer'),
+      cancelBtn: document.getElementById('cvRecCancel'),
+      sendBtn: document.getElementById('cvRecSend'),
+      onSend: async function (blob, secs, filename) {
+        const fd = new FormData();
+        fd.append('audio', blob, filename);
+        fd.append('audio_duration', secs);
+        if (replyTo) fd.append('reply_to', replyTo);
+        try {
+          const r = await fetch(POST, { method: 'POST', headers: { 'X-CSRFToken': csrf() }, body: fd });
+          const d = await r.json();
+          if (!r.ok) { alert(d.error || 'Erreur'); return; }
+          intro.style.display = 'none';
+          append([d.message]); toBottom();
+          replyTo = null; document.getElementById('cvReplyBar').classList.remove('show');
+        } catch (e) {}
+      },
+    });
+  }
 })();
 </script>
 {% endblock %}

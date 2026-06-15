@@ -97,6 +97,11 @@ class Message(models.Model):
         related_name="community_mentions",
         help_text="Produit tagué dans le message.",
     )
+    audio = models.FileField(
+        upload_to="community/audio/%Y/%m/%d/", blank=True, null=True,
+        help_text="Note vocale.",
+    )
+    audio_duration = models.PositiveIntegerField(default=0, help_text="Durée de la note vocale (s).")
     is_pinned = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     deleted_by = models.ForeignKey(
@@ -327,6 +332,11 @@ class DirectMessage(models.Model):
         default=False, help_text="Message envoyé par l'équipe (admin) plutôt que le client."
     )
     content = models.TextField(blank=True, default="")
+    audio = models.FileField(
+        upload_to="community/support/audio/%Y/%m/%d/", blank=True, null=True,
+        help_text="Note vocale.",
+    )
+    audio_duration = models.PositiveIntegerField(default=0)
     reply_to = models.ForeignKey(
         "self", on_delete=models.SET_NULL, null=True, blank=True, related_name="replies"
     )
