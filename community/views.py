@@ -11,9 +11,11 @@ from shop.models import Product
 from shop.templatetags.price_filters import _format, _get_rate, _get_setting
 
 from . import permissions as perm
+from .typing import set_typing, typing_names
 from .models import (
     Channel,
     ChannelMute,
+    ChannelRead,
     ChannelSubscription,
     CommunityBan,
     Message,
@@ -153,6 +155,24 @@ def _feed_queryset(channel):
     )
 
 
+def _mark_channel_read(user, channel):
+    """Avance le curseur de lecture de l'utilisateur jusqu'au dernier message du salon."""
+    if not user.is_authenticated:
+        return
+    latest = (
+        Message.objects.filter(channel=channel, is_deleted=False)
+        .order_by("-id").values_list("id", flat=True).first()
+    )
+    if not latest:
+        return
+    cr, created = ChannelRead.objects.get_or_create(
+        channel=channel, user=user, defaults={"last_read_id": latest}
+    )
+    if not created and cr.last_read_id < latest:
+        cr.last_read_id = latest
+        cr.save(update_fields=["last_read_id", "updated_at"])
+
+
 # ── Pages ───────────────────────────────────────────────────────────────────
 def community_home(request, slug=None):
     channels_qs = Channel.objects.filter(is_active=True)
@@ -170,6 +190,7 @@ def community_home(request, slug=None):
     else:
         active = channels[0]
 
+    _mark_channel_read(request.user, active)
     setting = _get_setting()
     msgs = list(_feed_queryset(active).order_by("-created_at")[:FEED_LIMIT])
     msgs.reverse()
@@ -199,6 +220,7 @@ def messages_feed(request, slug):
     if not perm.can_read_channel(request.user, channel):
         return JsonResponse({"error": "forbidden"}, status=403)
 
+    _mark_channel_read(request.user, channel)
     setting = _get_setting()
     qs = _feed_queryset(channel)
 
@@ -214,10 +236,12 @@ def messages_feed(request, slug):
         msgs.reverse()
 
     data = [serialize_message(m, request, setting) for m in msgs]
+    typing = typing_names("ch", channel.id, request.user.id if request.user.is_authenticated else None)
     return JsonResponse({
         "messages": data,
         "last_id": data[-1]["id"] if data else (after or 0),
         "has_more": len(msgs) >= FEED_LIMIT if before is not None or not after else False,
+        "typing": typing,
     })
 
 
@@ -324,6 +348,31 @@ def pin_message(request, message_id):
     return JsonResponse({"ok": True, "is_pinned": msg.is_pinned})
 
 
+def message_readers_data(request, message_id):
+    """Liste des lecteurs d'un message (réservé staff). Respecte la confidentialité."""
+    msg = get_object_or_404(Message, id=message_id)
+    reads = (
+        ChannelRead.objects.filter(channel_id=msg.channel_id, last_read_id__gte=msg.id)
+        .exclude(user_id=msg.author_id)
+        .select_related("user")
+        .order_by("-updated_at")
+    )
+    readers = []
+    for r in reads:
+        if not r.user.read_receipts:  # confidentialité de l'utilisateur
+            continue
+        readers.append({"name": _author_label(r.user), "at": r.updated_at.isoformat()})
+    return {"readers": readers, "count": len(readers)}
+
+
+@login_required
+@require_GET
+def message_readers(request, message_id):
+    if not request.user.is_staff:
+        return JsonResponse({"error": "forbidden"}, status=403)
+    return JsonResponse(message_readers_data(request, message_id))
+
+
 @login_required
 @require_GET
 def product_search(request):
@@ -411,6 +460,16 @@ def channel_subscribe(request, slug):
 
 @login_required
 @require_POST
+def channel_typing(request, slug):
+    """Ping « en train d'écrire » dans un salon."""
+    channel = get_object_or_404(Channel, slug=slug)
+    if perm.can_write_channel(request.user, channel):
+        set_typing("ch", channel.id, request.user.id, _author_label(request.user))
+    return JsonResponse({"ok": True})
+
+
+@login_required
+@require_POST
 def push_subscribe(request):
     token = (request.POST.get("token") or "").strip()
     if not token:
@@ -420,6 +479,15 @@ def push_subscribe(request):
         defaults={"user": request.user, "user_agent": request.META.get("HTTP_USER_AGENT", "")[:255]},
     )
     return JsonResponse({"ok": True})
+
+
+@login_required
+def read_receipts_setting(request):
+    """GET : état courant ; POST (enabled=1/0) : activer/désactiver ses accusés de lecture."""
+    if request.method == "POST":
+        request.user.read_receipts = request.POST.get("enabled") in ("1", "true", "on", "True")
+        request.user.save(update_fields=["read_receipts"])
+    return JsonResponse({"ok": True, "enabled": request.user.read_receipts})
 
 
 @login_required

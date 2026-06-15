@@ -22,6 +22,7 @@ from community.models import (
 )
 from community.views import serialize_notification
 from community.support_views import _send_message
+from community.typing import set_typing, typing_names
 from community.views import (
     ALLOWED_IMAGE_TYPES,
     FEED_LIMIT,
@@ -29,6 +30,8 @@ from community.views import (
     MAX_IMAGES,
     REACTION_EMOJIS,
     _author_label,
+    _mark_channel_read,
+    message_readers_data,
     parse_duration,
     validate_audio,
 )
@@ -90,6 +93,7 @@ class ChannelMessagesView(APIView):
         if not perm.can_read_channel(request.user, channel):
             raise ApiError("PERMISSION_DENIED", "Salon inaccessible.")
 
+        _mark_channel_read(request.user, channel)
         qs = _feed_queryset(channel)
         after = request.query_params.get("after")
         before = request.query_params.get("before")
@@ -104,10 +108,12 @@ class ChannelMessagesView(APIView):
 
         ctx = {"request": request, "setting": _get_setting()}
         data = MessageSerializer(msgs, many=True, context=ctx).data
+        typing = typing_names("ch", channel.id, request.user.id if request.user.is_authenticated else None)
         return Response({
             "success": True,
             "results": data,
             "last_id": data[-1]["id"] if data else (after or 0),
+            "typing": typing,
         })
 
     @extend_schema(tags=TAG, summary="Publier un message", responses=MessageSerializer)
@@ -281,9 +287,10 @@ def _dm_payload(dm, request):
     if dm.reply_to_id and dm.reply_to:
         rt = dm.reply_to
         reply = {"id": rt.id, "sender": _dm_label(rt), "excerpt": _dm_excerpt(rt)}
-    # Accusé de lecture : visible UNIQUEMENT par l'admin, sur les messages de l'équipe.
+    # Accusé de lecture : admin uniquement, messages équipe, si le client l'autorise.
     viewer_staff = request.user.is_authenticated and request.user.is_staff
-    read = dm.read_by_client if (viewer_staff and dm.is_admin) else None
+    client_allows = dm.conversation.client.read_receipts
+    read = dm.read_by_client if (viewer_staff and dm.is_admin and client_allows) else None
     return {
         "id": dm.id,
         "is_admin": dm.is_admin,
@@ -318,15 +325,17 @@ def _support_feed(request, conversation):
         msgs = list(qs.order_by("-created_at")[:FEED_LIMIT]); msgs.reverse()
     data = [_dm_payload(m, request) for m in msgs]
     read_ids = []
-    if request.user.is_authenticated and request.user.is_staff:
+    if request.user.is_authenticated and request.user.is_staff and conversation.client.read_receipts:
         read_ids = list(
             conversation.messages.filter(is_admin=True, read_by_client=True)
             .order_by("-id").values_list("id", flat=True)[:100]
         )
+    typing = typing_names("conv", conversation.id, request.user.id)
     return Response({
         "success": True, "results": data,
         "last_id": data[-1]["id"] if data else (after or 0),
         "read_ids": read_ids,
+        "typing": typing,
     })
 
 
@@ -487,6 +496,16 @@ class MuteAuthorView(APIView):
         return Response({"success": True, "muted": muted, "user": msg.author.username})
 
 
+class MessageReadersView(APIView):
+    """« Vu par » : liste des lecteurs d'un message (réservé admin)."""
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=TAG_MOD, summary="Liste des lecteurs d'un message (« vu par »)")
+    def get(self, request, pk):
+        data = message_readers_data(request, pk)
+        return Response({"success": True, **data})
+
+
 class ChannelLockView(APIView):
     permission_classes = [IsAdminUser]
 
@@ -532,6 +551,59 @@ class ChannelAdminUpdateView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"success": True, "data": serializer.data})
+
+
+class ReadReceiptSettingView(APIView):
+    """Confidentialité : activer/désactiver ses accusés de lecture."""
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(tags=TAG, summary="État de mes accusés de lecture")
+    def get(self, request):
+        return Response({"success": True, "enabled": request.user.read_receipts})
+
+    @extend_schema(tags=TAG, summary="Activer/désactiver mes accusés de lecture")
+    def post(self, request):
+        request.user.read_receipts = bool(request.data.get("enabled"))
+        request.user.save(update_fields=["read_receipts"])
+        return Response({"success": True, "enabled": request.user.read_receipts})
+
+
+class ChannelTypingView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(tags=TAG, summary="Ping « en train d'écrire » (salon)")
+    def post(self, request, slug):
+        try:
+            channel = Channel.objects.get(slug=slug)
+        except Channel.DoesNotExist:
+            raise ApiError("NOT_FOUND", "Salon introuvable.", status_code=404)
+        if perm.can_write_channel(request.user, channel):
+            set_typing("ch", channel.id, request.user.id, _author_label(request.user))
+        return Response({"success": True})
+
+
+class SupportTypingView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(tags=TAG, summary="Ping « en train d'écrire » (support, client)")
+    def post(self, request):
+        if not request.user.is_staff:
+            conv, _ = Conversation.objects.get_or_create(client=request.user)
+            set_typing("conv", conv.id, request.user.id, _author_label(request.user), is_admin=False)
+        return Response({"success": True})
+
+
+class SupportInboxTypingView(APIView):
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(tags=TAG, summary="Ping « en train d'écrire » (support, admin)")
+    def post(self, request, conv_id):
+        try:
+            conv = Conversation.objects.get(id=conv_id)
+        except Conversation.DoesNotExist:
+            raise ApiError("NOT_FOUND", "Conversation introuvable.", status_code=404)
+        set_typing("conv", conv.id, request.user.id, "Équipe Hayiti's", is_admin=True)
+        return Response({"success": True})
 
 
 class UserSearchView(APIView):

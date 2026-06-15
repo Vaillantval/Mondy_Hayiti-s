@@ -107,6 +107,8 @@
 .react-menu span:hover { transform:scale(1.3); }
 
 /* ── Composer ── */
+.cmty-typing { padding:0 20px; font-size:12.5px; color:#9a9a9a; font-style:italic; }
+.cmty-typing.on { padding:3px 20px 7px; }
 .cmty-composer { border-top:1px solid var(--cmty-line); padding:12px 16px; background:#fff; }
 .cmty-reply-bar, .cmty-prod-bar { display:none; align-items:center; gap:9px; background:var(--cmty-cream); border-radius:11px; padding:7px 11px; margin-bottom:8px; font-size:12.5px; }
 .cmty-reply-bar.show, .cmty-prod-bar.show { display:flex; }
@@ -164,6 +166,16 @@
 .cmty-recbar .rec-cancel, .cmty-recbar .rec-send { margin-left:auto; width:40px; height:40px; border:none; border-radius:12px; cursor:pointer; font-size:16px; }
 .cmty-recbar .rec-cancel { background:#f1f1f1; color:#555; }
 .cmty-recbar .rec-send { background:var(--cmty-red); color:#fff; margin-left:6px; }
+.cmty-readers-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:9998; align-items:center; justify-content:center; padding:20px; }
+.cmty-readers-modal.open { display:flex; }
+.crm-box { background:#fff; border-radius:16px; width:320px; max-width:92vw; max-height:70vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 18px 60px rgba(0,0,0,.25); }
+.crm-head { display:flex; align-items:center; justify-content:space-between; padding:13px 16px; border-bottom:1px solid var(--cmty-line); font-family:'Nunito',sans-serif; }
+.crm-head button { border:none; background:none; font-size:16px; cursor:pointer; color:#999; }
+.crm-list { overflow-y:auto; padding:6px; }
+.crm-item { display:flex; align-items:center; gap:10px; padding:9px 11px; }
+.crm-av { width:32px; height:32px; flex-shrink:0; border-radius:50%; background:var(--cmty-red); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; }
+.crm-name { font-size:14px; font-weight:600; }
+.crm-empty { padding:24px; text-align:center; color:#b0a89f; font-size:13px; }
 .cmty-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1A1A1A; color:#fff; padding:11px 20px; border-radius:30px; font-size:13.5px; z-index:9999; opacity:0; transition:opacity .2s; }
 .cmty-toast.show { opacity:1; }
 
@@ -297,6 +309,8 @@
         </div>
       </div>
 
+      <div class="cmty-typing" id="cmtyTyping"></div>
+
       {% if can_write %}
       <div class="cmty-composer" style="position:relative;">
         <!-- popover recherche produit -->
@@ -358,6 +372,12 @@
 {% endif %}
 
 <div class="cmty-lightbox" id="cmtyLightbox"><img src="" alt=""></div>
+<div class="cmty-readers-modal" id="cmtyReadersModal">
+  <div class="crm-box">
+    <div class="crm-head"><strong>👁 Vu par <span id="crmCount"></span></strong><button type="button" id="crmClose" aria-label="Fermer">✕</button></div>
+    <div class="crm-list" id="crmList"></div>
+  </div>
+</div>
 <div class="cmty-toast" id="cmtyToast"></div>
 
 {{ initial_messages|json_script:"cmty-initial" }}
@@ -484,6 +504,7 @@
     const modBtns = (m.can_moderate && !m.is_staff && !m.is_own)
       ? `<button class="b-act-btn act-mute" title="Mute dans ce salon">🔇</button><button class="b-act-btn act-ban" title="Bannir l'auteur">🚫</button>`
       : '';
+    const seenBtn = (m.can_moderate && m.is_own) ? `<button class="b-act-btn act-seen" title="Vu par">👁</button>` : '';
     const pinFlag = m.is_pinned ? `<span class="pin-flag">📌 épinglé</span>` : '';
 
     const text = m.content ? `<div class="b-text">${renderContent(m.content)}</div>` : '';
@@ -507,7 +528,7 @@
           ${pinFlag}
         </div>
         <div class="bubble">${reply}${text}${audioHtml}${imgs}${prod}</div>
-        <div class="b-actions"><span class="react-chips">${chips}</span>${reactMenu}${replyBtn}${delBtn}${pinBtn}${modBtns}</div>
+        <div class="b-actions"><span class="react-chips">${chips}</span>${reactMenu}${replyBtn}${delBtn}${pinBtn}${seenBtn}${modBtns}</div>
       </div>`;
     return el;
   }
@@ -540,6 +561,22 @@
   }
 
   // ── polling ──
+  function updateTyping(names) {
+    const el = document.getElementById('cmtyTyping');
+    if (!el) return;
+    if (names && names.length) {
+      el.textContent = names.length === 1 ? `${names[0]} écrit…` : `${names[0]} et d'autres écrivent…`;
+      el.classList.add('on');
+    } else { el.textContent = ''; el.classList.remove('on'); }
+  }
+  let lastTypingPing = 0;
+  function pingTyping() {
+    const now = Date.now();
+    if (now - lastTypingPing < 2800) return;
+    lastTypingPing = now;
+    fetch(`/community/c/${SLUG}/typing/`, { method: 'POST', headers: { 'X-CSRFToken': csrf() } }).catch(function () {});
+  }
+
   async function poll() {
     try {
       const r = await fetch(`${U.feed}?after=${lastId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
@@ -549,6 +586,7 @@
         const empty = feed.querySelector('.cmty-empty'); if (empty) empty.remove();
         appendMessages(data.messages, false);
       }
+      updateTyping(data.typing);
     } catch (e) { /* silencieux */ }
   }
   function startPolling() { if (!polling) polling = setInterval(poll, 4000); }
@@ -612,6 +650,8 @@
       const r = await fetch(U.pin(msgEl.dataset.id), { method: 'POST', headers: { 'X-CSRFToken': csrf() } });
       const d = await r.json(); toast(d.is_pinned ? 'Message épinglé' : 'Épingle retirée'); return;
     }
+    // vu par (admin)
+    if (e.target.classList.contains('act-seen') && msgEl) { openReaders(msgEl.dataset.id); return; }
     // bannir l'auteur
     if (e.target.classList.contains('act-ban') && msgEl) {
       if (!confirm("Bannir cet utilisateur de toute la communauté ?")) return;
@@ -672,6 +712,28 @@
     lockBtn.disabled = false;
   });
 
+  // ── "Vu par" (admin) ──
+  async function openReaders(id) {
+    const modal = document.getElementById('cmtyReadersModal');
+    const list = document.getElementById('crmList');
+    const cnt = document.getElementById('crmCount');
+    cnt.textContent = ''; list.innerHTML = '<div class="crm-empty">Chargement…</div>';
+    modal.classList.add('open');
+    try {
+      const r = await fetch(`/community/m/${id}/readers/`);
+      const d = await r.json();
+      if (!r.ok) { list.innerHTML = '<div class="crm-empty">Accès refusé.</div>'; return; }
+      cnt.textContent = d.count ? `(${d.count})` : '';
+      if (!d.readers || !d.readers.length) { list.innerHTML = "<div class=\"crm-empty\">Personne n'a encore lu ce message.</div>"; return; }
+      list.innerHTML = d.readers.map(u => `<div class="crm-item"><span class="crm-av">${esc((u.name[0] || '?').toUpperCase())}</span><span class="crm-name">${esc(u.name)}</span></div>`).join('');
+    } catch (e) { list.innerHTML = '<div class="crm-empty">Erreur.</div>'; }
+  }
+  (function () {
+    const modal = document.getElementById('cmtyReadersModal');
+    document.getElementById('crmClose').addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+  })();
+
   document.getElementById('cmtyLightbox').addEventListener('click', function () { this.classList.remove('open'); });
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.react-pop')) document.querySelectorAll('.react-menu.open').forEach(m => m.classList.remove('open'));
@@ -714,6 +776,7 @@
     }
     ta.addEventListener('input', () => {
       ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 130) + 'px'; refreshSend();
+      pingTyping();
     });
     ta.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); }

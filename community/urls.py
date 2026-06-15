@@ -14,6 +14,7 @@ urlpatterns = [
     path("m/<int:message_id>/react/", views.react_message, name="react"),
     path("m/<int:message_id>/delete/", views.delete_message, name="delete"),
     path("m/<int:message_id>/pin/", views.pin_message, name="pin"),
+    path("m/<int:message_id>/readers/", views.message_readers, name="message_readers"),
     path("products/search/", views.product_search, name="product_search"),
 
     # Modération in-UI (staff)
@@ -25,10 +26,14 @@ urlpatterns = [
 
     # Abonnement salon
     path("c/<slug:slug>/subscribe/", views.channel_subscribe, name="subscribe"),
+    path("c/<slug:slug>/typing/", views.channel_typing, name="channel_typing"),
 
     # Notifications
     path("notifications/feed/", views.notifications_feed, name="notifications_feed"),
     path("notifications/read/", views.notifications_read, name="notifications_read"),
+
+    # Réglage confidentialité (accusés de lecture)
+    path("read-receipts/", views.read_receipts_setting, name="read_receipts"),
 
     # Web Push
     path("push/subscribe/", views.push_subscribe, name="push_subscribe"),
@@ -38,10 +43,12 @@ urlpatterns = [
     path("support/", support_views.support_home, name="support"),
     path("support/feed/", support_views.support_feed, name="support_feed"),
     path("support/post/", support_views.support_post, name="support_post"),
+    path("support/typing/", support_views.support_typing, name="support_typing"),
 
     # Support privé — côté admin (inbox partagée)
     path("inbox/", support_views.inbox, name="inbox"),
     path("inbox/<int:conv_id>/", support_views.inbox_conversation, name="inbox_conversation"),
     path("inbox/<int:conv_id>/feed/", support_views.inbox_feed, name="inbox_feed"),
     path("inbox/<int:conv_id>/post/", support_views.inbox_post, name="inbox_post"),
+    path("inbox/<int:conv_id>/typing/", support_views.inbox_typing, name="inbox_typing"),
 ]

@@ -11,3 +11,8 @@ class Customer(AbstractUser):
         null=True,
         help_text="Firebase Cloud Messaging token pour les push notifications Flutter.",
     )
+    read_receipts = models.BooleanField(
+        default=True,
+        help_text="Si désactivé, l'utilisateur n'envoie plus d'accusés de lecture "
+                  "(personne ne voit quand il a lu un message).",
+    )

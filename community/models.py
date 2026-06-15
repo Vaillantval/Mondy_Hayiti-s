@@ -230,6 +230,31 @@ class ChannelSubscription(models.Model):
         return f"{self.user_id} suit {self.channel.slug}"
 
 
+class ChannelRead(models.Model):
+    """Curseur de lecture d'un utilisateur dans un salon (pour les accusés « vu par »).
+
+    `last_read_id` = id du dernier message vu. Un utilisateur a « lu » un message X
+    si son `last_read_id >= X.id`.
+    """
+
+    channel = models.ForeignKey(
+        Channel, on_delete=models.CASCADE, related_name="reads"
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="channel_reads"
+    )
+    last_read_id = models.PositiveBigIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("channel", "user")
+        verbose_name = "Lecture salon"
+        verbose_name_plural = "Lectures salon"
+
+    def __str__(self):
+        return f"{self.user_id} a lu {self.channel.slug} jusqu'à {self.last_read_id}"
+
+
 class Notification(models.Model):
     """Notification in-app (et trace de ce qui a été poussé en push)."""
 

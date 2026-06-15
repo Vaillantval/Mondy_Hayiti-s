@@ -8,6 +8,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from .models import Conversation, DirectMessage, DirectMessageAttachment
 from .notify import notify_support_message
+from .typing import set_typing, typing_names
 from .views import (
     ALLOWED_IMAGE_TYPES,
     FEED_LIMIT,
@@ -41,10 +42,11 @@ def serialize_dm(dm, request):
     if dm.reply_to_id and dm.reply_to:
         rt = dm.reply_to
         reply = {"id": rt.id, "sender": _dm_label(rt), "excerpt": _excerpt(rt)}
-    # Accusé de lecture : visible UNIQUEMENT par l'admin, sur les messages de l'équipe.
-    # Le client ne voit jamais cet état (toujours None pour lui).
+    # Accusé de lecture : visible UNIQUEMENT par l'admin, sur les messages de l'équipe,
+    # et seulement si le client n'a pas désactivé ses accusés de lecture (confidentialité).
     viewer_staff = request.user.is_authenticated and request.user.is_staff
-    read = dm.read_by_client if (viewer_staff and dm.is_admin) else None
+    client_allows = dm.conversation.client.read_receipts
+    read = dm.read_by_client if (viewer_staff and dm.is_admin and client_allows) else None
     return {
         "id": dm.id,
         "is_admin": dm.is_admin,
@@ -63,7 +65,7 @@ def serialize_dm(dm, request):
 def _feed_qs(conversation):
     return (
         conversation.messages
-        .select_related("sender", "reply_to", "reply_to__sender")
+        .select_related("sender", "reply_to", "reply_to__sender", "conversation__client")
         .prefetch_related("attachments")
     )
 
@@ -108,15 +110,17 @@ def _feed_response(request, conversation):
     data = [serialize_dm(m, request) for m in msgs]
     # Pour l'admin : ids des messages de l'équipe déjà lus par le client (maj des accusés au polling)
     read_ids = []
-    if request.user.is_authenticated and request.user.is_staff:
+    if request.user.is_authenticated and request.user.is_staff and conversation.client.read_receipts:
         read_ids = list(
             conversation.messages.filter(is_admin=True, read_by_client=True)
             .order_by("-id").values_list("id", flat=True)[:100]
         )
+    typing = typing_names("conv", conversation.id, request.user.id)
     return JsonResponse({
         "messages": data,
         "last_id": data[-1]["id"] if data else (after or 0),
         "read_ids": read_ids,
+        "typing": typing,
     })
 
 
@@ -138,7 +142,9 @@ def support_home(request):
         "last_id": msgs[-1].id if msgs else 0,
         "feed_url": "/community/support/feed/",
         "post_url": "/community/support/post/",
+        "typing_url": "/community/support/typing/",
         "back_url": "",
+        "read_receipts": request.user.read_receipts,
     })
 
 
@@ -214,6 +220,7 @@ def inbox_conversation(request, conv_id):
         "last_id": msgs[-1].id if msgs else 0,
         "feed_url": f"/community/inbox/{conv.id}/feed/",
         "post_url": f"/community/inbox/{conv.id}/post/",
+        "typing_url": f"/community/inbox/{conv.id}/typing/",
         "back_url": "/community/inbox/",
     })
 
@@ -248,3 +255,24 @@ def inbox_post(request, conv_id):
     dm = _send_message(conv, request.user, is_admin=True, content=content, images=images,
                        reply_to=reply_to, audio=audio, audio_duration=audio_duration)
     return JsonResponse({"message": serialize_dm(_feed_qs(conv).get(id=dm.id), request)}, status=201)
+
+
+# ── Indicateur "en train d'écrire" ──────────────────────────────────────────
+@login_required
+@require_POST
+def support_typing(request):
+    """Le client tape dans sa conversation support."""
+    if request.user.is_staff:
+        return JsonResponse({"ok": True})
+    conv, _ = Conversation.objects.get_or_create(client=request.user)
+    set_typing("conv", conv.id, request.user.id, _author_label(request.user), is_admin=False)
+    return JsonResponse({"ok": True})
+
+
+@staff_required
+@require_POST
+def inbox_typing(request, conv_id):
+    """L'admin tape dans une conversation client."""
+    conv = get_object_or_404(Conversation, id=conv_id)
+    set_typing("conv", conv.id, request.user.id, "Équipe Hayiti's", is_admin=True)
+    return JsonResponse({"ok": True})

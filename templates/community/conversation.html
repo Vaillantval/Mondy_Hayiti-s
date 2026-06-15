@@ -16,6 +16,8 @@
 .cv-head .cv-av { width:44px; height:44px; border-radius:50%; background:var(--cmty-red); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:17px; }
 .cv-head h1 { font-family:'Playfair Display',serif; font-size:19px; margin:0; }
 .cv-head p { margin:1px 0 0; font-size:12px; color:#8a8a8a; }
+.cv-head .cv-rr { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:11px; color:#999; cursor:pointer; white-space:nowrap; }
+.cv-head .cv-rr input { accent-color:var(--cmty-red); width:15px; height:15px; }
 .cv-feed { flex:1; overflow-y:auto; padding:18px; background:var(--cmty-cream); display:flex; flex-direction:column; gap:10px; }
 .cv-intro { margin:auto; text-align:center; color:#b0a89f; max-width:340px; }
 .cv-intro .ic { font-size:46px; }
@@ -57,6 +59,8 @@
 .cv-recbar .rec-cancel, .cv-recbar .rec-send { margin-left:auto; width:40px; height:40px; border:none; border-radius:12px; cursor:pointer; font-size:16px; }
 .cv-recbar .rec-cancel { background:#f1f1f1; color:#555; }
 .cv-recbar .rec-send { background:var(--cmty-red); color:#fff; margin-left:6px; }
+.cv-typing { padding:0 18px; font-size:12.5px; color:#9a9a9a; font-style:italic; }
+.cv-typing.on { padding:3px 18px 6px; }
 .cv-composer { border-top:1px solid var(--cmty-line); padding:12px 16px; background:#fff; position:relative; }
 .emoji-pan { position:absolute; bottom:62px; left:16px; width:316px; max-width:90vw; background:#fff; border:1px solid var(--cmty-line); border-radius:14px; box-shadow:0 12px 40px rgba(0,0,0,.16); padding:8px; display:none; grid-template-columns:repeat(8,1fr); gap:2px; z-index:40; max-height:230px; overflow-y:auto; }
 .emoji-pan.open { display:grid; }
@@ -94,7 +98,7 @@
 {% block content %}
 <div class="cv-wrap">
   <div class="cv-shell"
-       data-feed="{{ feed_url }}" data-post="{{ post_url }}" data-last="{{ last_id }}">
+       data-feed="{{ feed_url }}" data-post="{{ post_url }}" data-typing="{{ typing_url }}" data-last="{{ last_id }}">
     <header class="cv-head">
       <a href="{{ back_url|default:'/' }}" class="cv-back" title="Retour">‹</a>
       <span class="cv-av">{% if is_admin_view %}{{ peer_name|slice:":1"|upper }}{% else %}H{% endif %}</span>
@@ -102,6 +106,12 @@
         <h1>{{ peer_name }}</h1>
         <p>{% if is_admin_view %}Conversation client{% else %}Nous répondons au plus vite 💬{% endif %}</p>
       </div>
+      {% if not is_admin_view %}
+      <label class="cv-rr" title="Si désactivé, l'équipe ne voit pas quand vous avez lu ses messages">
+        <input type="checkbox" id="cvRrToggle" {% if read_receipts %}checked{% endif %}>
+        <span>Accusés de lecture</span>
+      </label>
+      {% endif %}
     </header>
 
     <div class="cv-feed" id="cvFeed">
@@ -110,6 +120,8 @@
         <p>{% if is_admin_view %}Aucun message dans cette conversation.{% else %}Bonjour&nbsp;! Posez votre question, l'équipe Hayiti's vous répondra ici.{% endif %}</p>
       </div>
     </div>
+
+    <div class="cv-typing" id="cvTyping"></div>
 
     <div class="cv-composer">
       {% csrf_token %}
@@ -145,7 +157,7 @@
 (function () {
   const shell = document.querySelector('.cv-shell');
   if (!shell) return;
-  const FEED = shell.dataset.feed, POST = shell.dataset.post;
+  const FEED = shell.dataset.feed, POST = shell.dataset.post, TYPING = shell.dataset.typing;
   let lastId = parseInt(shell.dataset.last || '0', 10);
   const feed = document.getElementById('cvFeed');
   const intro = document.getElementById('cvIntro');
@@ -207,6 +219,21 @@
   const initial = JSON.parse(document.getElementById('cv-initial').textContent);
   if (!initial.length) intro.style.display = 'block'; else { append(initial); toBottom(); }
 
+  function updateTyping(names) {
+    const el = document.getElementById('cvTyping');
+    if (!el) return;
+    if (names && names.length) { el.textContent = names[0] + ' écrit…'; el.classList.add('on'); }
+    else { el.textContent = ''; el.classList.remove('on'); }
+  }
+  let lastTypingPing = 0;
+  function pingTyping() {
+    if (!TYPING) return;
+    const now = Date.now();
+    if (now - lastTypingPing < 2800) return;
+    lastTypingPing = now;
+    fetch(TYPING, { method: 'POST', headers: { 'X-CSRFToken': csrf() } }).catch(function () {});
+  }
+
   async function poll() {
     try {
       const r = await fetch(`${FEED}?after=${lastId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
@@ -214,6 +241,7 @@
       const d = await r.json();
       if (d.messages && d.messages.length) { intro.style.display = 'none'; append(d.messages); }
       applyReadReceipts(d.read_ids);
+      updateTyping(d.typing);
     } catch (e) {}
   }
   let timer = setInterval(() => { if (!document.hidden) poll(); }, 4000);
@@ -245,7 +273,7 @@
     replyTo = null; document.getElementById('cvReplyBar').classList.remove('show');
   });
   function refresh() { sendBtn.disabled = !(ta.value.trim() || files.length); }
-  ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 130) + 'px'; refresh(); });
+  ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 130) + 'px'; refresh(); pingTyping(); });
   ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
   document.getElementById('cvImgBtn').addEventListener('click', () => filesInput.click());
   filesInput.addEventListener('change', () => {
@@ -305,6 +333,17 @@
     });
     document.addEventListener('click', (e) => { if (!pan.contains(e.target) && e.target !== btn) pan.classList.remove('open'); });
   })();
+
+  // ── confidentialité : accusés de lecture (client) ──
+  const rrToggle = document.getElementById('cvRrToggle');
+  if (rrToggle) rrToggle.addEventListener('change', function () {
+    const body = new URLSearchParams(); body.append('enabled', rrToggle.checked ? '1' : '0');
+    fetch('/community/read-receipts/', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrf(), 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    }).catch(function () {});
+  });
 
   // ── notes vocales ──
   if (window.VoiceNote) {

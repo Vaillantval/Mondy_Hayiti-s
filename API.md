@@ -454,6 +454,37 @@ Tous ces endpoints exigent `is_staff` (sinon `403 PERMISSION_DENIED`). `ban` et 
 sont des **toggles**. Une écriture refusée pour un membre renvoie `403` avec un
 `message` explicite (« Vous avez été banni… », « Ce salon est en lecture seule… »).
 
+### Accusés de lecture, « vu par » & confidentialité
+
+```
+# Support : chaque message renvoie "read" (admin uniquement, sinon null) ; le feed
+# renvoie aussi "read_ids" (messages équipe déjà lus, pour la maj des ✓✓ au polling).
+GET /api/community/support/inbox/42/messages/
+  → { ..., "results":[ { ..., "read": true } ], "read_ids":[123,124] }
+
+# Communauté — « Vu par » (admin) : lecteurs d'un message
+GET /api/community/messages/1247/readers/
+  → { success, count: 3, readers:[ { name: "Marie L.", at: "..." } ] }
+
+# Confidentialité (utilisateur) : couper ses accusés de lecture (support + communauté)
+GET  /api/community/settings/read-receipts/        → { success, enabled: true }
+POST /api/community/settings/read-receipts/  { enabled: false }
+```
+Si un utilisateur désactive ses accusés (`enabled:false`), il n'apparaît plus dans
+les « vu par » et son `read` n'est jamais exposé aux admins.
+
+### Indicateur « en train d'écrire »
+
+```
+# Ping pendant la frappe (toutes les ~3 s) :
+POST /api/community/channels/general/typing/         (communauté)
+POST /api/community/support/typing/                  (support, client)
+POST /api/community/support/inbox/42/typing/         (support, admin)
+```
+L'état est renvoyé dans les **feeds** (`"typing": ["Marie L."]`, hors soi-même, plus
+récent d'abord) — communauté : afficher le premier ; support : la personne en face.
+Les entrées expirent après ~6 s sans ping.
+
 ### Notifications push (FCM)
 
 L'app enregistre son token via `POST /api/auth/fcm-token/`. Les notifications
