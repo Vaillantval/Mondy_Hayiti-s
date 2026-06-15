@@ -26,6 +26,8 @@
 .dm .nm { font-size:11px; font-weight:800; color:var(--cmty-red); margin-bottom:2px; }
 .dm .tx { font-size:14px; line-height:1.5; color:#222; white-space:pre-wrap; word-break:break-word; }
 .dm .tm { font-size:10.5px; color:#b0a89f; margin-top:3px; text-align:right; }
+.dm .tm .dm-rr { font-size:11px; color:#c0b8af; letter-spacing:-1px; }
+.dm .tm .dm-rr.read { color:#34B7F1; }
 .dm .ims { display:grid; gap:5px; margin-top:7px; grid-template-columns:repeat(2,1fr); }
 .dm .ims.one { grid-template-columns:1fr; }
 .dm .ims img { width:100%; height:130px; object-fit:cover; border-radius:9px; cursor:pointer; }
@@ -154,6 +156,18 @@
   function nearBottom() { return feed.scrollHeight - feed.scrollTop - feed.clientHeight < 120; }
   function toBottom() { feed.scrollTop = feed.scrollHeight; }
 
+  // Accusé de lecture (admin uniquement : m.read est null pour le client → pas de tick)
+  function rrTick(m) {
+    if (m.read === null || m.read === undefined) return '';
+    return ` <span class="dm-rr${m.read ? ' read' : ''}" data-mid="${m.id}">${m.read ? '✓✓' : '✓'}</span>`;
+  }
+  function applyReadReceipts(ids) {
+    (ids || []).forEach(function (id) {
+      const el = feed.querySelector('.dm-rr[data-mid="' + id + '"]');
+      if (el && !el.classList.contains('read')) { el.classList.add('read'); el.textContent = '✓✓'; }
+    });
+  }
+
   function render(m) {
     const el = document.createElement('div');
     el.className = 'dm' + (m.is_own ? ' own' : '');
@@ -175,7 +189,7 @@
       </div>`;
     }
     el.innerHTML = `<div class="bw">
-      <div class="bub">${reply}${nm}${tx}${audioHtml}${imgs}<div class="tm">${fmt(m.created_at)}</div></div>
+      <div class="bub">${reply}${nm}${tx}${audioHtml}${imgs}<div class="tm">${fmt(m.created_at)}${rrTick(m)}</div></div>
       <div class="dm-actions"><button type="button" class="dm-reply-btn" title="Répondre">↪</button></div>
     </div>`;
     return el;
@@ -199,6 +213,7 @@
       if (!r.ok) return;
       const d = await r.json();
       if (d.messages && d.messages.length) { intro.style.display = 'none'; append(d.messages); }
+      applyReadReceipts(d.read_ids);
     } catch (e) {}
   }
   let timer = setInterval(() => { if (!document.hidden) poll(); }, 4000);

@@ -281,6 +281,9 @@ def _dm_payload(dm, request):
     if dm.reply_to_id and dm.reply_to:
         rt = dm.reply_to
         reply = {"id": rt.id, "sender": _dm_label(rt), "excerpt": _dm_excerpt(rt)}
+    # Accusé de lecture : visible UNIQUEMENT par l'admin, sur les messages de l'équipe.
+    viewer_staff = request.user.is_authenticated and request.user.is_staff
+    read = dm.read_by_client if (viewer_staff and dm.is_admin) else None
     return {
         "id": dm.id,
         "is_admin": dm.is_admin,
@@ -290,6 +293,7 @@ def _dm_payload(dm, request):
         "attachments": [request.build_absolute_uri(a.image.url) for a in dm.attachments.all()],
         "audio": request.build_absolute_uri(dm.audio.url) if dm.audio else None,
         "audio_duration": dm.audio_duration,
+        "read": read,
         "created_at": dm.created_at.isoformat(),
         "is_own": bool(dm.sender_id == request.user.id),
     }
@@ -313,7 +317,17 @@ def _support_feed(request, conversation):
     else:
         msgs = list(qs.order_by("-created_at")[:FEED_LIMIT]); msgs.reverse()
     data = [_dm_payload(m, request) for m in msgs]
-    return Response({"success": True, "results": data, "last_id": data[-1]["id"] if data else (after or 0)})
+    read_ids = []
+    if request.user.is_authenticated and request.user.is_staff:
+        read_ids = list(
+            conversation.messages.filter(is_admin=True, read_by_client=True)
+            .order_by("-id").values_list("id", flat=True)[:100]
+        )
+    return Response({
+        "success": True, "results": data,
+        "last_id": data[-1]["id"] if data else (after or 0),
+        "read_ids": read_ids,
+    })
 
 
 def _check_images(request):
