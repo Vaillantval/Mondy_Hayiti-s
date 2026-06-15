@@ -1,5 +1,6 @@
 from django.db import models
 
+from shop.models.file_cleanup import collect_replaced_files
 from shop.validators import validate_apk_extension
 
 
@@ -75,18 +76,12 @@ class Setting(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # Supprime l'ancien APK quand on en uploade un nouveau (ou qu'on le retire),
+        # Supprime l'ancien APK / logo quand on les remplace (ou les retire),
         # pour ne pas accumuler les fichiers sur le volume.
-        old_apk = None
-        if self.pk:
-            previous = Setting.objects.filter(pk=self.pk).first()
-            if previous and previous.apk_file and (
-                not self.apk_file or previous.apk_file.name != self.apk_file.name
-            ):
-                old_apk = previous.apk_file
+        old_files = collect_replaced_files(self, Setting, ("apk_file", "logo"))
         super().save(*args, **kwargs)
-        if old_apk:
-            old_apk.delete(save=False)
+        for f in old_files:
+            f.delete(save=False)
 
     def __str__(self):
         return self.name
