@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import uuid
 
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -25,6 +26,35 @@ from shop.services.moncash_service import MonCashService
 from shop.services.payment_service import StripeService
 
 logger = logging.getLogger(__name__)
+
+
+def _expected_htg(order):
+    """Montant attendu en HTG pour une commande (avec conversion depuis la devise de base)."""
+    setting = Setting.objects.first()
+    base = setting.base_currency if setting else "HTG"
+    if base == "HTG":
+        return float(order.order_cost_ttc)
+    rate = ExchangeRate.objects.filter(base_currency=base, target_currency="HTG").first()
+    return float(order.order_cost_ttc) * (rate.rate if rate else 1.0)
+
+
+def _apply_moncash_success(order, payment):
+    """Transaction MonCash 'successful' : vérifie que la transaction correspond bien à
+    la commande (référence) ET que le montant payé est suffisant, puis marque payé.
+
+    Lève ApiError si la transaction ne correspond pas ou si le montant est insuffisant.
+    Idempotent : ne re-traite pas une commande déjà payée.
+    """
+    ref_prefix = str(payment.get("reference", "")).split("-")[0]
+    if ref_prefix != str(order.id):
+        raise ApiError("PAYMENT_FAILED", "La transaction ne correspond pas à la commande.")
+    if float(payment.get("cost", 0)) < _expected_htg(order) - 1:
+        raise ApiError("PAYMENT_FAILED", "Montant payé insuffisant.")
+    if not order.is_paid:
+        order.is_paid = True
+        order.status = "processing"
+        order.payment_status = "paid"
+        order.save(update_fields=["is_paid", "status", "payment_status"])
 
 
 class PaymentInitiateView(APIView):
@@ -71,9 +101,12 @@ class PaymentInitiateView(APIView):
                         )
                     amount_htg = round(float(order.order_cost_ttc) * rate_obj.rate, 2)
 
+                # orderId unique (préfixé par l'id commande) — comme le flow web,
+                # retrouvé dans payment.reference à la vérification + évite les collisions au retry
+                mc_order_id = f"{order.id}-{uuid.uuid4().hex[:8]}"
                 result = MonCashService.create_payment(
                     amount=amount_htg,
-                    order_id=str(order.id),
+                    order_id=mc_order_id,
                 )
                 return Response({
                     "success": True,
@@ -183,9 +216,8 @@ class PaymentVerifyView(APIView):
                     )
                 payment = MonCashService.retrieve_transaction(transaction_id)
                 if payment.get("message") == "successful":
-                    order.is_paid = True
-                    order.status = "processing"
-                    order.save(update_fields=["is_paid", "status"])
+                    # vérifie référence + montant, puis marque payé (idempotent)
+                    _apply_moncash_success(order, payment)
                 return Response({"success": True, "data": {"is_paid": order.is_paid, "moncash": payment}})
 
             elif method == "stripe":
@@ -200,9 +232,11 @@ class PaymentVerifyView(APIView):
                     )
                 intent = stripe.PaymentIntent.retrieve(intent_id)
                 if intent["status"] == "succeeded":
-                    order.is_paid = True
-                    order.status = "processing"
-                    order.save(update_fields=["is_paid", "status"])
+                    if not order.is_paid:
+                        order.is_paid = True
+                        order.status = "processing"
+                        order.payment_status = "paid"
+                        order.save(update_fields=["is_paid", "status", "payment_status"])
                 return Response({"success": True, "data": {"is_paid": order.is_paid, "stripe_status": intent["status"]}})
 
             else:
@@ -275,18 +309,16 @@ class MonCashWebhookView(APIView):
     @extend_schema(tags=["Paiements"], summary="Webhook MonCash", exclude=True)
     def post(self, request):
         try:
-            data = request.data
-            order_id = data.get("orderId") or data.get("order_id")
-            transaction_id = data.get("transactionId") or data.get("transaction_id")
-
-            if order_id:
-                order = Order.objects.filter(id=order_id).first()
-                if order and transaction_id:
-                    payment = MonCashService.retrieve_transaction(transaction_id)
-                    if payment.get("message") == "successful":
-                        order.is_paid = True
-                        order.status = "processing"
-                        order.save(update_fields=["is_paid", "status"])
+            transaction_id = request.data.get("transactionId") or request.data.get("transaction_id")
+            if transaction_id:
+                payment = MonCashService.retrieve_transaction(transaction_id)
+                if payment.get("message") == "successful":
+                    # La commande est dérivée de la RÉFÉRENCE de la transaction (source de
+                    # confiance), pas d'un orderId fourni par l'appelant.
+                    prefix = str(payment.get("reference", "")).split("-")[0]
+                    order = Order.objects.filter(id=prefix).first() if prefix.isdigit() else None
+                    if order:
+                        _apply_moncash_success(order, payment)
         except Exception as e:
             logger.error(f"MonCash webhook error: {e}")
 

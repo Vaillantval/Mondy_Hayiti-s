@@ -98,6 +98,7 @@ def payment_success(request):
             order = get_object_or_404(Order, stripe_payment_intent=payment_intent_id)
             order.is_paid = True
             order.status = "processing"
+            order.payment_status = "paid"
             order.payment_method = "Stripe"
             order.save()
             CartService.clear_cart(request)
@@ -251,6 +252,7 @@ def moncash_callback(request):
 
         order.is_paid        = True
         order.status         = "processing"
+        order.payment_status = "paid"
         order.payment_method = "MonCash"
         order.save()
 
