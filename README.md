@@ -102,12 +102,15 @@ dépôt) et internationales (Stripe / carte bancaire).
 
 - Espace communautaire en plusieurs salons thématiques (type groupe WhatsApp / Discord)
 - Lecture publique configurable par salon, écriture réservée aux membres connectés
-- Messages avec images (jusqu'à 4), réponses, **tag d'un produit**, **mentions @** et sélecteur d'emojis
+- Messages avec images (jusqu'à 4), **notes vocales** 🎤, réponses, **tag d'un produit**,
+  **mentions @** et sélecteur d'emojis
 - Réactions emoji et épinglage de messages
 - Suivi de salon (auto-abonnement) et **notifications** in-app (cloche) + **push** (mobile FCM / Web Push)
+- **Indicateur « en train d'écrire »** et **accusés de lecture** : « vu par » côté admin en
+  communauté, ✓✓ dans le chat support — avec **réglage de confidentialité** par utilisateur
 - Mise à jour quasi temps réel par polling (sans WebSocket, compatible WSGI)
 - **Messagerie privée « Contacter un admin »** : conversation 1-to-1 client ↔ équipe
-  (inbox partagée côté admin, bouton flottant animé côté client)
+  (inbox partagée côté admin, bouton flottant animé côté client, notes vocales & images)
 - Modération directement dans l'UI (pas seulement l'admin Django) : bannissement global,
   mute par salon, verrouillage de salon, suppression / épingle, gestion des salons
 - Expérience mobile dédiée (chat plein écran) et **API REST complète** pour l'app Android
@@ -273,12 +276,16 @@ Mondy_Hayiti-s/
 │   ├── firebase_config.py
 │   └── signals.py
 │
-├── community/                  # Espace communautaire (chat multi-salons)
-│   ├── models.py               # Channel, Message, MessageAttachment,
-│   │                           # MessageReaction, CommunityBan, ChannelMute
+├── community/                  # Espace communautaire + support privé
+│   ├── models.py               # Channel, Message(+audio), Reaction, Subscription,
+│   │                           # Notification, WebPushToken, ChannelRead, Ban, Mute,
+│   │                           # Conversation, DirectMessage (support 1-to-1)
 │   ├── permissions.py          # Règles lecture/écriture partagées web + API
-│   ├── views.py                # Vues web (feed polling, post, réactions, modération)
-│   ├── signals.py              # Notification FCM des admins
+│   ├── views.py                # Vues communauté (feed polling, post, réactions, modération, vu-par)
+│   ├── support_views.py        # Messagerie privée client ↔ admin (inbox)
+│   ├── notify.py               # Notifications in-app + push (mention, réponse, salon, support)
+│   ├── typing.py               # Indicateur « en train d'écrire » (cache, TTL)
+│   ├── signals.py              # Déclenche les notifications à chaque message
 │   └── admin.py                # Modération (ban, mute, suppression, épingle)
 │
 ├── templates/                  # Templates HTML Django
@@ -421,13 +428,16 @@ Authorization: Bearer <access_token>
 | Méthode | Endpoint                                      | Description                              |
 |---------|-----------------------------------------------|------------------------------------------|
 | GET     | `/api/community/channels/`                    | Salons lisibles (+ `can_write`, `is_following`) |
-| GET/POST| `/api/community/channels/{slug}/messages/`    | Lire (polling `?after=`) / publier (texte, image, tag produit, réponse) |
+| GET/POST| `/api/community/channels/{slug}/messages/`    | Lire (polling `?after=`) / publier (texte, image, **note vocale**, tag produit, réponse) |
 | POST    | `/api/community/channels/{slug}/subscribe/`   | Suivre / ne plus suivre un salon         |
+| POST    | `/api/community/channels/{slug}/typing/`      | Ping « en train d'écrire »               |
 | POST    | `/api/community/messages/{id}/react/`         | Réagir à un message (toggle emoji)       |
 | DELETE  | `/api/community/messages/{id}/`               | Supprimer un message (auteur ou admin)   |
+| GET     | `/api/community/messages/{id}/readers/`       | « Vu par » — lecteurs d'un message (admin)|
 | GET     | `/api/community/users/search/?q=`             | Recherche d'utilisateurs (@mention)      |
 | GET/POST| `/api/community/notifications/`               | Notifications + non-lus / marquer lu     |
-| GET/POST| `/api/community/support/messages/`            | Ma conversation avec le support          |
+| GET/POST| `/api/community/settings/read-receipts/`      | Confidentialité des accusés de lecture   |
+| GET/POST| `/api/community/support/messages/`            | Ma conversation avec le support (+ typing)|
 | GET     | `/api/community/support/inbox/`               | Inbox des conversations clients (admin)  |
 | GET/POST| `/api/community/support/inbox/{id}/messages/` | Conversation d'un client (admin)         |
 | POST    | `/api/community/messages/{id}/ban-author/`    | Bannir l'auteur (admin)                  |
@@ -435,7 +445,8 @@ Authorization: Bearer <access_token>
 | POST    | `/api/community/channels/{slug}/lock/`        | Verrouiller / cycler l'accès (admin)     |
 | GET/POST/PATCH | `/api/community/manage/channels/`      | Gérer les salons (admin)                 |
 
-> Détails complets (payloads, polling, modération, support, notifications) dans [`API.md`](API.md#communauté--apicommunity).
+> Détails complets (payloads, polling, notes vocales, accusés de lecture, frappe, modération,
+> support, notifications) dans [`API.md`](API.md#communauté--apicommunity).
 
 ---
 

@@ -1,6 +1,6 @@
-# MatStore Haiti — API REST
+# Hayiti's — API REST
 
-**Base URL** : `https://matstorehaiti.online/api/`
+**Base URL** : `https://hayitis.com/api/`
 **Auth** : Bearer JWT (`Authorization: Bearer <access_token>`)
 **Docs interactives** : `/api/docs/` (Swagger) · `/api/redoc/` (ReDoc)
 **Format des erreurs** :
@@ -250,14 +250,19 @@ images et réactions. La mise à jour temps réel se fait par **polling** (`?aft
 | POST | `/community/messages/{id}/react/` | Requis | Réagir à un message (toggle) |
 | DELETE | `/community/messages/{id}/` | Propriétaire ou admin | Supprimer un message (suppression douce) |
 | POST | `/community/messages/{id}/` | Admin | Épingler / désépingler un message |
+| POST | `/community/channels/{slug}/typing/` | Requis | Ping « en train d'écrire » dans un salon |
 | GET | `/community/users/search/?q=` | Requis | Rechercher des utilisateurs (autocomplete @mention) |
 
-**Notifications**
+> Le **feed** d'un salon renvoie aussi `typing` (personnes en train d'écrire). Chaque message
+> peut porter une **note vocale** (`audio` + `audio_duration`).
+
+**Notifications & confidentialité**
 
 | Méthode | Endpoint | Auth | Description |
 |---------|----------|------|-------------|
 | GET | `/community/notifications/` | Requis | Mes notifications + nombre de non-lus |
 | POST | `/community/notifications/` | Requis | Marquer comme lues (toutes, ou `id` précis) |
+| GET/POST | `/community/settings/read-receipts/` | Requis | État / activation de mes accusés de lecture (confidentialité) |
 
 **Support privé (client ↔ équipe admin)**
 
@@ -265,14 +270,20 @@ images et réactions. La mise à jour temps réel se fait par **polling** (`?aft
 |---------|----------|------|-------------|
 | GET | `/community/support/messages/` | Requis | Ma conversation avec le support (polling) |
 | POST | `/community/support/messages/` | Requis (client) | Envoyer un message au support (multipart) |
+| POST | `/community/support/typing/` | Requis (client) | Ping « en train d'écrire » (support) |
 | GET | `/community/support/inbox/` | Admin | Liste des conversations clients |
 | GET | `/community/support/inbox/{id}/messages/` | Admin | Messages d'une conversation |
 | POST | `/community/support/inbox/{id}/messages/` | Admin | Répondre au client (multipart) |
+| POST | `/community/support/inbox/{id}/typing/` | Admin | Ping « en train d'écrire » (admin) |
+
+> Les messages support portent `read` (accusé de lecture, **admin uniquement**, `null` côté
+> client) ; le feed renvoie `read_ids` (✓✓ à mettre à jour) et `typing`.
 
 **Modération (admin — `is_staff`)**
 
 | Méthode | Endpoint | Auth | Description |
 |---------|----------|------|-------------|
+| GET | `/community/messages/{id}/readers/` | Admin | « Vu par » — lecteurs d'un message |
 | POST | `/community/messages/{id}/ban-author/` | Admin | Bannir / débannir l'auteur (toggle) |
 | POST | `/community/messages/{id}/mute-author/` | Admin | Mute / unmute l'auteur dans ce salon (toggle) |
 | POST | `/community/channels/{slug}/lock/` | Admin | Cycle d'accès écriture (ouvert → verrouillé → admins) |
