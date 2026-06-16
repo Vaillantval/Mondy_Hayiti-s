@@ -308,14 +308,18 @@ class SettingAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "show_app_banner",
+                    "apk_url",
                     "apk_file",
                     "apk_version",
                     "apk_description",
                 ),
                 "description": (
-                    "<strong>APK :</strong> uploadez votre fichier .apk pour le rendre téléchargeable.<br>"
-                    "Activez <em>Afficher le bandeau</em> pour inviter les visiteurs à télécharger l'app.<br>"
-                    "Le bandeau s'affiche automatiquement dans le header dès qu'un APK est disponible et le bandeau activé."
+                    "<strong>Recommandé — Lien APK :</strong> hébergez l'APK sur une "
+                    "<em>GitHub Release</em> et collez l'URL directe dans <em>Apk url</em>. "
+                    "Pas d'upload lourd, téléchargement rapide pour les utilisateurs.<br>"
+                    "<strong>Alternative — Upload :</strong> ou uploadez le fichier .apk dans <em>Apk file</em> "
+                    "(plus lent pour les gros fichiers). Si les deux sont renseignés, le lien est prioritaire.<br>"
+                    "Activez <em>Afficher le bandeau</em> pour inviter les visiteurs à télécharger l'app."
                 ),
             },
         ),
@@ -333,11 +337,15 @@ class SettingAdmin(admin.ModelAdmin):
     display_logo.short_description = "Logo"
 
     def display_apk(self, obj):
-        if obj.apk_file:
+        url = obj.apk_url or (obj.apk_file.url if obj.apk_file else None)
+        if url:
+            source = "lien externe" if obj.apk_url else "fichier"
             return format_html(
                 '<a href="{}" target="_blank" style="color:#28a745;font-weight:600;">'
-                '<i class="fas fa-android"></i> Télécharger APK</a>',
-                obj.apk_file.url,
+                '<i class="fas fa-android"></i> Télécharger APK</a> '
+                '<span style="color:#999;font-size:11px;">({})</span>',
+                url,
+                source,
             )
         return mark_safe('<span style="color:#999;">— Aucun APK</span>')
 

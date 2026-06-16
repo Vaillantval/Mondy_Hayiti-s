@@ -166,7 +166,7 @@ def site_settings(request):
         "my_mega_categories": my_mega_categories,
         "mega_collections": mega_collections,
         # Application mobile
-        "show_app_banner": settings_obj.show_app_banner and bool(settings_obj.apk_file),
+        "show_app_banner": settings_obj.show_app_banner and bool(settings_obj.apk_file or settings_obj.apk_url),
         "apk_version": settings_obj.apk_version,
         "apk_description": settings_obj.apk_description,
     }

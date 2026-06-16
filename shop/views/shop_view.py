@@ -173,9 +173,19 @@ def page_detail(request, slug):
 
 
 def download_apk(request):
-    """Sert le fichier APK en téléchargement direct."""
+    """Sert le fichier APK en téléchargement.
+
+    Si un lien externe (apk_url) est renseigné, on redirige vers celui-ci
+    (hébergement type GitHub Release) ; sinon on sert le fichier local.
+    """
     setting = Setting.objects.first()
-    if not setting or not setting.apk_file:
+    if not setting:
+        raise Http404("Aucun APK disponible pour le moment.")
+
+    if setting.apk_url:
+        return redirect(setting.apk_url)
+
+    if not setting.apk_file:
         raise Http404("Aucun APK disponible pour le moment.")
 
     apk_path = setting.apk_file.path

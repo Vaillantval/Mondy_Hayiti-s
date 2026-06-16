@@ -58,6 +58,16 @@ class Setting(models.Model):
         validators=[validate_apk_extension],
         help_text="Fichier APK Android (.apk uniquement). Laisser vide si non disponible.",
     )
+    apk_url = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text=(
+            "Lien direct vers l'APK hébergé ailleurs (ex : GitHub Release). "
+            "Recommandé pour les gros fichiers : si renseigné, il est utilisé en "
+            "priorité et aucun upload n'est nécessaire."
+        ),
+    )
     apk_version = models.CharField(
         max_length=20,
         blank=True,
