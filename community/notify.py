@@ -83,7 +83,12 @@ def notify_for_message(message):
     ChannelSubscription.objects.get_or_create(channel=channel, user=author)
 
     actor_name = _name(author)
-    excerpt = (message.content[:80] or "📷 image")
+    if message.content:
+        excerpt = message.content[:80]
+    elif message.audio:
+        excerpt = "🎤 note vocale"
+    else:
+        excerpt = "📷 image"
     notified = {author.id}  # évite doublons et auto-notification
 
     # 1) Réponse à un message
@@ -165,7 +170,12 @@ def _create_support_notif(recipient, actor, conversation):
 def notify_support_message(dm):
     """Notifie le destinataire d'un message support (best-effort)."""
     conv = dm.conversation
-    excerpt = dm.content[:80] or "📷 image"
+    if dm.content:
+        excerpt = dm.content[:80]
+    elif dm.audio:
+        excerpt = "🎤 note vocale"
+    else:
+        excerpt = "📷 image"
 
     if dm.is_admin:
         # Réponse de l'équipe → notifier le client
