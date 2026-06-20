@@ -15,14 +15,14 @@ from shop.models.Setting import Setting
 
 
 def _build_cart_response(user):
-    items = CartItem.objects.filter(user=user).select_related("product").prefetch_related(
-        "product__images", "product__categories"
-    )
+    items = CartItem.objects.filter(user=user).select_related(
+        "product", "product_price"
+    ).prefetch_related("product__images", "product__categories")
     setting = Setting.objects.first()
     tax_rate = (setting.taxe_rate / 100) if setting else 0
     currency = setting.base_currency if setting else "HTG"
 
-    subtotal_ht = sum(item.product.solde_price * item.quantity for item in items)
+    subtotal_ht = sum(item.unit_price * item.quantity for item in items)
     tax_amount = round(subtotal_ht * tax_rate, 2)
     subtotal_ttc = round(subtotal_ht + tax_amount, 2)
     total_items = sum(item.quantity for item in items)
@@ -62,6 +62,7 @@ class CartAddView(APIView):
         serializer.is_valid(raise_exception=True)
         product = serializer.validated_data["product_id"]
         quantity = serializer.validated_data["quantity"]
+        product_price = serializer.validated_data.get("product_price")
 
         item, created = CartItem.objects.get_or_create(
             user=request.user, product=product, defaults={"quantity": 0}
@@ -70,7 +71,8 @@ class CartAddView(APIView):
         if product.stock < new_qty:
             raise ApiError("INSUFFICIENT_STOCK", f"Stock insuffisant. Disponible : {product.stock}")
         item.quantity = new_qty
-        item.save(update_fields=["quantity"])
+        item.product_price = product_price
+        item.save(update_fields=["quantity", "product_price"])
 
         return Response(_build_cart_response(request.user), status=status.HTTP_201_CREATED)
 

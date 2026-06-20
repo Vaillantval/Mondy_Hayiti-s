@@ -3,6 +3,7 @@ from rest_framework import serializers
 from api.models import CartItem
 from api.products.serializers import ProductListSerializer
 from shop.models.Product import Product
+from shop.models.ProductPrice import ProductPrice
 from shop.models.Setting import Setting
 
 
@@ -13,15 +14,21 @@ class CartItemSerializer(serializers.ModelSerializer):
         write_only=True,
         source="product",
     )
+    price_id = serializers.IntegerField(source="product_price_id", read_only=True, allow_null=True)
+    price_label = serializers.CharField(source="price_label", read_only=True)
+    unit_price = serializers.FloatField(source="unit_price", read_only=True)
     subtotal = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
-        fields = ["id", "product", "product_id", "quantity", "subtotal", "created_at"]
+        fields = [
+            "id", "product", "product_id", "quantity",
+            "price_id", "price_label", "unit_price", "subtotal", "created_at",
+        ]
         read_only_fields = ["id", "created_at"]
 
     def get_subtotal(self, obj):
-        return round(obj.product.solde_price * obj.quantity, 2)
+        return round(obj.unit_price * obj.quantity, 2)
 
 
 class AddToCartSerializer(serializers.Serializer):
@@ -29,6 +36,7 @@ class AddToCartSerializer(serializers.Serializer):
         queryset=Product.objects.filter(is_available=True)
     )
     quantity = serializers.IntegerField(min_value=1, default=1)
+    price_id = serializers.IntegerField(required=False, allow_null=True, default=None)
 
     def validate(self, attrs):
         product = attrs["product_id"]
@@ -37,6 +45,16 @@ class AddToCartSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {"quantity": f"Stock insuffisant. Disponible : {product.stock}"}
             )
+        price_id = attrs.get("price_id")
+        if price_id is not None:
+            pp = ProductPrice.objects.filter(id=price_id, product=product).first()
+            if pp is None:
+                raise serializers.ValidationError(
+                    {"price_id": "Variante de prix introuvable pour ce produit."}
+                )
+            attrs["product_price"] = pp
+        else:
+            attrs["product_price"] = None
         return attrs
 
 
