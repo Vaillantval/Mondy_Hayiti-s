@@ -3,6 +3,13 @@ from rest_framework import serializers
 from shop.models.Category import Category
 from shop.models.Image import Image
 from shop.models.Product import Product
+from shop.models.ProductPrice import ProductPrice
+
+
+class ProductPriceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductPrice
+        fields = ["id", "label", "price", "regular_price", "order"]
 
 
 class CategoryBriefSerializer(serializers.ModelSerializer):
@@ -59,12 +66,13 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 class ProductDetailSerializer(ProductListSerializer):
     categories = CategoryBriefSerializer(many=True, read_only=True)
+    prices = ProductPriceSerializer(many=True, read_only=True)
 
     class Meta(ProductListSerializer.Meta):
         fields = ProductListSerializer.Meta.fields + [
             "more_description", "additional_info", "brand",
             "is_best_seller", "is_featured", "is_new_arrival",
-            "is_special_offer", "categories", "updated_at",
+            "is_special_offer", "categories", "updated_at", "prices",
         ]
 
 

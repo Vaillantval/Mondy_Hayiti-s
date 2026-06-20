@@ -51,11 +51,33 @@ class ProductDetailView(generics.RetrieveAPIView):
     lookup_field = "slug"
 
     def get_queryset(self):
-        return Product.objects.prefetch_related("images", "categories", "reviews")
+        return Product.objects.prefetch_related("images", "categories", "reviews", "prices")
 
     @extend_schema(tags=["Produits"], summary="Détail d'un produit")
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+
+
+class ProductRelatedView(generics.ListAPIView):
+    """Produits similaires (même catégorie, hors produit courant)."""
+    serializer_class = ProductListSerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
+
+    @extend_schema(tags=["Produits"], summary="Produits similaires")
+    def get(self, request, slug, *args, **kwargs):
+        from django.shortcuts import get_object_or_404
+        product = get_object_or_404(Product, slug=slug)
+        related = (
+            Product.objects.filter(
+                categories__in=product.categories.all(), is_available=True
+            )
+            .exclude(pk=product.pk)
+            .prefetch_related("images", "categories", "reviews")
+            .distinct()[:8]
+        )
+        serializer = self.get_serializer(related, many=True)
+        return Response({"success": True, "results": serializer.data})
 
 
 class FeaturedProductsView(generics.ListAPIView):

@@ -6,6 +6,7 @@ from api.products.views import (
     OnSaleProductsView,
     ProductDetailView,
     ProductListView,
+    ProductRelatedView,
     ProductSearchView,
 )
 
@@ -15,5 +16,6 @@ urlpatterns = [
     path("featured/", FeaturedProductsView.as_view(), name="api-product-featured"),
     path("new-arrivals/", NewArrivalsView.as_view(), name="api-product-new-arrivals"),
     path("on-sale/", OnSaleProductsView.as_view(), name="api-product-on-sale"),
+    path("<slug:slug>/related/", ProductRelatedView.as_view(), name="api-product-related"),
     path("<slug:slug>/", ProductDetailView.as_view(), name="api-product-detail"),
 ]
