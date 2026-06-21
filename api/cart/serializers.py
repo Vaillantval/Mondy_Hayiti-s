@@ -15,8 +15,8 @@ class CartItemSerializer(serializers.ModelSerializer):
         source="product",
     )
     price_id = serializers.IntegerField(source="product_price_id", read_only=True, allow_null=True)
-    price_label = serializers.CharField(source="price_label", read_only=True)
-    unit_price = serializers.FloatField(source="unit_price", read_only=True)
+    price_label = serializers.CharField(read_only=True)
+    unit_price = serializers.FloatField(read_only=True)
     subtotal = serializers.SerializerMethodField()
 
     class Meta:
