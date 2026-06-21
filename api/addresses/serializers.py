@@ -5,6 +5,12 @@ from dashboard.models.Adress import Adress
 
 class AddressSerializer(serializers.ModelSerializer):
     is_default = serializers.SerializerMethodField()
+    # Ces champs ont été retirés du formulaire mobile — ils restent en DB
+    # mais ne sont plus obligatoires à l'envoi.
+    name = serializers.CharField(required=False, allow_blank=True, default='')
+    full_name = serializers.CharField(required=False, allow_blank=True, default='')
+    code_postal = serializers.CharField(required=False, allow_blank=True, default='')
+    country = serializers.CharField(required=False, allow_blank=True, default='Haiti')
 
     class Meta:
         model = Adress
