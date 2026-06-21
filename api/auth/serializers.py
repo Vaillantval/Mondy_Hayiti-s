@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+from api.exceptions import ApiError
 
 User = get_user_model()
 
@@ -57,12 +58,9 @@ class LoginSerializer(serializers.Serializer):
             except User.DoesNotExist:
                 pass
         if not user:
-            raise serializers.ValidationError(
-                {"non_field_errors": "Identifiants incorrects."},
-                code="INVALID_CREDENTIALS",
-            )
+            raise ApiError("INVALID_CREDENTIALS")
         if not user.is_active:
-            raise serializers.ValidationError({"non_field_errors": "Ce compte est désactivé."})
+            raise ApiError("ACCOUNT_DISABLED")
         attrs["user"] = user
         return attrs
 

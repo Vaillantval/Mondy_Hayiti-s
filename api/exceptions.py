@@ -10,7 +10,8 @@ ERROR_CODES = {
     "INSUFFICIENT_STOCK": "Stock insuffisant pour la quantité demandée.",
     "ORDER_NOT_CANCELLABLE": "Cette commande ne peut plus être annulée.",
     "PAYMENT_FAILED": "Le paiement a échoué. Veuillez réessayer.",
-    "INVALID_CREDENTIALS": "Identifiants incorrects.",
+    "INVALID_CREDENTIALS": "Email ou mot de passe incorrect.",
+    "ACCOUNT_DISABLED": "Ce compte est désactivé.",
     "TOKEN_EXPIRED": "Le token a expiré. Veuillez vous reconnecter.",
     "PERMISSION_DENIED": "Vous n'avez pas la permission d'effectuer cette action.",
 }
@@ -66,6 +67,7 @@ class ApiError(exceptions.APIException):
             "ORDER_NOT_CANCELLABLE": status.HTTP_409_CONFLICT,
             "PAYMENT_FAILED": status.HTTP_402_PAYMENT_REQUIRED,
             "INVALID_CREDENTIALS": status.HTTP_401_UNAUTHORIZED,
+            "ACCOUNT_DISABLED": status.HTTP_403_FORBIDDEN,
             "TOKEN_EXPIRED": status.HTTP_401_UNAUTHORIZED,
             "PERMISSION_DENIED": status.HTTP_403_FORBIDDEN,
         }

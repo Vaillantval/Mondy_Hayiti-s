@@ -458,3 +458,33 @@ FIREBASE_WEB_PUSH_ENABLED = bool(
     and FIREBASE_WEB_CONFIG["appId"]
     and FIREBASE_VAPID_KEY
 )
+
+# --- LOGGING — affiche les erreurs 500 dans Railway logs ---
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "railway": {
+            "format": "[{levelname}] {name}: {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "railway",
+        },
+    },
+    "loggers": {
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+    },
+}
