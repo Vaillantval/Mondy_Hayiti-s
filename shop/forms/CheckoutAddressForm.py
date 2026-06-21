@@ -15,32 +15,22 @@ class CheckoutAddressForm(forms.ModelForm):
         model = Adress
         fields = (
             "email",
-            "name",
             "full_name",
             "phone",
             "street",
-            "code_postal",
             "city",
-            "country",
             "more_details",
             "address_type",
         )
 
         widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control custom-text-input"}),
             "full_name": forms.TextInput(
                 attrs={"class": "form-control custom-text-input"}
             ),
             "street": forms.TextInput(
                 attrs={"class": "form-control custom-text-input"}
             ),
-            "code_postal": forms.TextInput(
-                attrs={"class": "form-control custom-text-input"}
-            ),
             "city": forms.TextInput(attrs={"class": "form-control custom-text-input"}),
-            "country": forms.TextInput(
-                attrs={"class": "form-control custom-text-input"}
-            ),
             "phone": forms.TextInput(
                 attrs={"class": "form-control custom-text-input", "id": "id_phone"}
             ),

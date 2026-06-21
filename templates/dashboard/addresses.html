@@ -137,13 +137,12 @@
             {% if addr.adress_type == 'shipping' %}Livraison{% else %}Facturation{% endif %}
         </span>
 
-        <div class="addr-name">{{ addr.name }}</div>
-        <div class="addr-full">{{ addr.full_name }}</div>
+        <div class="addr-name">{{ addr.full_name }}</div>
 
         <div class="addr-line"><i class="ti-location-pin"></i> {{ addr.street }}</div>
         <div class="addr-line">
             <i class="ti-map"></i>
-            {{ addr.code_postal }} {{ addr.city }}{% if addr.country %}, {{ addr.country }}{% endif %}
+            {{ addr.city }}
         </div>
         {% if addr.phone %}
         <div class="addr-line"><i class="ti-mobile"></i> {{ addr.phone }}</div>
@@ -159,7 +158,7 @@
                 <i class="ti-pencil"></i> Modifier
             </a>
             <button class="addr-btn addr-btn-delete"
-                    onclick="openDeleteModal({{ addr.pk }}, '{{ addr.name|escapejs }}')">
+                    onclick="openDeleteModal({{ addr.pk }}, '{{ addr.full_name|escapejs }}')">
                 <i class="ti-trash"></i> Supprimer
             </button>
         </div>
