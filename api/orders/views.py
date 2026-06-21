@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.exceptions import ApiError
+from api.models import CartItem
 from api.orders.serializers import CreateOrderSerializer, OrderSerializer, OrderTrackingSerializer
 from api.pagination import StandardResultsPagination
 from shop.models.Carrier import Carrier
@@ -47,7 +48,9 @@ def _build_order_from_request(user, validated_data):
     for item in items_data:
         product = item["product_id"]
         qty = item["quantity"]
-        sub_ht = product.solde_price * qty
+        product_price = item.get("product_price")
+        unit_price = product_price.price if product_price else product.solde_price
+        sub_ht = unit_price * qty
         taxe_amount = sub_ht * tax_rate
         sub_ttc = sub_ht + taxe_amount
 
@@ -58,8 +61,8 @@ def _build_order_from_request(user, validated_data):
                 "product": product,
                 "product_name": product.name,
                 "product_description": product.description,
-                "solde_price": product.solde_price,
-                "regular_price": product.regular_price,
+                "solde_price": unit_price,
+                "regular_price": product_price.regular_price if product_price else product.regular_price,
                 "quantity": qty,
                 "taxe": round(taxe_amount, 2),
                 "sub_total_ht": round(sub_ht, 2),
@@ -144,6 +147,8 @@ class OrderListCreateView(APIView):
         serializer = CreateOrderSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         order = _build_order_from_request(request.user, serializer.validated_data)
+        # Clear the user's cart now that the order is confirmed.
+        CartItem.objects.filter(user=request.user).delete()
         return Response(
             {"success": True, "data": OrderSerializer(order).data},
             status=status.HTTP_201_CREATED,

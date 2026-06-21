@@ -4,12 +4,14 @@ from shop.models.Carrier import Carrier
 from shop.models.Order import Order
 from shop.models.OrderDetail import OrderDetail
 from shop.models.Product import Product
+from shop.models.ProductPrice import ProductPrice
 from shop.models.Setting import Setting
 
 
 class OrderItemInputSerializer(serializers.Serializer):
     product_id = serializers.PrimaryKeyRelatedField(queryset=Product.objects.filter(is_available=True))
     quantity = serializers.IntegerField(min_value=1)
+    price_id = serializers.IntegerField(required=False, allow_null=True, default=None)
 
 
 class DeliveryAddressSerializer(serializers.Serializer):
@@ -47,6 +49,16 @@ class CreateOrderSerializer(serializers.Serializer):
                         f"Disponible : {product.stock}, demandé : {qty}"
                     }
                 )
+            price_id = item.get("price_id")
+            if price_id:
+                pp = ProductPrice.objects.filter(id=price_id, product=product).first()
+                if pp is None:
+                    raise serializers.ValidationError(
+                        {"items": f"Variante de prix introuvable pour '{product.name}'."}
+                    )
+                item["product_price"] = pp
+            else:
+                item["product_price"] = None
         return attrs
 
 
